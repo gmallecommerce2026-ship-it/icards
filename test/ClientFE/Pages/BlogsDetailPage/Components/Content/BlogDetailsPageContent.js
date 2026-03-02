@@ -1,0 +1,170 @@
+// FrontendClient/Pages/BlogsDetailPage/Components/Content/BlogDetailsPageContent.js
+
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import api from '../../../../services/api';
+import SEO from '../../../../Features/SEO';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import '../../../../tiptap-content.css';
+import './BlogDetailsPageContent.css';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const BlogDetailsPageContent = () => {
+    const [blog, setBlog] = useState(null);
+    const [latestPosts, setLatestPosts] = useState([]); // ++ MỚI: State cho bài mới nhất
+    const [loading, setLoading] = useState(true);
+    const [scrollWidth, setScrollWidth] = useState(0);
+    const { slug } = useParams();
+    const navigate = useNavigate();
+    const contentRef = useRef(null);
+
+    // --- 1. Effect: Scroll Progress Bar (Giữ nguyên) ---
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (scrollTop / docHeight) * 100;
+            setScrollWidth(scrolled);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // --- 2. Fetch Data ---
+    useEffect(() => {
+        const fetchBlogDetails = async () => {
+            setLoading(true);
+            try {
+                const response = await api.get(`/pages/${slug}`);
+                // Cấu trúc response mới: { data: pageObject, related: { latestPosts: [] } }
+                const pageData = response.data?.data;
+                const relatedData = response.data?.related;
+
+                setBlog(pageData);
+                if (relatedData?.latestPosts) {
+                    setLatestPosts(relatedData.latestPosts);
+                }
+                
+                setTimeout(() => {
+                    gsap.fromTo(".blog-animate", 
+                        { y: 20, opacity: 0 }, 
+                        { y: 0, opacity: 1, duration: 0.6, stagger: 0.1 }
+                    );
+                }, 100);
+
+            } catch (err) {
+                console.error("Lỗi tải bài viết:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        if (slug) fetchBlogDetails();
+    }, [slug]);
+
+    if (loading) return <div className="loading-wrapper">Đang tải nội dung...</div>;
+    if (!blog) return <div className="loading-wrapper">Bài viết không tồn tại.</div>;
+
+    const blogHtmlContent = blog.content || '';
+    
+    // ++ MỚI: Lấy relatedProducts từ dữ liệu thật
+    const relatedProducts = blog.relatedProducts || [];
+
+    return (
+        <>
+            <SEO title={blog.title} description={blog.seo?.metaDescription || blog.excerpt} />
+
+            <div className="scroll-progress-container">
+                <div className="scroll-progress-bar" style={{ width: `${scrollWidth}%` }}></div>
+            </div>
+
+            <div className="luxury-blog-detail-wrapper">
+                <div onClick={() => navigate(-1)} className="nav-back">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    Quay lại
+                </div>
+
+                <div className="blog-layout">
+                    {/* --- CỘT TRÁI (Giữ nguyên) --- */}
+                    <article className="main-content" ref={contentRef}>
+                        <header className="blog-header blog-animate">
+                            <span className="blog-category-badge">{blog.category?.name || 'Blog'}</span>
+                            <h1 className="blog-title">{blog.title}</h1>
+                            <div className="author-meta">
+                                <img src={blog.author?.avatar || "https://ui-avatars.com/api/?name=Admin"} alt="Author" className="author-avatar" />
+                                <div className="author-info">
+                                    <h4>{blog.author?.name || 'Ban biên tập'}</h4>
+                                    <span>{new Date(blog.createdAt).toLocaleDateString('vi-VN')}</span>
+                                </div>
+                            </div>
+                        </header>
+
+                        {blog.thumbnail && (
+                            <div className="blog-thumbnail blog-animate" style={{marginBottom: '2rem', borderRadius: '8px', overflow: 'hidden'}}>
+                                <img src={blog.thumbnail} alt={blog.title} style={{width:'100%', display:'block'}} />
+                            </div>
+                        )}
+
+                        <div className="blog-content-body blog-animate ck-content" dangerouslySetInnerHTML={{ __html: blogHtmlContent }} />
+                    </article>
+
+                    {/* --- CỘT PHẢI: SIDEBAR --- */}
+                    <aside className="sidebar-wrapper">
+                        <div className="sidebar-sticky">
+                            
+                            {/* Widget 1: Sản phẩm liên quan (REAL DATA) */}
+                            {relatedProducts.length > 0 && (
+                                <div className="widget-box blog-animate">
+                                    <div className="widget-title" style={{ color: '#2563eb' }}>Sản phẩm gợi ý</div>
+                                    <div className="products-list">
+                                        {relatedProducts.map(prod => (
+                                            <Link to={`/products/${prod.slug || prod._id}`} key={prod._id} className="mini-product-card">
+                                                <img 
+                                                    src={prod.images?.[0]?.url || prod.thumbnail || "https://placehold.co/100"} 
+                                                    alt={prod.name} 
+                                                    className="mini-product-img" 
+                                                />
+                                                <div className="mini-product-info">
+                                                    <h5>{prod.name}</h5>
+                                                    <div className="price-tag">
+                                                        {prod.price?.toLocaleString('vi-VN')}đ
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Widget 2: Bài viết mới nhất (REAL DATA) */}
+                            {latestPosts.length > 0 && (
+                                <div className="widget-box blog-animate">
+                                    <div className="widget-title">Bài viết mới nhất</div>
+                                    <ul style={{listStyle: 'none', padding: 0, margin: 0}}>
+                                        {latestPosts.map(post => (
+                                            <li key={post._id} style={{marginBottom: '1rem', fontSize: '0.9rem'}}>
+                                                <Link 
+                                                    to={`/blog/${post.slug}`} 
+                                                    style={{textDecoration: 'none', color: '#374151', fontWeight: '500', display:'block', marginBottom: '4px'}}
+                                                >
+                                                    {post.title}
+                                                </Link>
+                                                <span style={{fontSize: '0.75rem', color: '#9ca3af'}}>
+                                                    {new Date(post.createdAt).toLocaleDateString('vi-VN')}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </>
+    );
+};
+
+export default BlogDetailsPageContent;

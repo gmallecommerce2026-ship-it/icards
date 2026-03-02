@@ -1,0 +1,125 @@
+/* FE/src/tiptap-content.css - Tệp CSS hợp nhất */
+
+/* Áp dụng cho cả hai môi trường: 
+  - .ProseMirror (trong editor của admin) 
+  - .tiptap-content (ngoài website FE) 
+*/
+.ProseMirror,
+.tiptap-content {
+    line-height: 1.6;
+    font-size: 16px;
+    color: #333;
+    outline: none; /* Loại bỏ đường viền khi focus vào editor */
+    
+    /* Sửa lỗi từ bị tràn ra ngoài */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.ProseMirror > *,
+.tiptap-content > * {
+    margin-bottom: 1.25em;
+}
+
+.ProseMirror h1, .tiptap-content h1,
+.ProseMirror h2, .tiptap-content h2,
+.ProseMirror h3, .tiptap-content h3,
+.ProseMirror h4, .tiptap-content h4 {
+    font-weight: 700;
+    line-height: 1.2;
+    margin-top: 1.5em;
+}
+
+.ProseMirror h1, .tiptap-content h1 { font-size: 2em; }
+.ProseMirror h2, .tiptap-content h2 { font-size: 1.8em; }
+.ProseMirror h3, .tiptap-content h3 { font-size: 1.5em; }
+.ProseMirror h4, .tiptap-content h4 { font-size: 1.2em; }
+
+.ProseMirror a, .tiptap-content a {
+    color: hsl(205, 90%, 48%);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.ProseMirror ul, .tiptap-content ul,
+.ProseMirror ol, .tiptap-content ol {
+    padding-left: 2em;
+}
+
+.ProseMirror blockquote, .tiptap-content blockquote {
+    padding-left: 1.5em;
+    font-style: italic;
+    border-left: 5px solid hsl(0, 0%, 80%);
+}
+
+.ProseMirror hr, .tiptap-content hr {
+    border: 0;
+    height: 1px;
+    background-color: hsl(0, 0%, 87%);
+    margin: 2em 0;
+}
+
+.ProseMirror code, .tiptap-content code {
+  background-color: hsla(0, 0%, 78%, 0.3);
+  padding: .15em;
+  border-radius: 2px;
+}
+
+.ProseMirror pre, .tiptap-content pre {
+  background: #0D0D0D;
+  color: #FFF;
+  font-family: 'JetBrainsMono', monospace;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  white-space: pre-wrap; /* Đảm bảo code block xuống dòng */
+  word-break: break-all;
+}
+
+/* === XỬ LÝ HIỂN THỊ HÌNH ẢNH (QUAN TRỌNG) === */
+
+/* 1. Style chung cho tất cả hình ảnh */
+.ProseMirror img,
+.tiptap-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* 2. Style cho ảnh được chọn trong editor (không ảnh hưởng FE) */
+.ProseMirror img.ProseMirror-selectednode {
+  outline: 3px solid #68CEF8;
+}
+
+/* 3. Căn giữa (mặc định cho ảnh không có data-float) */
+.ProseMirror img:not([data-float]),
+.tiptap-content img:not([data-float]) {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    clear: both; /* Đảm bảo không bị ảnh hưởng bởi float từ các ảnh trước đó */
+}
+
+/* 4. Căn trái (float left) */
+.ProseMirror img[data-float="left"],
+.tiptap-content img[data-float="left"] {
+  float: left;
+  margin-right: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* 5. Căn phải (float right) */
+.ProseMirror img[data-float="right"],
+.tiptap-content img[data-float="right"] {
+  float: right;
+  margin-left: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* 6. Clearfix cho container để xử lý float */
+.ProseMirror::after,
+.tiptap-content::after {
+    content: "";
+    display: table;
+    clear: both;
+}

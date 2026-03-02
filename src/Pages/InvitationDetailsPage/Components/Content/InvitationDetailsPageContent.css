@@ -1,0 +1,294 @@
+/* ==========================================================================
+   CSS cho Trang Chi tiết Thiệp mời (Invitation Details Page)
+   ========================================================================== */
+
+/* ----- Layout Chính ----- */
+.page-container {
+    background-color: var(--color-background);
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 50px;
+    box-sizing: border-box;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    width: 100%;
+    max-width: 1440px;
+}
+
+/* ----- Thanh công cụ Sản phẩm (Toolbar) ----- */
+.product-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 8px;
+    background-color: var(--color-background-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-soft);
+}
+
+.toolbar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 12px 8px;
+    border-radius: 8px; /* Bán kính bo góc nhỏ hơn cho item */
+    transition: background-color 0.2s;
+    min-width: 80px;
+}
+
+.toolbar-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.toolbar-item-label {
+    font-family: var(--font-primary);
+    font-size: 13px;
+    color: var(--color-text-light);
+    text-align: center;
+    line-height: 1.3;
+    font-weight: 500;
+}
+
+/* ----- Hiển thị Sản phẩm ----- */
+.product-display {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+    width: 100%;
+}
+
+.product-display-image {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* ----- Bảng Tùy chỉnh (Customization Panel) ----- */
+.customization-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 365px;
+}
+
+.customization-panel .panel-title {
+    font-family: var(--font-primary);
+    font-size: 28px;
+    color: var(--color-primary);
+    line-height: 1.3;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin: 0;
+}
+
+.customization-panel .panel-description {
+    font-family: var(--font-primary);
+    font-size: 18px;
+    color: var(--color-text-light);
+    font-weight: 500;
+    margin: 0;
+    margin-top: 4px;
+}
+
+.customization-panel .panel-intro-text {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.customization-panel .feature-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.customization-panel .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.customization-panel .feature-checkmark {
+    color: var(--color-primary);
+    padding-top: 3px;
+}
+
+.customization-panel .edit-button {
+    background-color: var(--color-primary);
+    color: var(--color-text-white);
+    width: 100%;
+    padding: 15px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 18px;
+    font-family: var(--font-primary);
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.customization-panel .edit-button:hover {
+    background-color: #1f426b; /* Biến --color-primary-dark */
+}
+
+/* ----- Thông báo (Notification) ----- */
+.notification-popup {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-text-dark);
+    color: var(--color-text-white);
+    padding: 10px 20px;
+    border-radius: 8px;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+}
+
+.notification-popup.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ----- Modal Xem trước (Preview) ----- */
+.preview-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.preview-modal-content {
+    position: relative;
+    padding: 20px;
+    background-color: var(--color-background);
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.preview-modal-canvas {
+    max-width: 80vw;
+    max-height: 80vh;
+    object-fit: contain;
+    border: 1px solid var(--color-border);
+}
+
+.preview-modal-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.preview-modal-nav button {
+    padding: 8px 16px;
+    cursor: pointer;
+    background-color: var(--color-background-light);
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+}
+.preview-modal-nav button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.preview-modal-close-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: var(--color-text-dark);
+    color: var(--color-text-white);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ----- Responsive cho Tablet và Mobile ----- */
+@media (max-width: 1024px) {
+    .main-content {
+        flex-direction: column;
+        align-items: center;
+    }
+    .customization-panel {
+        width: 100%;
+        max-width: 600px;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-container {
+        padding: 20px 15px;
+    }
+    .product-toolbar {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-evenly;
+        flex-wrap: wrap;
+    }
+}
+
+/* Styling cho các vị trí đặt quảng cáo */
+.ads-container {
+    width: 100%;
+    max-width: 1520px;
+    margin: 40px auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 250px;
+    text-align: center;
+}
+
+.placeholder-ad {
+    width: 100%;
+    max-width: 970px; /* Kích thước phổ biến của banner ngang */
+    height: 250px; /* Chiều cao phổ biến của banner ngang */
+    background-color: #f0f0f0;
+    border: 2px dashed #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    color: #888;
+    text-align: center;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.txt-ctn {
+  white-space: pre-wrap !important; 
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+}

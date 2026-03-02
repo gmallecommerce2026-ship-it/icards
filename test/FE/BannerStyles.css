@@ -1,0 +1,95 @@
+/* WebsiteFE/Css/BannerStyles.css */
+
+/* --- Kiểu dáng chung cho Hero Banner --- */
+.hero-section,
+.products-hero,
+.hero-section-invitations,
+.hero-section-pro {
+  width: 100%;
+  height: 60vh; /* Chiều cao mặc định, có thể tùy biến */
+  min-height: 400px; /* Chiều cao tối thiểu để đảm bảo banner không quá nhỏ */
+  max-height: 80vh; /* Chiều cao tối đa theo yêu cầu */
+  
+  /* Cấu hình hiển thị */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  
+  /* Cấu hình nền và hình ảnh */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  color: #ffffff; /* Màu chữ mặc định là trắng */
+  padding: 2rem;
+  box-sizing: border-box;
+  position: relative; /* Cần thiết cho lớp phủ (overlay) */
+  overflow: hidden;
+}
+
+/* Lớp phủ mờ giúp chữ dễ đọc hơn trên mọi ảnh nền */
+.hero-section::before,
+.products-hero::before,
+.hero-section-invitations::before,
+.hero-section-pro::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4); /* Lớp phủ màu đen với độ mờ 40% */
+  z-index: 1;
+}
+
+/* Đảm bảo nội dung hiển thị bên trên lớp phủ */
+.hero-content,
+.invitation-hero-content,
+.tutorial-hero-content,
+/* Áp dụng cho cả div chứa HTML tùy chỉnh */
+.hero-section > div,
+.products-hero > div,
+.hero-section-invitations > div,
+.hero-section-pro > div {
+  position: relative;
+  z-index: 2;
+  max-width: 900px; /* Giới hạn chiều rộng nội dung để dễ đọc */
+  width: 100%;
+}
+
+/* --- Kiểu dáng cho Tiêu đề và Tiêu đề phụ --- */
+.hero-title,
+.invitation-hero-content h1,
+.tutorial-hero-content h1 {
+  font-size: 3.2rem;
+  font-weight: bold;
+  margin: 0 0 0.5rem 0;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6); /* Đổ bóng cho chữ */
+}
+
+.hero-subtitle,
+.invitation-hero-content p,
+.tutorial-hero-content p {
+  font-size: 1.6rem;
+  font-weight: 300;
+  margin: 0;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Nút kêu gọi hành động (CTA) trên trang Mẫu thiệp */
+.invitation-hero-content .cta-button {
+    margin-top: 1.5rem;
+    padding: 12px 28px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.invitation-hero-content .cta-button:hover {
+    background-color: #0056b3;
+}

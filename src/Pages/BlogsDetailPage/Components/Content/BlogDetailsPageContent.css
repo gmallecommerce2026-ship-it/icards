@@ -1,0 +1,236 @@
+/* FE/Pages/BlogsDetailPage/Components/Content/BlogDetailsPageContent.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+    --primary-color: #2563eb; /* Màu xanh chủ đạo */
+    --text-heading: #111827;
+    --text-body: #374151;
+    --bg-gray: #f9fafb;
+    --border-color: #e5e7eb;
+    --container-width: 1200px;
+}
+
+body {
+    background-color: #fff;
+    color: var(--text-body);
+}
+
+/* --- Scroll Progress Bar --- */
+.scroll-progress-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: transparent;
+    z-index: 1000;
+}
+.scroll-progress-bar {
+    height: 100%;
+    background: var(--primary-color);
+    width: 0%;
+    transition: width 0.1s;
+}
+
+/* --- Layout Grid --- */
+.luxury-blog-detail-wrapper {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.blog-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+}
+
+/* Desktop: 8 phần content, 4 phần sidebar */
+@media (min-width: 1024px) {
+    .blog-layout {
+        grid-template-columns: 8fr 4fr;
+    }
+}
+
+/* --- Header Section --- */
+.blog-header {
+    margin-bottom: 2rem;
+}
+.blog-category-badge {
+    display: inline-block;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+.blog-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    line-height: 1.2;
+    color: var(--text-heading);
+    margin-bottom: 1.5rem;
+}
+.author-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+.author-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.author-info h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-heading);
+    font-weight: 600;
+}
+.author-info span {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+/* --- Content Typography (Mimic Tailwind Prose) --- */
+.blog-content-body {
+    font-family: 'Inter', sans-serif;
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: var(--text-body);
+}
+.blog-content-body h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: var(--text-heading);
+}
+.blog-content-body p {
+    margin-bottom: 1.5rem;
+}
+.blog-content-body img {
+    border-radius: 8px;
+    max-width: 100%;
+    height: auto;
+    margin: 2rem 0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.blog-content-body blockquote {
+    border-left: 4px solid var(--primary-color);
+    padding-left: 1rem;
+    font-style: italic;
+    color: #4b5563;
+    background: #f3f4f6;
+    padding: 1rem;
+    border-radius: 0 8px 8px 0;
+}
+
+/* --- Sidebar & Widgets --- */
+.sidebar-sticky {
+    position: sticky;
+    top: 2rem; /* Giữ sidebar khi scroll */
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.widget-box {
+    background: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.widget-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.widget-title::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: var(--primary-color);
+    border-radius: 50%;
+}
+
+/* Product Card trong Sidebar */
+.mini-product-card {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed var(--border-color);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s;
+}
+.mini-product-card:hover {
+    background-color: #f9fafb;
+}
+.mini-product-card:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.mini-product-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid var(--border-color);
+}
+.mini-product-info h5 {
+    margin: 0 0 4px 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.price-tag {
+    color: #dc2626;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* --- Back Button --- */
+.nav-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+.nav-back:hover {
+    color: var(--primary-color);
+}
+
+/* Loading */
+.loading-wrapper {
+    min-height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    color: #6b7280;
+}

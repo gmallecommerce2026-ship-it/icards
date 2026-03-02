@@ -1,0 +1,22 @@
+.breadcrumbs-container {
+    padding: 15px 30px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 14px;
+    text-transform: capitalize; /* Viết hoa chữ cái đầu */
+}
+
+.breadcrumb-link {
+    color: var(--color-text-dark);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.breadcrumb-link:hover {
+    color: black;
+}
+
+.breadcrumb-active {
+    color: black;
+    font-weight: bold;
+}

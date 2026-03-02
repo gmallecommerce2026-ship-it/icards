@@ -1,0 +1,635 @@
+/* src/Pages/InvitationDesign/Components/Content/EventSettingsPreview.css */
+/* Styles copied from AboutUsContentPage.css to ensure identical appearance */
+
+/* Modern Wedding Invitation - Minimalist Design */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+/* --- Keyframes Animations --- */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); }
+    40% { transform: translate(-50%, -10px); }
+    60% { transform: translate(-50%, -5px); }
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.event-settings-preview-container {
+    /* CSS Variables */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'Playfair Display', Georgia, serif;
+    
+    --color-primary: #4a4a68; /* Deep Navy Blue */
+    --color-primary-light: #6a6a8b;
+    --color-secondary: #f4f1ea; /* Creamy White */
+    --color-accent: #d4af37; /* Gold Accent */
+    --color-accent-light: #f8e9c0; /* Light Gold */
+    --color-background-subtle: #faf8f5; 
+    --color-text-dark: #333333;
+    --color-text-medium: #555555;
+    --color-text-light: #777777;
+    --color-white: #FFFFFF;
+    --color-background: #fdfcf9;
+    --color-background-light: #F7FAFC;
+    --color-border: #e0dcd4;
+    --color-border-light: #edeae4;
+    --color-success: #10B981;
+    --color-error: #EF4444;
+    
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    --spacing-2xl: 4rem;
+    --spacing-3xl: 6rem;
+    
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+    --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    
+    --transition-fast: 0.2s ease-out;
+    --transition-normal: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-slow: 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    font-family: var(--font-primary);
+    background-color: var(--color-background);
+    color: var(--color-text-dark);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    width: 100%;
+    overflow-x: hidden;
+    /* transform: scale(0.9); 
+    transform-origin: top center; */
+}
+
+.event-settings-preview-container * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.event-settings-preview-container .modern-invitation {
+    position: relative;
+    background: var(--color-background);
+}
+
+.event-settings-preview-container .modern-content {
+    background: transparent;
+    position: relative;
+    z-index: 2;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.event-settings-preview-container .modern-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+}
+
+.event-settings-preview-container .section-container {
+    padding: var(--spacing-3xl) 0;
+    border-bottom: 1px solid var(--color-border-light);
+    position: relative;
+}
+
+.event-settings-preview-container .section-container:last-child {
+    border-bottom: none;
+}
+
+.event-settings-preview-container .modern-section-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto var(--spacing-2xl) auto;
+    position: relative;
+}
+
+.event-settings-preview-container .section-title {
+    font-family: var(--font-display);
+    font-size: 2.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.2;
+}
+
+.event-settings-preview-container .section-subtitle {
+    font-size: 1.1rem;
+    color: var(--color-text-light);
+    line-height: 1.6;
+    margin: 0;
+    font-style: italic;
+}
+
+/* --- UX UPGRADE: Clickable Cards --- */
+.clickable-card {
+    cursor: pointer;
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.clickable-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+/* --- UX UPGRADE: Add New Card --- */
+.add-new-card {
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    min-height: 250px; /* Match height of other cards */
+    color: var(--color-text-light);
+    transition: all var(--transition-fast);
+    background-color: transparent;
+    padding: var(--spacing-lg);
+    text-align: center;
+}
+
+.add-new-card:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-background-subtle);
+    color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.add-new-card svg {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+
+/* Event Description */
+.event-settings-preview-container .event-description {
+    background: transparent;
+    padding: var(--spacing-3xl) var(--spacing-xl);
+    margin: 0;
+}
+
+.event-settings-preview-container .content-wrapper-narrow {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.event-settings-preview-container .event-description-text {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    color: var(--color-text-medium);
+    margin: 0;
+    text-align: center;
+    white-space: pre-wrap; /* To respect newlines */
+}
+
+/* Modern Couple Info */
+.event-settings-preview-container .modern-couple-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2xl);
+    flex-wrap: wrap;
+}
+
+.event-settings-preview-container .modern-couple-card {
+    text-align: center;
+    max-width: 320px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    border: 1px solid var(--color-border-light);
+}
+
+.event-settings-preview-container .modern-couple-image {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--color-white);
+    box-shadow: var(--shadow-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.event-settings-preview-container .couple-name {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin: 0 0 var(--spacing-sm) 0;
+    word-break: break-word;
+    line-height: 1.2;
+}
+
+.event-settings-preview-container .couple-info {
+    font-size: 1rem;
+    color: var(--color-text-medium);
+    line-height: 1.6;
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+.event-settings-preview-container .modern-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+}
+
+.event-settings-preview-container .heart-wrapper {
+    background: linear-gradient(135deg, var(--color-accent-light), var(--color-accent));
+    border-radius: 50%;
+    padding: var(--spacing-md);
+    box-shadow: var(--shadow-sm);
+    animation: heartbeat 2s infinite;
+}
+
+.event-settings-preview-container .heart-icon {
+    color: var(--color-primary);
+}
+
+/* Participants Section */
+.event-settings-preview-container .participants-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-xl);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.event-settings-preview-container .participant-card {
+    background-color: var(--color-background-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    border: 1px solid var(--color-border-light);
+}
+
+.event-settings-preview-container .participant-image {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-white);
+    box-shadow: var(--shadow-sm);
+    flex-shrink: 0;
+}
+
+.event-settings-preview-container .participant-info {
+    text-align: left;
+}
+
+.event-settings-preview-container .participant-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.event-settings-preview-container .participant-content {
+    font-size: 0.9rem;
+    color: var(--color-text-medium);
+    line-height: 1.5;
+}
+
+/* Event Schedule Section */
+.event-settings-preview-container .event-schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-xl);
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.event-settings-preview-container .event-card {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+}
+
+.event-settings-preview-container .event-card-image-wrapper {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background-color: #eee;
+}
+
+.event-settings-preview-container .event-card-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.event-settings-preview-container .event-card-content {
+    padding: var(--spacing-lg);
+    flex-grow: 1;
+}
+
+.event-settings-preview-container .event-card-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Love Story Timeline */
+.event-settings-preview-container .love-story-timeline {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--spacing-lg) 0;
+}
+
+.event-settings-preview-container .love-story-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background-color: var(--color-border);
+    transform: translateX(-50%);
+}
+
+.event-settings-preview-container .story-item {
+    display: flex;
+    position: relative;
+    width: 50%;
+    padding: 0 var(--spacing-xl);
+    margin-bottom: var(--spacing-3xl);
+}
+
+.event-settings-preview-container .story-item::after {
+    content: '';
+    position: absolute;
+    top: 40px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--color-white);
+    border: 3px solid var(--color-accent);
+    z-index: 1;
+}
+
+.event-settings-preview-container .story-item.left { padding-right: var(--spacing-xl); }
+.event-settings-preview-container .story-item.left::after { right: -8px; transform: translateX(50%); }
+.event-settings-preview-container .story-item.right { margin-left: 50%; padding-left: var(--spacing-xl); }
+.event-settings-preview-container .story-item.right::after { left: -8px; transform: translateX(-50%); }
+.event-settings-preview-container .story-title {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    color: var(--color-primary);
+}
+.event-settings-preview-container .story-date {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+}
+.event-settings-preview-container .story-description {
+    font-size: 1rem;
+    color: var(--color-text-medium);
+}
+.event-settings-preview-container .story-content {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+}
+
+
+/* Modern Countdown */
+.event-settings-preview-container .modern-countdown {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.event-settings-preview-container .modern-countdown-item {
+    min-width: 100px;
+}
+
+.event-settings-preview-container .countdown-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    text-align: center;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+}
+
+.event-settings-preview-container .countdown-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-accent);
+}
+
+.event-settings-preview-container .countdown-value {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    display: block;
+    margin-bottom: var(--spacing-xs);
+}
+
+.event-settings-preview-container .countdown-label {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    color: var(--color-text-light);
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.event-settings-preview-container .countdown-ended {
+    background: var(--color-accent-light);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    text-align: center;
+}
+
+.event-settings-preview-container .countdown-ended span {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+
+/* Other Sections */
+.event-settings-preview-container .modern-qr-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--spacing-lg);
+}
+
+.event-settings-preview-container .modern-qr-container img {
+    max-width: 150px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+.event-settings-preview-container .video-wrapper iframe {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: var(--radius-lg);
+    border: none;
+}
+
+/* Contact Section */
+.event-settings-preview-container .modern-contact-section {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-2xl);
+    flex-wrap: wrap;
+}
+
+.event-settings-preview-container .modern-contact-card {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    min-width: 200px;
+    box-shadow: var(--shadow-sm);
+}
+
+.event-settings-preview-container .contact-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--color-white);
+}
+
+.event-settings-preview-container .contact-info {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.event-settings-preview-container .contact-info h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.event-settings-preview-container .contact-info span {
+    font-size: 1rem;
+    color: var(--color-text-dark);
+    font-weight: 500;
+}
+
+.event-settings-preview-container .contact-info p {
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    margin: 0;
+}
+
+.event-settings-preview-container .modern-gallery {
+    column-count: 4; /* Số cột mặc định cho màn hình lớn */
+    column-gap: var(--spacing-sm, 1rem); /* Khoảng cách giữa các cột */
+}
+
+.event-settings-preview-container .modern-gallery img {
+    width: 100%;
+    height: auto;
+    display: block; /* Loại bỏ khoảng trống thừa bên dưới ảnh */
+    margin-bottom: var(--spacing-sm, 1rem); /* Khoảng cách giữa các ảnh trong cùng một cột */
+    border-radius: var(--radius-md, 0.5rem);
+    box-shadow: var(--shadow-sm);
+    break-inside: avoid; /* Ngăn không cho ảnh bị ngắt giữa các cột */
+    transition: transform 0.3s ease;
+}
+
+.event-settings-preview-container .modern-gallery img:hover {
+    transform: scale(1.02); /* Hiệu ứng phóng to nhẹ khi di chuột qua */
+}
+
+@media (max-width: 1200px) {
+    .event-settings-preview-container .modern-gallery {
+        column-count: 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .event-settings-preview-container .participants-grid {
+        grid-template-columns: 1fr;
+    }
+    .event-settings-preview-container .modern-gallery {
+        column-count: 2; /* Giảm còn 2 cột trên tablet */
+    }
+    .event-settings-preview-container .love-story-timeline::before {
+        left: 20px;
+    }
+    .event-settings-preview-container .story-item, .event-settings-preview-container .story-item.right {
+        width: 100%;
+        margin-left: 0;
+        padding-left: var(--spacing-3xl);
+    }
+    .event-settings-preview-container .story-item::after, .event-settings-preview-container .story-item.right::after {
+        left: 20px;
+        transform: translateX(-50%);
+    }
+}
+
+@media (max-width: 480px) {
+    .event-settings-preview-container .modern-gallery {
+        column-count: 1; /* Hiển thị 1 cột trên điện thoại */
+    }
+}

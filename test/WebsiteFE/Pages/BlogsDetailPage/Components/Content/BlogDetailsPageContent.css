@@ -1,0 +1,108 @@
+/* FE/Pages/BlogsDetailPage/Components/Content/BlogDetailsPageContent.css */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+
+:root {
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --text-primary: #212529;
+    --text-secondary: #495057;
+    --accent-primary: #27548A;
+    --border-color: #e9ecef;
+    --space-lg: 2rem;
+    --space-xl: 3rem;
+    --transition-normal: 0.3s ease-out;
+}
+
+.blog-detail-wrapper {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: var(--space-xl) var(--space-lg);
+    overflow-x: hidden;
+}
+
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: rgba(31, 31, 31, 0.46);
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    cursor: pointer;
+    z-index: 10;
+    transition: all var(--transition-normal);
+    font-family: var(--font-body);
+    font-weight: 500;
+    margin-bottom: var(--space-xl);
+}
+
+.back-button:hover {
+    color: rgb(0, 0, 0);
+}
+
+.blog-detail-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.blog-detail-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--space-xl);
+}
+
+.blog-detail-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: var(--space-lg);
+    color: var(--text-primary);
+}
+
+.blog-meta-info {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.meta-author::before, .meta-date::before, .meta-category::before {
+    content: '•';
+    margin-right: 0.75rem;
+    color: #ced4da;
+}
+.meta-author:first-child::before {
+    content: '';
+    margin-right: 0;
+}
+
+.blog-featured-image {
+    margin-bottom: var(--space-xl);
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+.blog-featured-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+/* Styles for .ck-content are now primarily in the global ckeditor-content.css */
+.blog-content-body {
+    padding-top: 1rem;
+}
+
+.ck-content {
+    opacity: 1 !important;
+}

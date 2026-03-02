@@ -1,0 +1,265 @@
+/* --- Tấm thiệp có thể MỞ (Card with Opening Effect) --- */
+.flat-card-container {
+  width: 400px;
+  height: 500px;
+  position: absolute;
+  transform-style: preserve-3d;
+  
+  /* SỬA LỖI: z-index ban đầu cao để thiệp bay lên trên */
+  z-index: 10; 
+  
+  /* Trạng thái ban đầu */
+  transform: translateX(-550px) scale(0.9) rotateY(180deg); 
+  opacity: 1;
+  
+  will-change: transform, opacity;
+}
+
+/* Phần DƯỚI của thiệp (cố định) */
+.card-bottom {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.card-bottom-front,
+.card-bottom-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.card-bottom-front {
+  transform: rotateY(0deg);
+}
+
+.card-bottom-back {
+  transform: rotateY(180deg);
+}
+
+.card-bottom-front img,
+.card-bottom-back img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Phần TRÊN của thiệp (có thể mở) */
+.card-top {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: top center; /* Trục xoay ở trên */
+  
+  /* Trạng thái ban đầu: Đóng */
+  transform: rotateX(0deg);
+  
+  will-change: transform;
+  z-index: 5;
+}
+
+.card-top-front,
+.card-top-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.card-top-front {
+  transform: rotateX(0deg);
+}
+
+.card-top-back {
+  transform: rotateX(180deg);
+}
+
+.card-top-front img,
+.card-top-back img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Thêm bóng đổ cho nắp mở */
+.card-top::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent 30%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.flat-card-container.opening .card-top::after {
+  opacity: 1;
+}
+.envelope-flow-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 9998; /* Dưới thanh điều khiển */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flow-scene {
+  position: relative;
+  width: 900px;
+  height: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  perspective: 2500px; /* Cực kỳ quan trọng cho 3D */
+  transform-style: preserve-3d;
+}
+
+/* --- Phong bì 3D (Wrapper) --- */
+.envelope-wrapper {
+  width: 520px; 
+  height: 420px; 
+  position: absolute;
+  transform-style: preserve-3d;
+  z-index: 5;
+  
+  /* Trạng thái ban đầu: Mặt sau (nắp mở) */
+  transform: rotateY(180deg);
+  
+  /* transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); */
+  will-change: transform;
+}
+
+/* Kích hoạt lật */
+/* Sửa: Xóa class .flip, GSAP sẽ kiểm soát hoàn toàn */
+/* .envelope-wrapper.flip { ... } */
+
+/* Các phần của phong bì */
+.envelope-part {
+  position: absolute;
+  width: 100%;
+  /* SỬA LỖI: Xóa 'height: 100%' để không xung đột với nắp */
+  /* height: 100%; */ 
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.envelope-part img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 1. Lưng phong bì (mặt sau chính) */
+.envelope-back {
+  /* SỬA LỖI: Thêm lại 'height: 100%' */
+  height: 100%;
+  transform: rotateY(180deg) translateZ(2px);
+  z-index: 3; /* Phải ở trên thiệp (khi thiệp zIndex=2) */
+}
+
+/* 2. Thân trước phong bì (che tấm thiệp) */
+.envelope-body {
+  /* SỬA LỖI: Thêm lại 'height: 100%' */
+  height: 100%;
+  transform: rotateY(0deg) translateZ(-2px);
+  z-index: 1; /* Ở sau cùng */
+}
+
+/* 2.5. Lớp lót bên trong (envelope liner) */
+.envelope-liner {
+  /* Nằm phía sau thân phong bì, chỉ thấy khi nắp mở */
+  height: 100%; /* SỬA LỖI: Thêm lại 'height: 100%' */
+  transform: rotateY(180deg) translateZ(1px);
+  z-index: 2;
+  opacity: 0; /* Ban đầu ẩn */
+  transition: opacity 0.5s ease;
+  /* Chỉ hiển thị phần trên cùng như ảnh mẫu */
+  clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+}
+
+/* 3. Nắp phong bì (cấu trúc 3D 2 mặt) */
+.envelope-lid {
+  width: 100%;
+  height: 200px; /* Chiều cao của nắp (Giữ nguyên) */
+  top: 0;
+  z-index: 4; /* Nắp phải ở trên cùng */
+  
+  /* Trạng thái ban đầu: Mở (hơi nâng lên) */
+  transform-origin: top center;
+  /* SỬA ĐỔI: Gắn nắp vào mặt lưng (ở translateZ(2px)) */
+  transform: rotateX(90deg) translateZ(2px); /* Mở 90 độ */
+  
+  will-change: transform;
+}
+
+/* Sửa: Xóa class .flip, GSAP sẽ kiểm soát hoàn toàn */
+/* .envelope-wrapper.flip .envelope-lid { ... } */
+
+.lid-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.lid-inner {
+  transform: rotateX(0deg);
+}
+
+/* Thêm hiệu ứng bóng đổ bên trong nắp khi mở */
+.lid-inner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.15), transparent);
+  opacity: 1;
+  transition: opacity 0.5s;
+}
+
+.lid-outer {
+  transform: rotateX(180deg);  
+}
+
+/* --- Thanh điều khiển --- */
+.flow-controls {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  display: flex;
+  gap: 15px;
+}
