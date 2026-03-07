@@ -368,7 +368,7 @@ const IntegratedSidebarPanel = ({
 const AVAILABLE_BLOCKS = {
     BANNER_CAROUSEL: { key: 'bannerImages', label: 'Banner Carousel', description: 'Trình chiếu slide ảnh nổi bật ở vị trí đầu trang.', icon: <ViewCarouselIcon />, required: true, isList: true },
     EVENT_DESCRIPTION: { key: 'eventDescription', label: 'Câu chuyện / Lời mời', description: 'Đoạn văn bản ngắn gửi gắm cảm xúc và lời mời chân thành.', icon: <TextFieldsIcon /> },
-    COUPLE_INFO: { key: 'coupleInfo', label: 'Thông tin Cô dâu & Chú rể', description: 'Hình ảnh, tên và đôi nét giới thiệu về hai nhân vật chính.', icon: <HeartIcon />, relatedFields: ['groomName', 'groomInfo', 'groomImageUrl', 'brideName', 'brideInfo', 'brideImageUrl', 'coupleSeparatorIconUrl'], titleKey: 'coupleTitle', subtitleKey: 'coupleSubtitle' },
+    COUPLE_INFO: { key: 'coupleInfo', label: 'Thông tin Cô dâu & Chú rể', description: 'Hình ảnh, tên và đôi nét giới thiệu về hai nhân vật chính.', icon: <HeartIcon />, relatedFields: ['groomName', 'groomInfo', 'groomImageUrl', 'brideName', 'brideInfo', 'brideImageUrl'], titleKey: 'coupleTitle', subtitleKey: 'coupleSubtitle' },
     PARTICIPANTS: { key: 'participants', label: 'Thành viên tham gia', description: 'Giới thiệu những người quan trọng (Bố mẹ, phù dâu, phù rể...).', icon: <PeopleIcon />, isList: true, titleKey: 'participantsTitle' },
     EVENT_SCHEDULE: { key: 'events', label: 'Lịch trình sự kiện', description: 'Thời gian và địa điểm cụ thể của các hoạt động trong sự kiện.', icon: <CalendarTodayIcon />, isList: true, titleKey: 'eventsTitle' },
     COUNTDOWN: { key: 'eventDate', label: 'Đếm ngược thời gian', description: 'Đồng hồ đếm ngược sinh động đến ngày tổ chức.', icon: <CalendarTodayIcon />, titleKey: 'countdownTitle' },
@@ -577,26 +577,7 @@ const CoupleInfoPreview = ({ settings, onSelectField, selectedFieldKey, onUpdate
                     </EditableWrapper>
                 </Box>
 
-                <Box className="modern-separator">
-                    <EditableWrapper 
-                        fieldKey="coupleSeparatorIconUrl" 
-                        onSelectField={onSelectField} 
-                        selectedFieldKey={selectedFieldKey} 
-                        sx={{ display: 'inline-flex', p: 0.5, borderRadius: '50%', border: 'none' }}
-                    >
-                        <Box className="heart-wrapper" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: 40, height: 40, overflow: 'hidden' }}>
-                            {settings.coupleSeparatorIconUrl ? (
-                                <img 
-                                    src={settings.coupleSeparatorIconUrl instanceof File ? URL.createObjectURL(settings.coupleSeparatorIconUrl) : settings.coupleSeparatorIconUrl} 
-                                    alt="Separator Icon" 
-                                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
-                                />
-                            ) : (
-                                <HeartIcon sx={{ color: 'var(--color-primary)' }} />
-                            )}
-                        </Box>
-                    </EditableWrapper>
-                </Box>
+                <Box className="modern-separator"><Box className="heart-wrapper"><HeartIcon sx={{ color: 'var(--color-primary)' }} /></Box></Box>
 
                 {/* --- CÔ DÂU --- */}
                 <Box className="modern-couple-card">
@@ -1656,7 +1637,7 @@ const SETTINGS_META = {
     brideName: { label: 'Tên cô dâu', type: 'story-text' },
     brideInfo: { label: 'Thông tin cô dâu', type: 'story-text' },
     contactBride: { label: 'Liên hệ cô dâu', type: 'story-text' },
-    coupleSeparatorIconUrl: { label: 'Icon phân cách', type: 'image', description: 'Biểu tượng nằm giữa Cô dâu & Chú rể (Mặc định: Hình trái tim)' },
+    brideImageUrl: { label: 'Ảnh cô dâu', type: 'image' },
     bannerImages: { label: 'Ảnh Banner Carousel', type: 'image-dnd-list', description: 'Tải lên, sắp xếp và xóa ảnh cho carousel banner.' },
     galleryImages: { label: 'Bộ sưu tập ảnh', type: 'image-grid', description: 'Những khoảnh khắc đẹp nhất để chia sẻ với khách mời.' },
     qrCodes: { label: 'Mã QR Chuyển Khoản', type: 'qr-code-editor', description: 'Tải lên các mã QR để khách mời gửi quà mừng.' },
@@ -4069,7 +4050,7 @@ const WeddingInvitationEditor = () => {
         })
     );
     const [eventSettings, setEventSettings] = useState({
-        eventDate: '', groomName: '', brideName: '', groomInfo: '', brideInfo: '', groomImageUrl: '', brideImageUrl: '', coupleSeparatorIconUrl: '',
+        eventDate: '', groomName: '', brideName: '', groomInfo: '', brideInfo: '', groomImageUrl: '', brideImageUrl: '',
         heroImages: { main: '', sub1: '', sub2: '' }, galleryImages: [],
         bannerImages: [], contactGroom: '', contactBride: '',
         eventLocation: { lat: 21.028511, lng: 105.804817, address: '' },
@@ -4534,7 +4515,6 @@ const WeddingInvitationEditor = () => {
             };
             settingsForDb.groomImageUrl = processSingleImageField('groomImageUrl', eventSettings.groomImageUrl);
             settingsForDb.brideImageUrl = processSingleImageField('brideImageUrl', eventSettings.brideImageUrl);
-            settingsForDb.coupleSeparatorIconUrl = processSingleImageField('coupleSeparatorIconUrl', eventSettings.coupleSeparatorIconUrl);
             settingsForDb.heroImages = {
                 main: processSingleImageField('heroImages_main', eventSettings.heroImages.main),
                 sub1: processSingleImageField('heroImages_sub1', eventSettings.heroImages.sub1),
