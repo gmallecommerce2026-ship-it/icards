@@ -368,7 +368,7 @@ const IntegratedSidebarPanel = ({
 const AVAILABLE_BLOCKS = {
     BANNER_CAROUSEL: { key: 'bannerImages', label: 'Banner Carousel', description: 'Trình chiếu slide ảnh nổi bật ở vị trí đầu trang.', icon: <ViewCarouselIcon />, required: true, isList: true },
     EVENT_DESCRIPTION: { key: 'eventDescription', label: 'Câu chuyện / Lời mời', description: 'Đoạn văn bản ngắn gửi gắm cảm xúc và lời mời chân thành.', icon: <TextFieldsIcon /> },
-    COUPLE_INFO: { key: 'coupleInfo', label: 'Thông tin Cô dâu & Chú rể', description: 'Hình ảnh, tên và đôi nét giới thiệu về hai nhân vật chính.', icon: <HeartIcon />, relatedFields: ['groomName', 'groomInfo', 'groomImageUrl', 'brideName', 'brideInfo', 'brideImageUrl'], titleKey: 'coupleTitle', subtitleKey: 'coupleSubtitle' },
+    COUPLE_INFO: { key: 'coupleInfo', label: 'Thông tin Cô dâu & Chú rể', description: 'Hình ảnh, tên và đôi nét giới thiệu về hai nhân vật chính.', icon: <HeartIcon />, relatedFields: ['groomName', 'groomInfo', 'groomImageUrl', 'brideName', 'brideInfo', 'brideImageUrl', 'coupleSeparatorImageUrl'], titleKey: 'coupleTitle', subtitleKey: 'coupleSubtitle' },
     PARTICIPANTS: { key: 'participants', label: 'Thành viên tham gia', description: 'Giới thiệu những người quan trọng (Bố mẹ, phù dâu, phù rể...).', icon: <PeopleIcon />, isList: true, titleKey: 'participantsTitle' },
     EVENT_SCHEDULE: { key: 'events', label: 'Lịch trình sự kiện', description: 'Thời gian và địa điểm cụ thể của các hoạt động trong sự kiện.', icon: <CalendarTodayIcon />, isList: true, titleKey: 'eventsTitle' },
     COUNTDOWN: { key: 'eventDate', label: 'Đếm ngược thời gian', description: 'Đồng hồ đếm ngược sinh động đến ngày tổ chức.', icon: <CalendarTodayIcon />, titleKey: 'countdownTitle' },
@@ -577,7 +577,21 @@ const CoupleInfoPreview = ({ settings, onSelectField, selectedFieldKey, onUpdate
                     </EditableWrapper>
                 </Box>
 
-                <Box className="modern-separator"><Box className="heart-wrapper"><HeartIcon sx={{ color: 'var(--color-primary)' }} /></Box></Box>
+                <EditableWrapper fieldKey="coupleSeparatorImageUrl" onSelectField={onSelectField} selectedFieldKey={selectedFieldKey} sx={{ p: 0, border: 'none', display: 'flex', justifyContent: 'center' }}>
+                    <Box className="modern-separator" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                        <Box className="heart-wrapper">
+                            {settings.coupleSeparatorImageUrl ? (
+                                <img 
+                                    src={settings.coupleSeparatorImageUrl instanceof File ? URL.createObjectURL(settings.coupleSeparatorImageUrl) : settings.coupleSeparatorImageUrl} 
+                                    alt="Separator" 
+                                    style={{ width: '40px', height: '40px', objectFit: 'contain', display: 'block' }} 
+                                />
+                            ) : (
+                                <HeartIcon sx={{ color: 'var(--color-primary)', fontSize: 40 }} />
+                            )}
+                        </Box>
+                    </Box>
+                </EditableWrapper>
 
                 {/* --- CÔ DÂU --- */}
                 <Box className="modern-couple-card">
@@ -1638,6 +1652,7 @@ const SETTINGS_META = {
     brideInfo: { label: 'Thông tin cô dâu', type: 'story-text' },
     contactBride: { label: 'Liên hệ cô dâu', type: 'story-text' },
     brideImageUrl: { label: 'Ảnh cô dâu', type: 'image' },
+    coupleSeparatorImageUrl: { label: 'Icon phân cách', type: 'image', description: 'Tải lên hoặc chọn icon từ sidebar để thay thế trái tim mặc định.' },
     bannerImages: { label: 'Ảnh Banner Carousel', type: 'image-dnd-list', description: 'Tải lên, sắp xếp và xóa ảnh cho carousel banner.' },
     galleryImages: { label: 'Bộ sưu tập ảnh', type: 'image-grid', description: 'Những khoảnh khắc đẹp nhất để chia sẻ với khách mời.' },
     qrCodes: { label: 'Mã QR Chuyển Khoản', type: 'qr-code-editor', description: 'Tải lên các mã QR để khách mời gửi quà mừng.' },
@@ -4050,7 +4065,7 @@ const WeddingInvitationEditor = () => {
         })
     );
     const [eventSettings, setEventSettings] = useState({
-        eventDate: '', groomName: '', brideName: '', groomInfo: '', brideInfo: '', groomImageUrl: '', brideImageUrl: '',
+        eventDate: '', groomName: '', brideName: '', groomInfo: '', brideInfo: '', groomImageUrl: '', brideImageUrl: '', coupleSeparatorImageUrl: '',
         heroImages: { main: '', sub1: '', sub2: '' }, galleryImages: [],
         bannerImages: [], contactGroom: '', contactBride: '',
         eventLocation: { lat: 21.028511, lng: 105.804817, address: '' },
@@ -4515,6 +4530,7 @@ const WeddingInvitationEditor = () => {
             };
             settingsForDb.groomImageUrl = processSingleImageField('groomImageUrl', eventSettings.groomImageUrl);
             settingsForDb.brideImageUrl = processSingleImageField('brideImageUrl', eventSettings.brideImageUrl);
+            settingsForDb.coupleSeparatorImageUrl = processSingleImageField('coupleSeparatorImageUrl', eventSettings.coupleSeparatorImageUrl);
             settingsForDb.heroImages = {
                 main: processSingleImageField('heroImages_main', eventSettings.heroImages.main),
                 sub1: processSingleImageField('heroImages_sub1', eventSettings.heroImages.sub1),
@@ -5157,6 +5173,17 @@ const WeddingInvitationEditor = () => {
     }, [pages, currentPageId, handleUpdateItem]);
 
     const handleSidebarItemClick = useCallback((itemData) => {
+        // --- THÊM LOGIC ĐỂ CHỌN ẢNH VÀO SETTING ---
+        // Nếu đang chọn một trường setting là hình ảnh (ví dụ: Icon phân cách, Ảnh cô dâu...)
+        if (selectedSettingField && SETTINGS_META[selectedSettingField]?.type === 'image') {
+            if (itemData.type === 'image' && itemData.url) {
+                handleUpdateSetting(selectedSettingField, itemData.url);
+                toast.success("Đã áp dụng hình ảnh vào thiết lập!");
+                return; // Dừng lại, không thêm vào Canvas
+            }
+        }
+        // ------------------------------------------
+
         // 1. Kiểm tra xem đã có trang nào được chọn chưa
         if (!currentPageId) {
             toast.warn("Vui lòng chọn hoặc tạo một trang trước khi thêm đối tượng!");
@@ -5169,7 +5196,7 @@ const WeddingInvitationEditor = () => {
         } else if (itemData.type === 'text' && itemData.content) {
             addTextToCanvas(itemData.content, currentPageId);
         }
-    }, [currentPageId, addImageToCanvas, addTextToCanvas]); 
+    }, [currentPageId, addImageToCanvas, addTextToCanvas, selectedSettingField, handleUpdateSetting]);
     const generateCanvasFromPage = useCallback(async (page) => {
         const canvas = exportCanvasRef.current;
         if (!canvas || !page) return null;

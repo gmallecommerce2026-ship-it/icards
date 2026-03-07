@@ -863,7 +863,15 @@ const CoupleInfo = React.memo(({ settings }) => {
 
                 <div className="modern-separator">
                     <div className="heart-wrapper">
-                        <Heart size={24} className="heart-icon" />
+                        {invitationData.settings.coupleSeparatorImageUrl ? (
+                            <img 
+                                src={invitationData.settings.coupleSeparatorImageUrl} 
+                                alt="Separator" 
+                                style={{ width: '40px', height: '40px', objectFit: 'contain' }} 
+                            />
+                        ) : (
+                            <HeartIcon style={{ color: 'var(--color-primary)', fontSize: 40 }} />
+                        )}
                     </div>
                 </div>
 
