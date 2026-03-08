@@ -1392,43 +1392,18 @@ const WishManagementPanel = () => (
     </div>
 );
 
-const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
-    const [settings, setSettings] = useState({
-        title: '',
-        description: '',
-        salutationStyle: 'Thân gửi',
-        useGlobalSalutation: false,
-        displayStyle: 'Kiểu 1',
-        qrCodeImageUrls: [],
-        videoUrl: '',
-        emailReminders: [],
-    });
+const EventManagementPanel = ({ invitation, onDataChange }) => {
+    const [reminders, setReminders] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         if (invitation && invitation.settings) {
-            setSettings({
-                title: invitation.settings.title || '',
-                description: invitation.settings.description || '',
-                salutationStyle: invitation.settings.salutationStyle || 'Thân gửi',
-                useGlobalSalutation: invitation.settings.useGlobalSalutation || false,
-                displayStyle: invitation.settings.displayStyle || 'Kiểu 1',
-                emailReminders: invitation.settings.emailReminders || [],
-            });
+            setReminders(invitation.settings.emailReminders || []);
         }
     }, [invitation]);
+
     const handleReminderUpdate = (newReminders) => {
-         setSettings(prev => ({
-            ...prev,
-            emailReminders: newReminders
-        }));
-    };
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setSettings(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+         setReminders(newReminders);
     };
 
     const handleSubmit = async (e) => {
@@ -1441,21 +1416,100 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
             return;
         }
         
+        // Cập nhật chỉ phần reminders, giữ nguyên các settings khác
         const payload = {
-            settingsData: settings 
+            settingsData: {
+                ...invitation.settings,
+                emailReminders: reminders
+            } 
         };
 
-        const promise = api.put(`/invitations/${invitation._id}/settings`, payload, {
-        });
+        const promise = api.put(`/invitations/${invitation._id}/settings`, payload);
+
+        handlePromiseToast(promise, {
+            pending: 'Đang lưu cài đặt sự kiện...',
+            success: 'Đã lưu thiết lập email nhắc nhở thành công!',
+            error: 'Lưu cài đặt thất bại!'
+        }).then((response) => onDataChange(response.data.data, 'update-settings'))
+          .catch(err => {
+              console.error("Lỗi khi lưu cài đặt:", err.response?.data || err.message);
+          })
+          .finally(() => setIsSaving(false));
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="settings-panel-wrapper">
+            <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+                <div>
+                    <h3 className="settings-section-title">Thiết lập Email Nhắc nhở sự kiện</h3>
+                    <ReminderSettings 
+                        reminders={reminders} 
+                        onUpdate={handleReminderUpdate} 
+                    />
+                </div>
+            </div>
+
+            <button type="submit" disabled={isSaving} className="settings-save-btn">
+                {isSaving ? 'Đang lưu...' : 'Lưu thông tin'}
+            </button>
+        </form>
+    );
+};
+
+const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
+    const [settings, setSettings] = useState({
+        title: '',
+        description: '',
+        salutationStyle: 'Thân gửi',
+        useGlobalSalutation: false,
+        displayStyle: 'Kiểu 1',
+        qrCodeImageUrls: [],
+        videoUrl: '',
+        // Xóa emailReminders ở state cục bộ này đi vì đã chuyển sang tab khác
+    });
+    const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        if (invitation && invitation.settings) {
+            setSettings({
+                title: invitation.settings.title || '',
+                description: invitation.settings.description || '',
+                salutationStyle: invitation.settings.salutationStyle || 'Thân gửi',
+                useGlobalSalutation: invitation.settings.useGlobalSalutation || false,
+                displayStyle: invitation.settings.displayStyle || 'Kiểu 1',
+            });
+        }
+    }, [invitation]);
+
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setSettings(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSaving(true);
+        
+        if (!invitation?._id) return;
+        
+        // Merge lại với emailReminders cũ để không bị ghi đè mất khi lưu ở tab này
+        const payload = {
+            settingsData: {
+                ...settings,
+                emailReminders: invitation?.settings?.emailReminders || []
+            } 
+        };
+
+        const promise = api.put(`/invitations/${invitation._id}/settings`, payload);
 
         handlePromiseToast(promise, {
             pending: 'Đang lưu cài đặt...',
             success: 'Đã lưu tất cả thay đổi thành công!',
             error: 'Lưu cài đặt thất bại!'
         }).then((response) => onDataChange(response.data.data, 'update-settings'))
-          .catch(err => {
-              console.error("Lỗi khi lưu cài đặt:", err.response?.data || err.message);
-          })
           .finally(() => setIsSaving(false));
     };
 
@@ -1468,22 +1522,19 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
     }, [settings.useGlobalSalutation, settings.salutationStyle]);
 
     return (
-        <form onSubmit={handleSubmit} style={{ backgroundColor: "white", width: "100%", maxWidth: '1080px', margin: '40px auto', boxShadow: "0px 0px 8px 0px rgba(0,0,0,0.3)", padding: "40px", boxSizing: 'border-box', display: "flex", flexDirection: "column", gap: "40px" }}>
-            <div style={{ backgroundColor: "rgba(204,215,229,1)", padding: "20px", fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "16px", borderRadius: '4px' }}>
+        <form onSubmit={handleSubmit} className="settings-panel-wrapper">
+            <div className="settings-notice-box">
                 <span style={{ fontWeight: "700" }}>Lưu ý:</span> Hệ thống sẽ tự động thay đổi cụm từ <code style={{fontWeight: 700}}>&#123;TênKháchMời&#125;</code> và <code style={{fontWeight: 700}}>&#123;LờiXưngHô&#125;</code>.
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
                 <div>
-                    <h3 style={{ borderBottom: '2px solid #27548a', paddingBottom: '10px', color: '#27548a', marginBottom: '20px' }}>Cài đặt Email & Lời chào</h3>
-                    <ReminderSettings 
-                        reminders={settings.emailReminders} 
-                        onUpdate={handleReminderUpdate} 
-                    />
+                    <h3 className="settings-section-title">Cài đặt Email & Lời chào</h3>
+                    {/* Đã xóa <ReminderSettings /> ở đây */}
                     <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
                         <SettingsField 
                             label="Tiêu đề & Nội dung thiệp (Dùng cho Email)" 
                             required 
-                            description={emailDescription} // Sử dụng biến động
+                            description={emailDescription} 
                         >
                             <div className="email-compose-container">
                                 <div className="email-compose-header">
@@ -1496,8 +1547,8 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
                                     <div className="email-compose-field">
                                         <span>Chủ đề:</span>
                                         <input 
-                                            name="title" // Đổi thành "title"
-                                            value={settings.title} // Đổi thành settings.title
+                                            name="title" 
+                                            value={settings.title} 
                                             onChange={handleChange} 
                                             className="email-compose-subject"
                                             placeholder="Tiêu đề thiệp của bạn (cũng là chủ đề email)"
@@ -1506,8 +1557,8 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
                                 </div>
                                 <div className="email-compose-body">
                                     <textarea 
-                                        name="description" // Đổi thành "description"
-                                        value={settings.description} // Đổi thành settings.description
+                                        name="description" 
+                                        value={settings.description} 
                                         onChange={handleChange} 
                                         className="email-compose-textarea"
                                         placeholder="Mô tả thiệp của bạn (cũng là nội dung email)..."
@@ -1520,12 +1571,7 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
                             required 
                             description="Kiểu hiển thị bạn chọn ở đây sẽ sử dụng cho biến: <code>&#123;LờiXưngHô&#125;</code>"
                         >
-                            <select 
-                                name="salutationStyle" 
-                                value={settings.salutationStyle} 
-                                onChange={handleChange} 
-                                className="settings-select"
-                            >
+                            <select name="salutationStyle" value={settings.salutationStyle} onChange={handleChange} className="settings-select">
                                 <option>Thân gửi</option> 
                                 <option>Kính mời</option> 
                                 <option>Trân trọng kính mời</option>
@@ -1539,10 +1585,7 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
                                     onChange={handleChange}
                                     style={{ width: '16px', height: '16px', cursor: 'pointer' }}
                                 />
-                                <label 
-                                    htmlFor="useGlobalSalutation"
-                                    style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "15px", color: "#333", fontWeight: 500, cursor: 'pointer' }}
-                                >
+                                <label htmlFor="useGlobalSalutation" style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "15px", color: "#333", fontWeight: 500, cursor: 'pointer' }}>
                                     Sử dụng cài đặt này cho tất cả khách mời (ghi đè cài đặt của nhóm)
                                 </label>
                             </div>
@@ -1551,12 +1594,13 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
                 </div>
             </div>
 
-            <button type="submit" disabled={isSaving} style={{ backgroundColor: "rgba(39,84,138,1)", width: "100%", height: "60px", color: "white", border: 'none', cursor: 'pointer', fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "16px", textTransform: "uppercase", fontWeight: "600", borderRadius: '4px' }}>
+            <button type="submit" disabled={isSaving} className="settings-save-btn">
                 {isSaving ? 'Đang lưu...' : 'Lưu thông tin'}
             </button>
         </form>
     );
 };
+
 const ReminderSettings = ({ reminders, onUpdate }) => {
     const [newDays, setNewDays] = useState('');
 
@@ -1892,6 +1936,7 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
         { id: 'dashboard', title: 'Tổng quan' },
         { id: 'guests', title: 'Quản lý khách mời' },
         { id: 'master-guests', title: 'Danh bạ khách mời' },
+        { id: 'event-management', title: 'Quản lí sự kiện' },
         { id: 'invitation-settings', title: 'Cài đặt thiệp mời' },
         { id: 'delete', title: 'Xóa thiệp mời' },
     ];
@@ -1943,6 +1988,8 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
                 return <WishManagementPanel />;
             case 'master-guests': // <-- RENDER PANEL MỚI
                 return <MasterGuestPanel user={invitation.user} onAddGuestsToInvitation={handleAddGuestsFromMaster} />;
+            case 'event-management': // <- BỔ SUNG SWITCH CASE
+                return <EventManagementPanel invitation={invitation} onDataChange={onDataChange} />;
             case 'invitation-settings':
                 return <InvitationSettingsPanel invitation={invitation} onDataChange={onDataChange} />;
             default:
@@ -1951,12 +1998,14 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
     }
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%' }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%', overflowX: 'hidden' }}>
             <PageHeader />
-            <div className="tabs-container">
-                {tabs.map(tab => (
-                    <Tab key={tab.id} id={tab.id} title={tab.title} isActive={activeTab === tab.id} onClick={handleTabClick} />
-                ))}
+            <div className="tabs-container-wrapper">
+                <div className="tabs-container">
+                    {tabs.map(tab => (
+                        <Tab key={tab.id} id={tab.id} title={tab.title} isActive={activeTab === tab.id} onClick={handleTabClick} />
+                    ))}
+                </div>
             </div>
             <div style={{width: '100%', maxWidth: '1520px', margin: '0 auto', boxSizing: 'border-box', padding: '0 20px'}}>
                 {renderActivePanel()}
