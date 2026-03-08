@@ -1996,11 +1996,35 @@ const SettingsPropertyEditor = ({ selectedKey, settings, setSettings, customFont
                     InputLabelProps={{ shrink: true }}
                 />;
             case 'image':
-                return <ImageUploadField
-                    value={value}
-                    onFileSelect={(file) => handleUpdate(selectedKey, { content: file })}
-                    onFileClear={() => handleUpdate(selectedKey, { content: '' })}
-                />;
+                return (
+                    <Box>
+                        <ImageUploadField
+                            value={value}
+                            onFileSelect={(file) => handleUpdate(selectedKey, { content: file })}
+                            onFileClear={() => handleUpdate(selectedKey, { content: '' })}
+                        />
+                        {/* HIỂN THỊ MẸO UX ĐỂ ĐIỀU HƯỚNG NGƯỜI DÙNG */}
+                        {selectedKey === 'coupleSeparatorImageUrl' && (
+                            <Typography 
+                                variant="caption" 
+                                color="primary" 
+                                sx={{ 
+                                    display: 'flex', 
+                                    mt: 1.5, 
+                                    p: 1.2, 
+                                    bgcolor: 'rgba(59, 130, 246, 0.08)', 
+                                    borderRadius: 1, 
+                                    fontStyle: 'italic', 
+                                    alignItems: 'flex-start', 
+                                    gap: 1 
+                                }}
+                            >
+                                <ImageIcon fontSize="small" sx={{ mt: 0.2 }} />
+                                Mẹo: Hãy click vào các biểu tượng ở tab "Icon" hoặc "Thành phần" bên thanh công cụ trái để thay thế nhanh ảnh phân cách.
+                            </Typography>
+                        )}
+                    </Box>
+                );
 
             case 'image-grid':
                 return <ImageGridEditor
@@ -4755,7 +4779,17 @@ const WeddingInvitationEditor = () => {
         setSelectedItemId(null);
         setItemToEdit(null);
         setSelectedSettingField(prevKey => (prevKey === key ? null : key));
-        setActiveTool('default');
+        
+        // --- NÂNG CẤP UX: Tự động điều hướng Sidebar khi chọn thuộc tính ---
+        if (key && SETTINGS_META[key]?.type === 'image') {
+            if (key === 'coupleSeparatorImageUrl') {
+                setActiveTool('icons'); // Tự động mở tab "Icon" khi click vào hình trái tim
+            } else {
+                setActiveTool('user-images'); // Mở tab upload với ảnh cô dâu/chú rể
+            }
+        } else {
+            setActiveTool('default');
+        }
     };
     const handleSelectBlock = (blockType) => {
         const blockConfig = AVAILABLE_BLOCKS[blockType];
