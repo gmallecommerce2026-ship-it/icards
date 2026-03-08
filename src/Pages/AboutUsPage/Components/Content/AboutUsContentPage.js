@@ -862,15 +862,17 @@ const CoupleInfo = React.memo(({ settings }) => {
                 </div>
 
                 <div className="modern-separator">
-                    {settings.coupleSeparatorImageUrl ? (
-                        <img 
-                            src={settings.coupleSeparatorImageUrl} 
-                            alt="Couple Separator" 
-                            style={{ width: '40px', height: '40px', objectFit: 'contain', display: 'block' }} 
-                        />
-                    ) : (
-                        <HeartIcon sx={{ color: 'var(--color-primary)', fontSize: 40 }} />
-                    )}
+                    <div className="heart-wrapper">
+                        {settings.coupleSeparatorImageUrl ? (
+                            <img 
+                                src={settings.coupleSeparatorImageUrl} 
+                                alt="Separator" 
+                                style={{ width: '40px', height: '40px', objectFit: 'contain' }} 
+                            />
+                        ) : (
+                            <Heart size={40} style={{ color: 'var(--color-primary)' }} />
+                        )}
+                    </div>
                 </div>
 
                 {/* --- CÔ DÂU --- */}
