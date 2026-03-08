@@ -1692,7 +1692,7 @@ const StyledTextPropertyEditor = ({ fieldKey, settings, onUpdate, customFonts })
         </Box>
     );
 };
-const ImageUploadField = ({ value, onFileSelect }) => {
+const ImageUploadField = ({ value, onFileSelect, onFileClear }) => {
     const fileInputRef = useRef(null);
     const [preview, setPreview] = useState(value);
     useEffect(() => {
@@ -1742,10 +1742,19 @@ const ImageUploadField = ({ value, onFileSelect }) => {
                         <ImageIcon sx={{ color: 'text.secondary' }} />
                     )}
                 </Box>
-                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" style={{ display: 'none' }} />
-                <Button variant="outlined" onClick={() => fileInputRef.current.click()}>
-                    Chọn ảnh
-                </Button>
+                {/* Thay đổi hiển thị nút chọn và nút xóa thành cột dọc */}
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                    <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" style={{ display: 'none' }} />
+                    <Button variant="outlined" onClick={() => fileInputRef.current.click()} size="small">
+                        Chọn ảnh
+                    </Button>
+                    {/* Nút clear dành cho việc xóa hoàn toàn ảnh tùy chỉnh */}
+                    {onFileClear && preview && (
+                        <Button variant="outlined" color="error" onClick={onFileClear} size="small">
+                            Xóa ảnh
+                        </Button>
+                    )}
+                </Box>
             </Box>
         </Box>
     );
@@ -1990,6 +1999,7 @@ const SettingsPropertyEditor = ({ selectedKey, settings, setSettings, customFont
                 return <ImageUploadField
                     value={value}
                     onFileSelect={(file) => handleUpdate(selectedKey, { content: file })}
+                    onFileClear={() => handleUpdate(selectedKey, { content: '' })}
                 />;
 
             case 'image-grid':
@@ -4719,7 +4729,7 @@ const WeddingInvitationEditor = () => {
     }, [currentPageId, currentItems, selectedItemId, setPages, selectedSettingField]);
     const handleSetActiveTool = (tool) => {
         setSelectedItemId(null);
-        setSelectedSettingField(null);
+        // setSelectedSettingField(null);
         setItemToEdit(null);
         setActiveTool(prevTool => prevTool === tool ? 'default' : tool);
     };
@@ -4745,6 +4755,7 @@ const WeddingInvitationEditor = () => {
         setSelectedItemId(null);
         setItemToEdit(null);
         setSelectedSettingField(prevKey => (prevKey === key ? null : key));
+        setActiveTool('default');
     };
     const handleSelectBlock = (blockType) => {
         const blockConfig = AVAILABLE_BLOCKS[blockType];
@@ -5460,6 +5471,25 @@ const WeddingInvitationEditor = () => {
 
 
     const renderSecondarySidebar = () => {
+        const toolsWithContent = ['templates', 'user-images', 'icons', 'components', 'tags', 'create-new'];
+        if (toolsWithContent.includes(activeTool)) {
+            switch (activeTool) {
+                case 'templates':
+                    return <Box sx={{ p: 2 }}><TemplatePickerIntegrated templates={backendTemplates} onSelectTemplate={handleSelectTemplate} /></Box>;
+                case 'user-images':
+                    return <Box sx={{ p: 2 }}><UserImageManager userImages={userUploadedImages} onSelectUserImage={handleSidebarItemClick} onImageUploaded={handleUserImageFileUpload} isUploading={isUploading} selectedIds={selectedUserImageIds} onToggleSelect={handleToggleSelectUserImage} /></Box>;
+                case 'icons':
+                    return <Box sx={{ p: 2 }}><GenericImagePicker images={iconImages} title="Chọn Icon" onItemClick={handleSidebarItemClick} /></Box>;
+                case 'components':
+                    return <Box sx={{ p: 2 }}><GenericImagePicker images={componentImages} title="Chọn Thành Phần" onItemClick={handleSidebarItemClick} /></Box>;
+                case 'tags':
+                    return <Box sx={{ p: 2 }}><GenericImagePicker images={tagImages} title="Chọn Tag/Khung" onItemClick={handleSidebarItemClick} /></Box>;
+                case 'create-new':
+                    return <Box sx={{ p: 2 }}><BlankCanvasCreator onCreate={handleCreateBlankCanvas} /></Box>;
+                default:
+                    break;
+            }
+        }
         if (isScrolledToSettings) {
             if (selectedSettingField && selectedSettingField !== 'invitationType') { // Cập nhật điều kiện
                 return (
