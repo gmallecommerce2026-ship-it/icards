@@ -1997,19 +1997,36 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
         }
     }
 
+    const GridContainer = ({ children }) => (
+        <div style={{ width: '100%', maxWidth: '1520px', margin: '0 auto', boxSizing: 'border-box', padding: '0 20px' }}>
+            {children}
+        </div>
+    );
+
     return (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%', overflowX: 'hidden' }}>
-            <PageHeader />
+            
+            {/* 1. Header thẳng lề */}
+            <GridContainer>
+                <PageHeader />
+            </GridContainer>
+            
+            {/* 2. Thanh Tabs vươn viền full màn hình nhưng nội dung lõi thẳng lề */}
             <div className="tabs-container-wrapper">
-                <div className="tabs-container">
-                    {tabs.map(tab => (
-                        <Tab key={tab.id} id={tab.id} title={tab.title} isActive={activeTab === tab.id} onClick={handleTabClick} />
-                    ))}
-                </div>
+                <GridContainer>
+                    <div className="tabs-container" style={{ margin: 0, maxWidth: '100%' }}>
+                        {tabs.map(tab => (
+                            <Tab key={tab.id} id={tab.id} title={tab.title} isActive={activeTab === tab.id} onClick={handleTabClick} />
+                        ))}
+                    </div>
+                </GridContainer>
             </div>
-            <div style={{width: '100%', maxWidth: '1520px', margin: '0 auto', boxSizing: 'border-box', padding: '0 20px'}}>
+
+            {/* 3. Panel nội dung (Thẻ thống kê, Form,...) thẳng lề */}
+            <GridContainer>
                 {renderActivePanel()}
-            </div>
+            </GridContainer>
+            
             {isDeleteModalOpen && (
                 <DeleteConfirmationModal onClose={() => setDeleteModalOpen(false)} onConfirm={handleDeleteConfirm} message="Bạn có chắc chắn muốn xóa thiệp mời này?"/>
             )}

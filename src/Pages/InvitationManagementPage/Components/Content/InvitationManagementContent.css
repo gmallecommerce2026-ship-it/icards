@@ -33,9 +33,19 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    max-width: 1520px;
     padding: 20px 0;
-    margin: 0 auto 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Đảm bảo tab tự cuộn mượt mà và không vượt rào */
+.tabs-container {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
 }
 .back-button {
     background: none;
@@ -66,7 +76,7 @@ body {
 
 
 /* ----- TABS ----- */
-.tabs-container {
+/* .tabs-container {
     display: flex;
     justify-content: flex-start; 
     width: 100%;
@@ -76,7 +86,7 @@ body {
     scrollbar-width: none; 
     -ms-overflow-style: none; 
     -webkit-overflow-scrolling: touch;
-}
+} */
 
 .tabs-container::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
@@ -496,7 +506,7 @@ body {
         padding: 20px;
         margin: 20px auto;
     }
-    
+
     .container {
         padding: 0 1rem;
     }
