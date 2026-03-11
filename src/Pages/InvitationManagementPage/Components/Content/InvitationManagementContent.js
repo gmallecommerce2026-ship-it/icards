@@ -1928,6 +1928,194 @@ const InvitationDashboard = ({ invitation, onTabClick }) => {
     );
 };
 
+const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) => {
+    const [tasks, setTasks] = useState(initialTasks);
+    const [newTaskTitle, setNewTaskTitle] = useState('');
+    const [editingTaskId, setEditingTaskId] = useState(null);
+    const [editTitle, setEditTitle] = useState('');
+    
+    // Drag & Drop refs
+    const dragItem = useRef();
+    const dragOverItem = useRef();
+
+    useEffect(() => {
+        setTasks(initialTasks);
+    }, [initialTasks]);
+
+    // Gọi API để lưu toàn bộ mảng (Bulk Sync)
+    const saveTasksToDB = async (updatedTasks) => {
+        try {
+            const response = await api.put(`/invitations/${invitationId}/tasks`, { tasks: updatedTasks });
+            onDataChange(response.data.data, 'update-tasks');
+        } catch (error) {
+            showErrorToast('Không thể lưu kế hoạch cưới.');
+        }
+    };
+
+    const handleAddTask = (e) => {
+        e.preventDefault();
+        if (!newTaskTitle.trim()) return;
+        const newTask = { id: Date.now().toString(), title: newTaskTitle, completed: false };
+        const updatedTasks = [newTask, ...tasks];
+        setTasks(updatedTasks);
+        saveTasksToDB(updatedTasks);
+        setNewTaskTitle('');
+    };
+
+    const handleToggleComplete = (taskId) => {
+        const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, completed: !t.completed } : t);
+        setTasks(updatedTasks);
+        saveTasksToDB(updatedTasks);
+    };
+
+    const handleDeleteTask = (taskId) => {
+        const updatedTasks = tasks.filter(t => t.id !== taskId);
+        setTasks(updatedTasks);
+        saveTasksToDB(updatedTasks);
+    };
+
+    const startEditing = (task) => {
+        setEditingTaskId(task.id);
+        setEditTitle(task.title);
+    };
+
+    const handleSaveEdit = (taskId) => {
+        if (!editTitle.trim()) return setEditingTaskId(null);
+        const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, title: editTitle } : t);
+        setTasks(updatedTasks);
+        saveTasksToDB(updatedTasks);
+        setEditingTaskId(null);
+    };
+
+    // --- Drag & Drop Handlers ---
+    const dragStart = (e, position) => {
+        dragItem.current = position;
+        e.target.style.opacity = 0.5;
+    };
+
+    const dragEnter = (e, position) => {
+        dragOverItem.current = position;
+    };
+
+    const drop = (e) => {
+        e.target.style.opacity = 1;
+        const copyListItems = [...tasks];
+        const dragItemContent = copyListItems[dragItem.current];
+        copyListItems.splice(dragItem.current, 1);
+        copyListItems.splice(dragOverItem.current, 0, dragItemContent);
+        
+        dragItem.current = null;
+        dragOverItem.current = null;
+        
+        setTasks(copyListItems);
+        saveTasksToDB(copyListItems);
+    };
+
+    const dragEnd = (e) => {
+        e.target.style.opacity = 1;
+    };
+
+    // Calculate progress
+    const completedCount = tasks.filter(t => t.completed).length;
+    const progress = tasks.length === 0 ? 0 : Math.round((completedCount / tasks.length) * 100);
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', width: '100%', padding: '20px 0' }}>
+            {/* Header & Progress */}
+            <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '8px', border: '0.5px solid #ccc', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+                <h3 style={{ fontFamily: "'SVN-Gilroy', sans-serif", color: '#27548a', margin: '0 0 16px 0' }}>Tiến độ chuẩn bị cưới</h3>
+                <div style={{ width: '100%', backgroundColor: '#E0E0E0', height: '12px', borderRadius: '6px', overflow: 'hidden' }}>
+                    <div style={{ width: `${progress}%`, backgroundColor: '#10B981', height: '100%', transition: 'width 0.3s ease' }} />
+                </div>
+                <p style={{ marginTop: '10px', color: '#666', fontWeight: 500 }}>Hoàn thành {completedCount}/{tasks.length} công việc ({progress}%)</p>
+            </div>
+
+            {/* Thêm mới Task */}
+            <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '12px' }}>
+                <input 
+                    type="text" 
+                    value={newTaskTitle} 
+                    onChange={(e) => setNewTaskTitle(e.target.value)} 
+                    placeholder="Thêm công việc mới (VD: Đặt cọc nhà hàng, Thử váy cưới...)" 
+                    style={{ flex: 1, padding: '12px 20px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '16px' }}
+                />
+                <button type="submit" className="guest-action-btn" style={{ height: 'auto', padding: '0 24px', backgroundColor: '#27548a', color: 'white' }}>
+                    <AddIcon /> Thêm việc
+                </button>
+            </form>
+
+            {/* Danh sách Task */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {tasks.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '40px', color: '#999', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
+                        Chưa có công việc nào. Hãy thêm công việc mới để bắt đầu kế hoạch của bạn!
+                    </div>
+                ) : (
+                    tasks.map((task, index) => (
+                        <div 
+                            key={task.id}
+                            draggable
+                            onDragStart={(e) => dragStart(e, index)}
+                            onDragEnter={(e) => dragEnter(e, index)}
+                            onDragEnd={dragEnd}
+                            onDragOver={(e) => e.preventDefault()}
+                            style={{ 
+                                display: 'flex', alignItems: 'center', padding: '16px 20px', 
+                                backgroundColor: task.completed ? '#f0fdf4' : 'white', 
+                                border: '1px solid #e0e0e0', borderRadius: '6px', cursor: 'grab',
+                                transition: 'all 0.2s ease', gap: '16px'
+                            }}
+                        >
+                            {/* Nút kéo thả */}
+                            <div style={{ color: '#aaa', cursor: 'grab' }}>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                            </div>
+
+                            {/* Checkbox */}
+                            <input 
+                                type="checkbox" 
+                                checked={task.completed} 
+                                onChange={() => handleToggleComplete(task.id)}
+                                style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#10B981' }}
+                            />
+
+                            {/* Tiêu đề / Sửa */}
+                            <div style={{ flex: 1 }}>
+                                {editingTaskId === task.id ? (
+                                    <input 
+                                        autoFocus
+                                        value={editTitle}
+                                        onChange={(e) => setEditTitle(e.target.value)}
+                                        onBlur={() => handleSaveEdit(task.id)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit(task.id)}
+                                        style={{ width: '100%', padding: '8px', border: '1px solid #27548a', borderRadius: '4px' }}
+                                    />
+                                ) : (
+                                    <span 
+                                        onClick={() => startEditing(task)}
+                                        style={{ 
+                                            fontSize: '16px', fontWeight: 500, cursor: 'pointer',
+                                            textDecoration: task.completed ? 'line-through' : 'none',
+                                            color: task.completed ? '#9ca3af' : '#111827'
+                                        }}
+                                    >
+                                        {task.title}
+                                    </span>
+                                )}
+                            </div>
+
+                            {/* Xóa */}
+                            <button onClick={() => handleDeleteTask(task.id)} className="table-action-btn" style={{ color: '#EF4444' }}>
+                                <DeleteIcon width="20" height="20" />
+                            </button>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    );
+};
+
 const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, activeTab, onTabChange }) => {
     const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
     const navigate = useNavigate();
@@ -1937,6 +2125,7 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
         { id: 'guests', title: 'Quản lý khách mời' },
         { id: 'master-guests', title: 'Danh bạ khách mời' },
         { id: 'event-management', title: 'Quản lí sự kiện' },
+        { id: 'tasks', title: 'Kế hoạch cưới' },
         { id: 'invitation-settings', title: 'Cài đặt thiệp mời' },
         { id: 'delete', title: 'Xóa thiệp mời' },
     ];
@@ -1988,6 +2177,8 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
                 return <WishManagementPanel />;
             case 'master-guests': // <-- RENDER PANEL MỚI
                 return <MasterGuestPanel user={invitation.user} onAddGuestsToInvitation={handleAddGuestsFromMaster} />;
+            case 'tasks':
+                return <TaskManagementPanel invitationId={invitation._id} initialTasks={invitation.tasks || []} onDataChange={onDataChange} />;
             case 'event-management': // <- BỔ SUNG SWITCH CASE
                 return <EventManagementPanel invitation={invitation} onDataChange={onDataChange} />;
             case 'invitation-settings':
@@ -2119,6 +2310,10 @@ const InvitationManagement = () => {
             switch(type) {
                 case 'update-settings':
                     return _.cloneDeep(data);
+
+                case 'update-tasks': // <--- THÊM CASE NÀY ĐỂ XỬ LÝ UPDATE LOCAL STATE CHO TASK
+                    newInvitation.tasks = data;
+                    return newInvitation;
 
                 case 'add-guest':
                     newInvitation.guests = [...(newInvitation.guests || []), data];
