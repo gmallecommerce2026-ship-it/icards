@@ -1997,19 +1997,19 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
         dragOverItem.current = position;
     };
 
-    const drop = (e) => {
-        e.target.style.opacity = 1;
-        const copyListItems = [...tasks];
-        const dragItemContent = copyListItems[dragItem.current];
-        copyListItems.splice(dragItem.current, 1);
-        copyListItems.splice(dragOverItem.current, 0, dragItemContent);
+    // const drop = (e) => {
+    //     e.target.style.opacity = 1;
+    //     const copyListItems = [...tasks];
+    //     const dragItemContent = copyListItems[dragItem.current];
+    //     copyListItems.splice(dragItem.current, 1);
+    //     copyListItems.splice(dragOverItem.current, 0, dragItemContent);
         
-        dragItem.current = null;
-        dragOverItem.current = null;
+    //     dragItem.current = null;
+    //     dragOverItem.current = null;
         
-        setTasks(copyListItems);
-        saveTasksToDB(copyListItems);
-    };
+    //     setTasks(copyListItems);
+    //     saveTasksToDB(copyListItems);
+    // };
 
     const dragEnd = (e) => {
         e.target.style.opacity = 1;
