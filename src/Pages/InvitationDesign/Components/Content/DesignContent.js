@@ -2896,7 +2896,6 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
                 height: newHeight,
                 x: newX,
                 y: newY,
-                isTransforming: true
             };
 
             // --- BẮT ĐẦU THÊM MỚI ---
@@ -2913,9 +2912,8 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
             if (startItem.type === 'text') {
                 if (isCorner) {
                     const scaleRatio = newWidth / startItem.width;
-                    // Làm tròn 1 chữ số thập phân giúp font không bị nhảy pixel liên tục
-                    newProps.fontSize = Math.max(8, Math.round(startItem.fontSize * scaleRatio * 10) / 10); 
-                    newProps.isCustomWidth = true;
+                    newProps.fontSize = Math.max(8, startItem.fontSize * scaleRatio); 
+                    newProps.isCustomWidth = true; // Kéo góc cũng tính là can thiệp chiều ngang
                 }
             }
 
@@ -2924,10 +2922,7 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
         const handleEnd = () => {
             window.removeEventListener('pointermove', handleMove);
             window.removeEventListener('pointerup', handleEnd);
-            
-            // <--- 2. SỬA LẠI DÒNG NÀY ĐỂ TẮT CỜ KHI NHẢ CHUỘT
-            onUpdateItem(item.id, { isTransforming: false }, true); 
-            
+            onUpdateItem(item.id, {}, true);
             setTimeout(() => { setIsTransforming(false); }, 0);
         };
         window.addEventListener('pointermove', handleMove);
@@ -3047,15 +3042,11 @@ const TextEditor = (props) => {
 
     // LOGIC AUTO-FIT THÔNG MINH
     useLayoutEffect(() => {
-        // <--- 1. THÊM DÒNG NÀY VÀO NGAY ĐẦU HÀM
-        // Bỏ qua việc auto-fit đo đạc DOM khi người dùng đang kéo scale/resize
-        if (item.isTransforming) return; 
-
         if (measureRef.current) {
             // Lấy kích thước tự nhiên của văn bản
             const { offsetWidth, offsetHeight } = measureRef.current;
             const fitHeight = offsetHeight;
-            const fitWidth = offsetWidth + 2; 
+            const fitWidth = offsetWidth + 2; // Buffer nhỏ để tránh rớt dòng chập chờn
 
             let updates = {};
             let needsUpdate = false;
@@ -3086,8 +3077,7 @@ const TextEditor = (props) => {
                 onUpdateItem(item.id, updates, false);
             }
         }
-    // <--- 2. NHỚ THÊM item.isTransforming VÀO DEPENDENCY ARRAY CUỐI CÙNG
-    }, [item.content, item.fontSize, item.fontFamily, item.fontWeight, item.fontStyle, item.width, item.height, item.x, item.textAlign, item.id, isCustomWidth, item.isTransforming, onUpdateItem]);
+    }, [item.content, item.fontSize, item.fontFamily, item.fontWeight, item.fontStyle, item.width, item.height, item.x, item.textAlign, item.id, isCustomWidth, onUpdateItem]);
 
     return (
         <DraggableItemComponent {...props}>
