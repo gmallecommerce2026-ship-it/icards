@@ -2968,6 +2968,7 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
         <DraggableItem
             ref={itemRef}
             drag={!isTransforming && !isLocked && !item.isEditing}
+            dragMomentum={false} // <--- THÊM DÒNG NÀY ĐỂ TẮT QUÁN TÍNH
             onDragStart={handleDragStart}
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}
@@ -2978,7 +2979,6 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
                 zIndex: isSelected ? item.zIndex + 1000 : item.zIndex,
                 width: item.width,
                 height: item.height,
-                // SỬA TẠI ĐÂY: Hiển thị viền liền (solid) dày 2.5px khi được chọn HOẶC đang kéo
                 border: (isSelected || isTransforming) ? `2.5px solid ${BORDER_COLOR}` : `2.5px solid transparent`,
                 transformOrigin: 'center center',
                 opacity: item.opacity,
