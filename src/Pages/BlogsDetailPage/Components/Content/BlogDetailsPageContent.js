@@ -66,7 +66,7 @@ const BlogDetailsPageContent = () => {
     if (loading) return <div className="loading-wrapper">Đang tải nội dung...</div>;
     if (!blog) return <div className="loading-wrapper">Bài viết không tồn tại.</div>;
 
-    const blogHtmlContent = blog.content || '';
+    //const blogHtmlContent = blog.content || '';
     
     // ++ MỚI: Lấy relatedProducts từ dữ liệu thật
     const relatedProducts = blog.relatedProducts || [];
@@ -106,7 +106,37 @@ const BlogDetailsPageContent = () => {
                             </div>
                         )}
 
-                        <div className="blog-content-body blog-animate ck-content" dangerouslySetInnerHTML={{ __html: blogHtmlContent }} />
+                        <div className="blog-content-body blog-animate ck-content">
+                            {Array.isArray(blog.content) ? (
+                                // Nếu content là mảng các block (cấu trúc mới)
+                                blog.content.map((block, index) => {
+                                    if (block.type === 'text') {
+                                        return (
+                                            <div 
+                                                key={block._id || index} 
+                                                dangerouslySetInnerHTML={{ __html: block.content }} 
+                                            />
+                                        );
+                                    }
+                                    if (block.type === 'image') {
+                                        return (
+                                            <img 
+                                                key={block._id || index} 
+                                                src={block.content} 
+                                                alt={block.alt || "blog-image"} 
+                                                style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0' }}
+                                            />
+                                        );
+                                    }
+                                    return null;
+                                })
+                            ) : (
+                                // Nếu content là một chuỗi string HTML (cấu trúc cũ/fallback)
+                                typeof blog.content === 'string' ? (
+                                    <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+                                ) : null
+                            )}
+                        </div>
                     </article>
 
                     {/* --- CỘT PHẢI: SIDEBAR --- */}
