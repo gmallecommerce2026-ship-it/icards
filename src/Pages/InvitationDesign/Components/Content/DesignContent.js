@@ -2552,6 +2552,7 @@ const PannableImageFrame = ({ item, onUpdateItem, onSelectItem }) => {
           ref={imageRef}
           src={item.url}
           alt="Đối tượng hình ảnh có thể kéo"
+          crossOrigin="anonymous"
           style={imageStyles}
           onPointerDown={handlePointerDown}
           onDragStart={(e) => e.preventDefault()}
@@ -2590,7 +2591,7 @@ const GenericImagePicker = ({ images, title, onItemClick }) => (
                                 justifyContent: 'center'
                             }}
                         >
-                            <CardMedia component="img" image={image.url} alt={image.name}
+                            <CardMedia component="img" image={image.url} alt={image.name} crossOrigin="anonymous"
                                 sx={{ objectFit: 'contain', p: 1, maxHeight: '100%', maxWidth: '100%', pointerEvents: 'none' }}
                                 onError={(e) => {
                                     const target = e.target; target.onerror = null;
@@ -2724,7 +2725,7 @@ const UserImageManager = ({ userImages, onSelectUserImage, onImageUploaded, isUp
                                         borderColor: isSelected ? 'primary.main' : 'transparent',
                                     }}
                                 >
-                                    <CardMedia component="img" image={img.url} alt={img.name}
+                                    <CardMedia component="img" image={img.url} alt={img.name} crossOrigin="anonymous"
                                         sx={{
                                             objectFit: 'contain',
                                             p: 1,
@@ -3894,7 +3895,7 @@ const TemplatePickerIntegrated = ({ templates, onSelectTemplate }) => (
             {templates.map(template => (
                 <Grid item key={template._id} xs={12}>
                     <Card onClick={() => onSelectTemplate(template._id)} sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4, transform: 'scale(1.02)' }, transition: 'all 0.2s ease' }}>
-                        <CardMedia component="img" height="150" image={template.imgSrc || 'https://placehold.co/400x400/EBF1FB/B0C7EE?text=No+Image'} alt={template.title} sx={{ objectFit: 'cover' }} />
+                        <CardMedia component="img" height="150" image={template.imgSrc || 'https://placehold.co/400x400/EBF1FB/B0C7EE?text=No+Image'} crossOrigin="anonymous" alt={template.title} sx={{ objectFit: 'cover' }} />
                         <CardContent sx={{ p: 1.5 }}>
                             <Typography variant="body2" fontWeight="500">{template.title}</Typography>
                         </CardContent>
@@ -4194,8 +4195,9 @@ const WeddingInvitationEditor = () => {
             ), true);
             setSelectedItemId(newImageItem.id);
         };
-        img.onerror = () => toast.error(`Không thể tải hình ảnh từ: ${url}`);
-        img.src = url; // <--- ĐÃ SỬA: Tải URL trực tiếp
+        img.onerror = () => toast.error(`tải hình ảnh từ: ${url}`);
+        const bypassCacheUrl = url.includes('?') ? `${url}&t=${Date.now()}` : `${url}?t=${Date.now()}`;
+        img.src = bypassCacheUrl; // <--- ĐÃ SỬA: Tải URL trực tiếp
     }, [pages, getNextZIndex, setPages, currentPageId]);
 
     const [activeDragItem, setActiveDragItem] = useState(null);
@@ -5398,7 +5400,7 @@ const WeddingInvitationEditor = () => {
                     await new Promise((resolve, reject) => { // Sửa lỗi cú pháp Promise
                         img.onload = resolve;
                         img.onerror = (err) => reject(new Error(`Không thể tải ảnh: ${item.url}`));
-                        img.src = item.url;
+                        img.src = item.url.includes('?') ? `${item.url}&t=${Date.now()}` : `${item.url}?t=${Date.now()}`;
                     });
 
                     // 1. Set clipping path (khung) dựa trên item.shape
