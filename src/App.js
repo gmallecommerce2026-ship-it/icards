@@ -300,9 +300,8 @@ function App() {
                     <Route path="/product/:productId" element={<ProductDetailsPage />} />
                     <Route path="/invitations" element={<InvitationPage />} />
                     <Route path="/invitations/category/:categoryName" element={<InvitationPage />} />
-                    <Route path="/invitations/category/:categoryName/:groupName" element={<InvitationPage />} />
-                    {/* SỬA LỖI ĐIỀU HƯỚNG: Thay đổi route cho type */}
-                    <Route path="/invitations/category/:categoryName/type/:typeName" element={<InvitationPage />} />
+                    <Route path="/invitations/category/:categoryName/group/:groupName" element={<InvitationPage />} />
+                    <Route path="/invitations/category/:categoryName/group/:groupName/type/:typeName" element={<InvitationPage />} />
                     <Route path="/invitation/:invitationId" element={<InvitationDetailsPage />} />
                     <Route path="/professional" element={<TutorialPage />} />
                     <Route path="/search/:query" element={<SearchResultsPage />} />
