@@ -357,17 +357,22 @@ const Header = ({ className }) => {
                 columns: (navItem.children || [])
                     .filter(col => col.isVisible)
                     .sort((a, b) => (a.order || 0) - (b.order || 0))
-                    .map(column => ({
-                        title: column.title,
-                        path: `${categoryPath}/type/${titleToSlug(column.title)}`,
-                        links: (column.children || [])
-                           .filter(link => link.isVisible)
-                           .sort((a, b) => (a.order || 0) - (b.order || 0))
-                           .map(link => ({
-                                text: link.title,
-                                href: `${categoryPath}/type/${titleToSlug(link.title)}`,
-                           })),
-                    })),
+                    .map(column => {
+                        // SỬA TẠI ĐÂY 1: Tạo đường dẫn chuẩn cho Group
+                        const groupPath = `${categoryPath}/group/${titleToSlug(column.title)}`;
+                        return {
+                            title: column.title,
+                            path: groupPath, 
+                            links: (column.children || [])
+                               .filter(link => link.isVisible)
+                               .sort((a, b) => (a.order || 0) - (b.order || 0))
+                               .map(link => ({
+                                    text: link.title,
+                                    // SỬA TẠI ĐÂY 2: Link của Type phải nối tiếp sau Group
+                                    href: `${groupPath}/type/${titleToSlug(link.title)}`,
+                               })),
+                        };
+                    }),
             };
         });
 
@@ -388,7 +393,8 @@ const Header = ({ className }) => {
                             .sort((a, b) => (a.order || 0) - (b.order || 0))
                             .map(link => ({
                                 text: link.title,
-                                href: `${categoryPath}/type/${titleToSlug(link.title)}`,
+                                // SỬA TẠI ĐÂY 3: Link cho danh mục con của "Thiệp khác" sẽ là Group
+                                href: `${categoryPath}/group/${titleToSlug(link.title)}`,
                             })),
                     };
                 }),
