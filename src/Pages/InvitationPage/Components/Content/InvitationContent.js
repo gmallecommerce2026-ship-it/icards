@@ -24,7 +24,7 @@ const InvitationCard = ({ id, title, imgSrc }) => {
 // --- Main Page Component ---
 const InvitationPageContent = () => {
     // Sửa lại để nhận `typeName` làm tham số lọc chính
-    const { categoryName, typeName } = useParams();
+    const { categoryName, groupName, typeName } = useParams();
     const navigate = useNavigate();
     const [allTemplates, setAllTemplates] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -63,7 +63,34 @@ const InvitationPageContent = () => {
     }, []);
     const banners = settings?.banners || [];
     const invitationBanner = banners.find(b => b.displayPage === 'invitations' && b.isEnabled) || banners.find(b => b.displayPage === 'all' && b.isEnabled);
+    const groupsForCurrentCategory = useMemo(() => {
+        if (!categoryName) return [];
+        const templatesInCategory = allTemplates.filter(t => titleToSlug(t.category) === categoryName);
+        return [...new Set(templatesInCategory.map(t => t.group).filter(Boolean))];
+    }, [allTemplates, categoryName]);
+    const typesForCurrentGroup = useMemo(() => {
+        if (!categoryName || !groupName) return [];
+        const templatesInGroup = allTemplates.filter(t => 
+            titleToSlug(t.category) === categoryName && 
+            titleToSlug(t.group) === groupName
+        );
+        return [...new Set(templatesInGroup.map(t => t.type).filter(Boolean))];
+    }, [allTemplates, categoryName, groupName]);
+    // const filteredTemplates = useMemo(() => {
+    //     if (!categoryName) return allTemplates;
 
+    //     let filtered = allTemplates.filter(template => titleToSlug(template.category) === categoryName);
+
+    //     if (groupName) {
+    //         filtered = filtered.filter(template => titleToSlug(template.group) === groupName);
+    //     }
+
+    //     if (typeName) {
+    //         filtered = filtered.filter(template => titleToSlug(template.type) === typeName);
+    //     }
+
+    //     return filtered;
+    // }, [allTemplates, categoryName, groupName, typeName]);
     const titleToSlug = (title) => {
         if (!title) return '';
         return title
@@ -104,13 +131,16 @@ const InvitationPageContent = () => {
 
         let filtered = allTemplates.filter(template => titleToSlug(template.category) === categoryName);
 
-        // Lọc theo 'type' nếu có
+        if (groupName) {
+            filtered = filtered.filter(template => titleToSlug(template.group) === groupName);
+        }
+
         if (typeName) {
             filtered = filtered.filter(template => titleToSlug(template.type) === typeName);
         }
 
         return filtered;
-    }, [allTemplates, categoryName, typeName]);
+    }, [allTemplates, categoryName, groupName, typeName]);
 
     return (
         <main className="invitation-page">
@@ -158,21 +188,45 @@ const InvitationPageContent = () => {
             <div className="container">
                 <div className="section-container">
                     {/* [SỬA LỖI HIỂN THỊ] - Filter giờ sẽ hiển thị các 'type' */}
-                    {typesForCurrentCategory.length > 0 && (
-                        <div className="invitation-type-filters" ref={filtersRef}>
+                    {groupsForCurrentCategory.length > 0 && (
+                        <div className="invitation-type-filters" ref={filtersRef} style={{ marginBottom: typeName || groupName ? '10px' : '30px' }}>
                             <button
-                                className={`category-button-pro ${!typeName ? 'active' : ''}`}
+                                className={`category-button-pro ${!groupName ? 'active' : ''}`}
                                 onClick={() => navigate(`/invitations/category/${categoryName}`)}
                             >
-                                Tất cả
+                                Tất cả chủ đề
                             </button>
-                            {typesForCurrentCategory.map(type => {
-                                const typeSlug = titleToSlug(type);
+                            {groupsForCurrentCategory.map(group => {
+                                const gSlug = titleToSlug(group);
+                                return (
+                                    <button
+                                        key={group}
+                                        className={`category-button-pro ${groupName === gSlug ? 'active' : ''}`}
+                                        onClick={() => navigate(`/invitations/category/${categoryName}/group/${gSlug}`)}
+                                    >
+                                        {group}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* FILTER CHO TYPE (Cấp 3 - Chỉ hiện khi đã chọn Group) */}
+                    {groupName && typesForCurrentGroup.length > 0 && (
+                        <div className="invitation-type-filters" style={{ marginBottom: '30px' }}>
+                            <button
+                                className={`category-button-pro sub-filter ${!typeName ? 'active' : ''}`}
+                                onClick={() => navigate(`/invitations/category/${categoryName}/group/${groupName}`)}
+                            >
+                                Tất cả loại
+                            </button>
+                            {typesForCurrentGroup.map(type => {
+                                const tSlug = titleToSlug(type);
                                 return (
                                     <button
                                         key={type}
-                                        className={`category-button-pro ${typeName === typeSlug ? 'active' : ''}`}
-                                        onClick={() => navigate(`/invitations/category/${categoryName}/type/${typeSlug}`)}
+                                        className={`category-button-pro sub-filter ${typeName === tSlug ? 'active' : ''}`}
+                                        onClick={() => navigate(`/invitations/category/${categoryName}/group/${groupName}/type/${tSlug}`)}
                                     >
                                         {type}
                                     </button>
@@ -218,7 +272,7 @@ const InvitationPageContent = () => {
                                 />
                             ))
                         ) : (
-                            <div className="grid-message">Chưa có sản phẩm nào trong danh mục này.</div>
+                            <div className="grid-message">Chưa có mẫu thiệp nào trong danh mục này.</div>
                         )}
                     </div>
                 </div>

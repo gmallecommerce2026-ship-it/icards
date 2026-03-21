@@ -1,11 +1,17 @@
 // src/Pages/Components/Breadcrumbs.js
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import api from '../../services/api';
 import './Breadcrumbs.css';
 
-// Component con để xử lý việc tải tên cho các trang chi tiết
+// Hàm helper để convert slug thành text dễ nhìn (Fallback khi không có trong map)
+const formatSlugToText = (slug) => {
+    if (!slug) return '';
+    const text = decodeURIComponent(slug).replace(/-/g, ' ');
+    // Viết hoa chữ cái đầu của mỗi từ
+    return text.replace(/\b\w/g, char => char.toUpperCase());
+};
+
 const DynamicBreadcrumbItem = ({ type, id }) => {
     const [name, setName] = useState('...'); // Hiển thị '...' trong khi tải
 
@@ -50,75 +56,78 @@ const DynamicBreadcrumbItem = ({ type, id }) => {
     return <span className="breadcrumb-active"> / {name}</span>;
 };
 
-
-const Breadcrumbs = ({ className }) => {
+// Cung cấp thêm prop customBreadcrumbs để ghi đè khi cần
+const Breadcrumbs = ({ className, customBreadcrumbs }) => {
     const location = useLocation();
+    
+    // Nếu component cha truyền customBreadcrumbs, ưu tiên dùng nó (Dùng cho trang Detail)
+    if (customBreadcrumbs && customBreadcrumbs.length > 0) {
+        return (
+            <nav className={`breadcrumbs-container ${className || ''}`}>
+                <Link to="/" className="breadcrumb-link">Trang chủ</Link>
+                {customBreadcrumbs.map((crumb, index) => {
+                    const isLast = index === customBreadcrumbs.length - 1;
+                    return isLast ? (
+                        <span key={index} className="breadcrumb-active"> / {crumb.label}</span>
+                    ) : (
+                        <Link key={index} to={crumb.path} className="breadcrumb-link"> / {crumb.label}</Link>
+                    );
+                })}
+            </nav>
+        );
+    }
+
     const pathnames = location.pathname.split('/').filter((x) => x);
 
+    // Mở rộng map cho các category/group phổ biến để hiển thị chính xác tiếng Việt có dấu
     const breadcrumbNameMap = {
-        'invitations': 'Tất cả mẫu thiệp',
+        'invitations': 'Mẫu thiệp', // Đổi "Tất cả mẫu thiệp" thành "Mẫu thiệp" cho đỡ rườm rà
         'product': 'Sản phẩm',
         'invitation': 'Mẫu thiệp',
         'shop': 'Cửa hàng',
-        'professional': 'Chuyên nghiệp',
-        'account-settings': 'Thiết lập tài khoản',
-        'invitation-management': 'Quản lý thiệp mời',
-        
-        // Mapping thêm cho các slug tiếng Việt để hiển thị đẹp hơn
-        'thiep-theo-mua': 'Thiệp Theo Mùa',
-        'trang-trong': 'Trang Trọng',
-        'hien-dai': 'Hiện Đại',
-        'truyen-thong': 'Truyền Thống',
-        'toi-gian': 'Tối Giản',
+        'category': null, // Thêm null để dễ handle filter
+        'group': null,
+        'type': null,
+        // Map sẵn một số slug tiếng Việt
+        'thiep-chuc-mung': 'Thiệp Chúc Mừng',
+        'thiep-mung-ngay-le': 'Thiệp Mừng Ngày Lễ',
+        'thiep-mung-nam-moi': 'Thiệp Mừng Năm Mới',
         'thiep-cuoi': 'Thiệp Cưới',
-        'thiep-sinh-nhat': 'Thiệp Sinh Nhật',
-        'thiep-thoi-noi': 'Thiệp Thôi Nôi',
-        'thiep-tan-gia': 'Thiệp Tân Gia',
     };
 
-    // --- BẮT ĐẦU SỬA LỖI ---
     const breadcrumbLinkMap = {
         'product': '/shop',
-        'invitation': '/invitations' // Thêm dòng này để map đúng về trang danh sách
+        'invitation': '/invitations'
     };
-    // --- KẾT THÚC SỬA LỖI ---
 
-    if (pathnames.length === 0) {
-        return null;
-    }
+    if (pathnames.length === 0) return null;
+
+    // Các keyword cần ẩn khỏi breadcrumb path
+    const hiddenKeywords = ['category', 'group', 'type'];
 
     return (
         <nav className={`breadcrumbs-container ${className || ''}`}>
             <Link to="/" className="breadcrumb-link">Trang chủ</Link>
             {pathnames.map((value, index) => {
-                const isLast = index === pathnames.length - 1;
                 const to = `/${pathnames.slice(0, index + 1).join('/')}`;
                 const prevPath = pathnames[index - 1];
 
-                // --- CHỈNH SỬA: Ẩn cả 'category' và 'type' khỏi giao diện ---
-                if (value === 'category' || value === 'type') {
-                    return null;
-                }
-                // ----------------------------------------------------------
+                // Bỏ qua các params phân cấp của router
+                if (hiddenKeywords.includes(value)) return null;
 
+                const isLast = index === pathnames.length - 1;
                 if (isLast && (prevPath === 'product' || prevPath === 'invitation' || prevPath === 'invitation-management')) {
                     return <DynamicBreadcrumbItem key={to} type={prevPath} id={value} />;
                 }
                 
-                // Ưu tiên lấy tên từ map, nếu không có thì format lại slug (bỏ dấu gạch ngang)
-                const displayName = breadcrumbNameMap[value] || decodeURIComponent(value).replace(/-/g, ' ');
-                
-                // Sử dụng breadcrumbLinkMap để lấy đường dẫn đúng nếu có
+                // Ưu tiên lấy từ map, nếu không có thì tự động format slug (thiep-chuc-mung -> Thiep Chuc Mung)
+                const displayName = breadcrumbNameMap[value] || formatSlugToText(value);
                 const linkPath = breadcrumbLinkMap[value] || to;
 
                 return isLast ? (
-                    <span key={to} className="breadcrumb-active">
-                        {` / ${displayName}`}
-                    </span>
+                    <span key={to} className="breadcrumb-active"> / {displayName}</span>
                 ) : (
-                    <Link key={to} to={linkPath} className="breadcrumb-link">
-                        {` / ${displayName}`}
-                    </Link>
+                    <Link key={to} to={linkPath} className="breadcrumb-link"> / {displayName}</Link>
                 );
             })}
         </nav>
