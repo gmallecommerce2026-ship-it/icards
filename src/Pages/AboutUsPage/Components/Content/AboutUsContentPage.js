@@ -1479,8 +1479,13 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                     <div className="flap top"></div>
                     <div className="flap left"></div>
                     <div className="flap right"></div>
-                    <div className={`envelope-seal ${isRotating ? 'rotating' : ''}`}>
-                         <span className="seal-text">Mở thiệp</span>
+                    <div className={`envelope-seal custom-wax-seal ${isRotating ? 'rotating' : ''}`}>
+                        {/* Thêm ảnh dấu sáp png của bạn vào đây */}
+                        <img src="/assets/dau-sap.png" alt="Mở thiệp" className="wax-seal-img" />
+                        
+                        {/* Vẫn giữ lại chữ Mở thiệp để hỗ trợ người dùng nhận biết, 
+                            nhưng ta sẽ style cho nó nổi bật phía trên ảnh hoặc ẩn đi tùy ý */}
+                        <span className="seal-text">Mở thiệp</span>
                     </div>
                 </div>
                 {/* END: MODIFIED ENVELOPE STRUCTURE */}
