@@ -263,3 +263,30 @@
   display: flex;
   gap: 15px;
 }
+
+.wax-seal {
+  position: absolute;
+  /* Chỉnh kích thước dấu sáp cho phù hợp với phong bì */
+  width: 70px; 
+  height: 70px;
+  
+  /* Căn giữa theo chiều ngang và đặt ngay mũi nhọn của nắp (cao 200px) */
+  left: 50%;
+  top: 200px; 
+  
+  /* 1. translate(-50%, -50%): Kéo tâm hình ảnh vào đúng điểm nhọn.
+    2. rotateX(180deg): Xoay 180 độ giống mặt ngoài (lid-outer) để hướng ra ngoài.
+    3. translateZ(2px): Đẩy lên 1 chút xíu trong không gian 3D để không bị chìm vào texture giấy.
+  */
+  transform: translate(-50%, -50%) rotateX(180deg) translateZ(2px);
+  
+  /* Chỉ hiện khi nhìn từ mặt ngoài, khi mở nắp ra sau sẽ không thấy lỗi ngược hình */
+  backface-visibility: hidden;
+  
+  /* Đổ bóng (drop-shadow) sát theo viền ảnh PNG giúp dấu sáp trông thật và nổi khối 3D hơn */
+  filter: drop-shadow(0px 6px 8px rgba(0, 0, 0, 0.4));
+  
+  /* Đảm bảo người dùng không vô tình click / kéo nhầm con dấu */
+  pointer-events: none; 
+  z-index: 10;
+}

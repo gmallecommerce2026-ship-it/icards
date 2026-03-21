@@ -63,31 +63,27 @@ const FlatCard = ({ isInserting, frontCoverUrl, backCoverUrl }) => (
  * Phong bì (wrapper) có thể lật và trượt đi.
  */
 const Envelope = ({ 
-  isFlipped, stage, isMoving, // SỬA: 'isFlipped' được dùng trở lại
+  isFlipped, stage, isMoving, 
   envelopeFrontUrl, envelopeBackUrl, 
   lidOuterUrl, lidInnerUrl 
 }) => (
   <div 
     className={`
       envelope-wrapper 
-      ${/* SỬA LỖI: Xóa class 'flip' khỏi đây, GSAP sẽ toàn quyền kiểm soát */ ''} 
       ${stage === 'closingLid' ? 'closing-lid' : ''}
       ${stage === 'flippingAndMoving' || stage === 'done' ? 'flipping-and-moving' : ''}
       ${isMoving ? 'move-right' : ''}
     `}
   >
-    {/* Phần lưng phong bì (mặt sau chính) */}
     <div className="envelope-part envelope-back">
       <img src={envelopeBackUrl || PLACEHOLDERS.envelopeBack} alt="Mặt sau phong bì" />
     </div>
 
-    {/* Phần thân trước của phong bì (che tấm thiệp) */}
     <div className="envelope-part envelope-body">
       <img src={envelopeFrontUrl || PLACEHOLDERS.envelopeFront} alt="Mặt trước phong bì" />
     </div>
 
     {/* Nắp phong bì (cấu trúc 3D 2 mặt) */}
-    {/* SỬA LỖI: Xóa class 'envelope-part' khỏi nắp để tránh xung đột CSS */}
     <div className="envelope-lid">
       <div className="lid-face lid-inner">
         <img src={lidInnerUrl || PLACEHOLDERS.lidInner} alt="Mặt trong nắp" />
@@ -95,6 +91,13 @@ const Envelope = ({
       <div className="lid-face lid-outer">
         <img src={lidOuterUrl || PLACEHOLDERS.lidOuter} alt="Mặt ngoài nắp" />
       </div>
+      
+      {/* 🚀 THÊM DẤU SÁP VÀO ĐÂY 🚀 */}
+      <img 
+        src="/assets/dau-sap.png" 
+        alt="Wax Seal" 
+        className="wax-seal"
+      />
     </div>
   </div>
 );
