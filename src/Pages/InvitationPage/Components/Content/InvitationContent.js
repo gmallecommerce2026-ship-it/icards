@@ -20,7 +20,16 @@ const InvitationCard = ({ id, title, imgSrc }) => {
         </div>
     );
 };
-
+const titleToSlug = (title) => {
+        if (!title) return '';
+        return title
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d")
+            .replace(/\s+/g, '-')
+            .replace(/[^\w-]+/g, '');
+    };
 // --- Main Page Component ---
 const InvitationPageContent = () => {
     // Sửa lại để nhận `typeName` làm tham số lọc chính
@@ -91,16 +100,7 @@ const InvitationPageContent = () => {
 
     //     return filtered;
     // }, [allTemplates, categoryName, groupName, typeName]);
-    const titleToSlug = (title) => {
-        if (!title) return '';
-        return title
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/đ/g, "d")
-            .replace(/\s+/g, '-')
-            .replace(/[^\w-]+/g, '');
-    };
+    
 
     useEffect(() => {
         const fetchAllTemplates = async () => {
