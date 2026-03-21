@@ -6,6 +6,72 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from "../../../../services/api";
 import SEO from '../../../../Features/SEO';
 import { useSettings } from '../../../../Context/SettingsContext';
+import Skeleton from '../../../../Components/Skeleton/Skeleton';
+
+const IntroSection = ({ content }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const contentRef = useRef(null);
+    const [shouldShowButton, setShouldShowButton] = useState(false);
+
+    // Kiểm tra chiều cao thực tế để quyết định có hiện nút hay không
+    useEffect(() => {
+        if (contentRef.current && contentRef.current.scrollHeight > 200) {
+            setShouldShowButton(true);
+        }
+    }, [content]);
+
+    // Nội dung mặc định chuẩn SEO nếu chưa có dữ liệu từ Settings
+    const defaultContent = `
+        <h3>Về iCards - Nền Tảng Thiết Kế Thiệp Online Hàng Đầu</h3>
+        <p>Chào mừng bạn đến với <strong>iCards</strong>, giải pháp toàn diện giúp bạn tạo ra những tấm thiệp mời, thiệp chúc mừng ấn tượng và mang đậm dấu ấn cá nhân. Dù là thiệp cưới sang trọng, thiệp sinh nhật vui nhộn hay thiệp sự kiện chuyên nghiệp, chúng tôi đều cung cấp hàng ngàn mẫu thiết kế độc đáo để bạn lựa chọn.</p>
+        <p>Với công cụ thiết kế trực quan, bạn không cần phải là một chuyên gia đồ họa. Chỉ cần vài thao tác kéo thả, chỉnh sửa nội dung, bạn đã có ngay một tấm thiệp ưng ý để gửi đến người thân, bạn bè và đối tác.</p>
+        <h4>Tại sao chọn iCards?</h4>
+        <ul>
+            <li><strong>Kho giao diện phong phú:</strong> Cập nhật liên tục các xu hướng thiết kế mới nhất.</li>
+            <li><strong>Tùy biến linh hoạt:</strong> Thay đổi màu sắc, font chữ, hình ảnh dễ dàng.</li>
+            <li><strong>Tiết kiệm chi phí & thời gian:</strong> Tạo thiệp online nhanh chóng, gửi đi tức thì qua Email, Zalo, Facebook.</li>
+            <li><strong>Chất lượng cao:</strong> Hỗ trợ xuất file in ấn sắc nét hoặc file kỹ thuật số tối ưu.</li>
+        </ul>
+        <p>Hãy bắt đầu hành trình sáng tạo của bạn ngay hôm nay cùng iCards và biến những khoảnh khắc đặc biệt trở nên đáng nhớ hơn bao giờ hết!</p>
+    `;
+
+    const finalContent = content || defaultContent;
+
+    return (
+        <section className="section-intro">
+            <div className="section-header">
+                <p className="section-subtitle">VỀ CHÚNG TÔI</p>
+                <h2 className="section-title">GIỚI THIỆU ICARDS</h2>
+            </div>
+            
+            <div className={`intro-content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}>
+                <div 
+                    ref={contentRef}
+                    className="intro-html-content"
+                    dangerouslySetInnerHTML={{ __html: finalContent }} 
+                />
+                {/* Lớp phủ mờ khi chưa mở rộng */}
+                {!isExpanded && shouldShowButton && <div className="content-fade-overlay"></div>}
+            </div>
+
+            {shouldShowButton && (
+                <button 
+                    className="intro-toggle-btn" 
+                    onClick={() => setIsExpanded(!isExpanded)}
+                >
+                    {isExpanded ? 'Thu gọn' : 'Xem thêm'}
+                    <svg 
+                        width="12" height="8" viewBox="0 0 12 8" fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                        style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}
+                    >
+                        <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                </button>
+            )}
+        </section>
+    );
+};
 
 // Hàm tiện ích để chuẩn hóa chuỗi thành slug URL
 const titleToSlug = (title) => {
@@ -35,7 +101,51 @@ const OccasionCard = ({ title, imgSrc, onClick }) => (
         <p className="occasion-title">{title}</p>
     </div>
 );
+const HomeSkeleton = () => {
+    return (
+        <div className="homepage-skeleton">
+            {/* Hero Banner Skeleton */}
+            <div style={{ width: '100%', aspectRatio: '16/9', maxHeight: '600px', marginBottom: '20px' }}>
+                <Skeleton type="rect" height="100%" />
+            </div>
 
+            <div className="homepage-main" style={{ padding: '0 20px', maxWidth: '1440px', margin: '0 auto' }}>
+                {/* Occasions Section Skeleton */}
+                <div style={{ marginBottom: '40px', marginTop: '40px' }}>
+                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                         <Skeleton type="text" width="200px" height="20px" />
+                     </div>
+                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
+                         <Skeleton type="title" width="400px" height="40px" />
+                     </div>
+                     <div style={{ display: 'flex', gap: '20px', overflow: 'hidden' }}>
+                         {[1, 2, 3, 4, 5].map((i) => (
+                             <div key={i} style={{ minWidth: '200px', flex: 1 }}>
+                                 <Skeleton type="rect" height="200px" style={{ borderRadius: '12px', marginBottom: '10px' }} />
+                                 <Skeleton type="text" width="80%" height="20px" style={{ margin: '0 auto' }} />
+                             </div>
+                         ))}
+                     </div>
+                </div>
+
+                {/* Products Grid Skeleton */}
+                <div style={{ marginBottom: '40px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
+                         <Skeleton type="title" width="300px" height="40px" />
+                    </div>
+                    <div className="product-grid">
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                            <div key={i} className="product-item">
+                                <Skeleton type="rect" height="300px" style={{ borderRadius: '12px', marginBottom: '10px' }} />
+                                <Skeleton type="text" width="90%" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 const InvitationCard = React.memo(({ _id, title, imgSrc }) => {
     const navigate = useNavigate();
     const handleNavigate = () => navigate(`/invitation/${_id}`);
@@ -123,7 +233,7 @@ export const Content = () => {
     const homeBanner = homeBanners.find(b => b.name?.toLowerCase().includes('chính')) || homeBanners[0];
 
     const secondaryBanners = homeBanners.filter(b => b.id !== homeBanner?.id).slice(0, 2);
-
+    const introContent = settings?.introText || undefined;
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -187,7 +297,7 @@ export const Content = () => {
     const homeSeo = settings?.seo?.pages?.home;
 
     if (loading || settingsLoading) {
-        return <div className="loading-spinner"><div></div><div></div><div></div></div>;
+        return <HomeSkeleton />;
     }
     
     const renderHeroBanner = () => {
@@ -315,6 +425,8 @@ export const Content = () => {
                         <SecondaryBanner key={banner.id || index} banner={banner} />
                     ))}
                 </section>
+
+                <IntroSection content={introContent} />
             </main>
         </>
     );

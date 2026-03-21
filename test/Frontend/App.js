@@ -15,6 +15,7 @@ import ScrollToTop from './Features/ScrollToTop';
 import GlobalHeader from './Pages/Components/GlobalHeader';
 import GlobalFooter from './Pages/Components/GlobalFooter';
 import Breadcrumbs from './Pages/Components/Breadcrumbs';
+import GenAIPage from './Pages/GenAIPage/GenAIPage';
 
 // --- PAGES ---
 const HomePage = lazy(() => import('./Pages/HomePage/HomePage'));
@@ -156,7 +157,6 @@ const WelcomePopup = ({ onClose }) => {
   );
 };
 
-// +++ BẮT ĐẦU THÊM MỚI +++
 // Component cho trang bảo trì
 const MaintenancePage = () => {
   const maintenanceStyles = `
@@ -203,7 +203,6 @@ const MaintenancePage = () => {
     </>
   );
 };
-// +++ KẾT THÚC THÊM MỚI +++
 
 
 // --- ROUTE & LAYOUT COMPONENTS ---
@@ -214,20 +213,25 @@ const MaintenancePage = () => {
  */
 const MainLayout = () => {
     const location = useLocation();
-    // DEBUG: Log a new path whenever the location changes
-    console.log(`[DEBUG] Current location in MainLayout: ${location.pathname}`); 
     
-    const isBlogPage = location.pathname.startsWith('/blogs') || location.pathname.startsWith('/blog');
-    const themeClass = isBlogPage ? 'blog-theme' : '';
+    // Kiểm tra xem trang hiện tại có phải là trang Blog không
+    // Dựa trên route đã định nghĩa: /page và /page/:slug
+    const isBlogPage = location.pathname.startsWith('/page');
 
     return (
         <>
-            <GlobalHeader className={themeClass} />
-            <Breadcrumbs className={themeClass} />
+            {/* Chỉ hiển thị Header chung nếu KHÔNG phải trang Blog */}
+            {!isBlogPage && <GlobalHeader />}
+            
+            {/* Chỉ hiển thị Breadcrumbs chung nếu KHÔNG phải trang Blog */}
+            {!isBlogPage && <Breadcrumbs />}
+            
             <main className="main-content-area">
                 <Outlet />
             </main>
-            <GlobalFooter className={themeClass} />
+            
+            {/* Chỉ hiển thị Footer chung nếu KHÔNG phải trang Blog */}
+            {!isBlogPage && <GlobalFooter />}
         </>
     );
 };
@@ -255,10 +259,8 @@ const ProtectedRoute = () => {
 function App() {
     const [showWelcomePopup, setShowWelcomePopup] = useState(false);
     
-    // +++ BẮT ĐẦU THÊM MỚI +++
     // Đặt biến này thành true để kích hoạt chế độ bảo trì
     const isMaintenanceMode = false; 
-    // +++ KẾT THÚC THÊM MỚI +++
 
     useEffect(() => {
         const hasVisited = localStorage.getItem('hasVisitedSite');
@@ -268,12 +270,9 @@ function App() {
         }
     }, []);
 
-    // +++ BẮT ĐẦU THÊM MỚI +++
     if (isMaintenanceMode) {
       return <MaintenancePage />;
     }
-    // +++ KẾT THÚC THÊM MỚI +++
-
 
     return (
         <>
@@ -308,8 +307,12 @@ function App() {
                     <Route path="/professional" element={<TutorialPage />} />
                     <Route path="/search/:query" element={<SearchResultsPage />} />
                     <Route path="/faq" element={<FaqPage />} />
+                    
+                    {/* Trang Blog sẽ dùng Header/Footer riêng của nó (đã xử lý trong MainLayout) */}
                     <Route path="/page" element={<BlogsPage />} />
                     <Route path="/page/:slug" element={<BlogDetailsPage />} />
+                    
+                    <Route path="/ai-face-gen" element={<GenAIPage />} />
                     
                     {/* --- Nhóm các route cần đăng nhập mới có thể truy cập --- */}
                     <Route element={<ProtectedRoute />}>

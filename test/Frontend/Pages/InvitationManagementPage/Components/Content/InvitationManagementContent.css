@@ -33,9 +33,19 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    max-width: 1520px;
     padding: 20px 0;
-    margin: 0 auto 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Đảm bảo tab tự cuộn mượt mà và không vượt rào */
+.tabs-container {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
 }
 .back-button {
     background: none;
@@ -66,30 +76,38 @@ body {
 
 
 /* ----- TABS ----- */
-.tabs-container {
-    border-top: 1px solid #E5E7EB;
-    border-bottom: 1px solid #E5E7EB;
+/* .tabs-container {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; 
     width: 100%;
     max-width: 1520px;
     margin: 0 auto;
+    overflow-x: auto;
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+    -webkit-overflow-scrolling: touch;
+} */
+
+.tabs-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
 }
+
 .tab-button {
     background-color: transparent;
-    padding: 24px 20px;
-    flex-grow: 1;
+    padding: 20px 24px;
+    flex: 1 0 auto; /* Đảm bảo không bị bóp méo chữ, cho phép scroll nếu dài */
     display: flex;
     justify-content: center;
     align-items: center;
     border: none;
     border-right: 1px solid #E5E7EB;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.95rem; /* Căn chỉnh lại size để 6 tab hiển thị vừa vặn hơn trên Desktop */
     color: #111827;
     text-transform: uppercase;
     font-weight: 600;
     transition: background-color 0.3s, color 0.3s;
+    white-space: nowrap; /* Bắt buộc không bẻ dòng text */
 }
 .tab-button:last-child {
     border-right: none;
@@ -99,7 +117,62 @@ body {
     color: #FFFFFF;
 }
 .tab-button:hover:not(.active) {
-    background-color: #F3F4F6; /* Xám rất nhạt */
+    background-color: #F3F4F6;
+}
+
+.settings-panel-wrapper {
+    background-color: white;
+    width: 100%;
+    max-width: 1080px;
+    margin: 40px auto;
+    box-shadow: 0px 0px 8px 0px rgba(0,0,0,0.1); /* Giảm độ gắt của bóng */
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    border-radius: 12px;
+}
+
+.settings-notice-box {
+    background-color: rgba(204,215,229,0.5); /* Nhẹ nhàng hơn */
+    padding: 20px;
+    font-family: "'SVN-Gilroy', sans-serif";
+    font-size: 16px;
+    border-radius: 8px;
+    color: #111827;
+}
+
+.settings-section-title {
+    border-bottom: 2px solid #27548a;
+    padding-bottom: 10px;
+    color: #27548a;
+    margin-bottom: 20px;
+    font-family: "'SVN-Gilroy', sans-serif";
+}
+
+.settings-save-btn {
+    background-color: rgba(39,84,138,1);
+    width: 100%;
+    height: 60px;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-family: "'SVN-Gilroy', sans-serif";
+    font-size: 16px;
+    text-transform: uppercase;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.settings-save-btn:hover {
+    background-color: rgba(29, 65, 107, 1);
+}
+
+.settings-save-btn:disabled {
+    background-color: #9CA3AF;
+    cursor: not-allowed;
 }
 
 /* ----- GUEST MANAGEMENT STYLES ----- */
@@ -418,6 +491,22 @@ body {
 
 
 @media (max-width: 768px) {
+    .tabs-container {
+        flex-wrap: nowrap; /* Bắt buộc scroll ngang trên mobile */
+        padding: 0;
+    }
+
+    .tab-button {
+        width: auto;
+        border-bottom: none;
+        padding: 16px 20px;
+    }
+    
+    .settings-panel-wrapper {
+        padding: 20px;
+        margin: 20px auto;
+    }
+
     .container {
         padding: 0 1rem;
     }
@@ -690,4 +779,11 @@ body {
     font-size: 15px;
     color: #111827;
     line-height: 1.6;
+}
+
+.tabs-container-wrapper {
+    width: 100%;
+    border-top: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E7EB;
+    background-color: #fff;
 }

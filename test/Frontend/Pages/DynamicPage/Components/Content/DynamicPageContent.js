@@ -38,9 +38,25 @@ const DynamicPageContent = () => {
 
     if (!page) return null;
 
-    const rawHtml = page.content && Array.isArray(page.content) 
-        ? page.content.map(block => block.content).join('') 
-        : '';
+    let rawHtml = page.content || '';
+
+    // Fix phòng trường hợp dữ liệu cũ lưu dạng JSON String "...."
+    // Nếu chuỗi bắt đầu bằng " và kết thúc bằng " (đôi khi bị stringify 2 lần), hoặc là JSON object string
+    if (typeof rawHtml === 'string' && (rawHtml.trim().startsWith('{') || rawHtml.trim().startsWith('"'))) {
+         try {
+            // Thử parse nếu nó là JSON string (phòng hờ)
+            const parsed = JSON.parse(rawHtml);
+            // Nếu parse ra mà nó có dạng schema cũ (nếu có), xử lý tiếp, còn không thì dùng chính nó
+            if (typeof parsed === 'string') rawHtml = parsed; 
+         } catch (e) {
+            // Nếu lỗi parse thì cứ để nguyên là string HTML
+         }
+    }
+    
+    // Nếu trước đây bạn lỡ lưu mảng object vào DB (từ code cũ), cần xử lý fallback:
+    if (Array.isArray(rawHtml)) {
+         rawHtml = rawHtml.map(block => block.content).join('');
+    }
 
     return (
         <>
@@ -52,6 +68,7 @@ const DynamicPageContent = () => {
                         <p className="last-updated">Cập nhật lần cuối: {new Date(page.updatedAt).toLocaleDateString('vi-VN')}</p>
                     </header>
                     
+                    {/* Hiển thị nội dung HTML trực tiếp */}
                     <div
                         className="tiptap-content" 
                         dangerouslySetInnerHTML={{ __html: rawHtml }}
@@ -62,7 +79,6 @@ const DynamicPageContent = () => {
                     </div>
                 </div>
             </main>
-            {/* ... CSS styles giữ nguyên ... */}
         </>
     );
 };

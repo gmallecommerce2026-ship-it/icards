@@ -291,7 +291,14 @@ const BannerCarousel = ({ images }) => {
 
 
     if (!images || images.length === 0) return null;
-    const getImageUrl = (image) => typeof image === 'string' ? image : image.preview;
+
+    // --- SỬA LỖI TẠI ĐÂY ---
+    // Cập nhật logic để lấy url từ cả 'preview' (khi đang edit/upload) và 'url' (khi lấy từ DB)
+    const getImageUrl = (image) => {
+        if (typeof image === 'string') return image;
+        return image.url || image.preview || ''; 
+    };
+    // --- KẾT THÚC SỬA LỖI ---
 
     return (
         <div className="modern-banner">
@@ -781,7 +788,38 @@ const Countdown = ({ targetDate, title, titleStyle }) => {
         </section>
     );
 };
+const CoupleImageDisplay = ({ src, alt, position }) => {
+    // Lấy thông số position, nếu không có thì mặc định là 0, 0, 1
+    const x = position?.x || 0;
+    const y = position?.y || 0;
+    const scale = position?.scale || 1;
 
+    return (
+        <div 
+            className="modern-couple-image" // Giữ class cũ để lấy kích thước/bo tròn từ CSS
+            style={{ 
+                position: 'relative', 
+                overflow: 'hidden',
+                padding: 0,
+                display: 'block' // Đảm bảo div hoạt động như khung chứa
+            }}
+        >
+            <img
+                src={src}
+                alt={alt}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    // --- LOGIC QUAN TRỌNG: Đồng bộ với Editor ---
+                    transform: `scale(${scale}) translate(${x / scale}px, ${y / scale}px)`,
+                    transformOrigin: 'center center',
+                    willChange: 'transform' // Tối ưu hiệu năng render
+                }}
+            />
+        </div>
+    );
+};
 const CoupleInfo = React.memo(({ settings }) => {
     const createStyleObject = (styleData, defaultSize = 16) => ({
         fontFamily: styleData?.fontFamily || 'var(--font-primary)',
@@ -800,22 +838,21 @@ const CoupleInfo = React.memo(({ settings }) => {
 
     return (
         <section className="section-container">
-            {/* === SỬA LỖI TẠI ĐÂY === */}
-            {/* Bổ sung titleStyle và subtitleStyle được truyền vào từ settings */}
             <SectionHeader 
                 title={settings.coupleTitle || "Cô Dâu & Chú Rể"} 
                 subtitle={settings.coupleSubtitle || "... và hai trái tim cùng chung một nhịp đập ..."} 
                 titleStyle={settings.coupleTitleStyle}
                 subtitleStyle={settings.coupleSubtitleStyle}
             />
-            {/* === KẾT THÚC SỬA LỖI === */}
             <div className="modern-couple-container fade-in-up">
+                {/* --- CHÚ RỂ --- */}
                 <div className="modern-couple-card">
                     <div className="couple-image-wrapper">
-                        <img
+                        {/* Sử dụng component hiển thị mới */}
+                        <CoupleImageDisplay 
                             src={settings.groomImageUrl || 'https://placehold.co/300x300/F2E8EB/5C5258?text=CR'}
                             alt={settings.groomName}
-                            className="modern-couple-image"
+                            position={settings.groomImagePosition} // Truyền tọa độ và scale
                         />
                     </div>
                     <div className="couple-content">
@@ -826,16 +863,26 @@ const CoupleInfo = React.memo(({ settings }) => {
 
                 <div className="modern-separator">
                     <div className="heart-wrapper">
-                        <Heart size={24} className="heart-icon" />
+                        {settings.coupleSeparatorImageUrl ? (
+                            <img 
+                                src={settings.coupleSeparatorImageUrl} 
+                                alt="Separator" 
+                                style={{ width: '40px', height: '40px', objectFit: 'contain' }} 
+                            />
+                        ) : (
+                            <Heart size={40} style={{ color: 'var(--color-primary)' }} />
+                        )}
                     </div>
                 </div>
 
+                {/* --- CÔ DÂU --- */}
                 <div className="modern-couple-card">
                     <div className="couple-image-wrapper">
-                        <img
+                        {/* Sử dụng component hiển thị mới */}
+                        <CoupleImageDisplay 
                             src={settings.brideImageUrl || 'https://placehold.co/300x300/F2E8EB/5C5258?text=CD'}
                             alt={settings.brideName}
-                            className="modern-couple-image"
+                            position={settings.brideImagePosition} // Truyền tọa độ và scale
                         />
                     </div>
                     <div className="couple-content">
@@ -1249,7 +1296,7 @@ const WeddingInvitation = () => {
     const { contactGroom, contactBride, groomName, brideName } = settings;
     const pageTitle = (settings.title || "Thiệp mời online").replace('{LờiXưngHô}', guestDetails?.salutation || settings.salutationStyle).replace('{TênKháchMời}', guestDetails?.name || "Bạn");
     const pageDescription = (settings.description || "Mời bạn đến tham dự buổi tiệc chung vui cùng gia đình chúng tôi!").replace('{LờiXưngHô}', '').replace('{TênKháchMời}', '').trim();
-const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?guestId=${guestId}&preview=true` : '?preview=true'}`;
+const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?guestId=${guestId}` : ''}`;
     const shareText = `Trân trọng kính mời bạn đến dự lễ cưới của ${groomName} và ${brideName}!`;
     const ogImageUrl = invitationData.imgSrc || settings.heroImages?.main;
 

@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../../../services/api';
 import './InvitationContent.css';
 import { useSettings } from '../../../../Context/SettingsContext';
+import Skeleton from '../../../../Components/Skeleton/Skeleton';
 
 // Card component to display each invitation
 const InvitationCard = ({ id, title, imgSrc }) => {
@@ -196,7 +197,17 @@ const InvitationPageContent = () => {
 
                     <div className="invitation-grid">
                         {loading ? (
-                            <div className="grid-message">Đang tải mẫu thiệp...</div>
+                            // Render 8-12 thẻ skeleton card
+                            Array.from({ length: 12 }).map((_, index) => (
+                                <div key={index} className="invitation-card-item">
+                                    <div className="invitation-card-image-wrapper">
+                                        <Skeleton type="rect" height="100%" />
+                                    </div>
+                                    <div style={{ marginTop: '10px' }}>
+                                        <Skeleton type="text" width="80%" />
+                                    </div>
+                                </div>
+                            ))
                         ) : filteredTemplates.length > 0 ? (
                             filteredTemplates.map((item) => (
                                 <InvitationCard

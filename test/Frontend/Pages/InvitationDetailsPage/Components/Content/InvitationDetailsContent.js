@@ -5,7 +5,36 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import api from '../../../../services/api';
 import SEO from '../../../../Features/SEO'; 
 import './InvitationDetailsPageContent.css';
+import Skeleton from '../../../../Components/Skeleton/Skeleton';
+const DetailSkeleton = ({ isMobile, isTablet }) => {
+    return (
+        <div className="page-container">
+            <div className="main-content" style={{ opacity: 0.6 }}> 
+                {/* Toolbar Skeleton */}
+                <div className={`product-toolbar ${isMobile ? 'mobile' : ''}`} style={{ marginBottom: '20px' }}>
+                     {[1,2,3,4,5].map(i => <Skeleton key={i} type="circle" width="40px" height="40px" />)}
+                </div>
 
+                {/* Product Display (Image) Skeleton */}
+                <div className="product-display">
+                     <Skeleton type="rect" height={isMobile ? "300px" : "600px"} style={{ borderRadius: '12px' }} />
+                </div>
+
+                {/* Customization Panel Skeleton */}
+                <div className={`customization-panel ${isTablet ? 'tablet' : ''}`}>
+                    <Skeleton type="title" width="70%" height="40px" />
+                    <Skeleton type="text" width="100%" />
+                    <Skeleton type="text" width="100%" />
+                    <Skeleton type="text" width="80%" />
+                    <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                         <Skeleton type="rect" height="45px" width="100%" style={{ borderRadius: '25px' }} />
+                         <Skeleton type="rect" height="45px" width="100%" style={{ borderRadius: '25px' }} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 // --- CUSTOM HOOK FOR RESPONSIVENESS (Không thay đổi) ---
 const useWindowSize = () => {
     const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
@@ -397,7 +426,7 @@ const Content = () => {
         { icon: <LinkIcon />, label: 'Chia sẻ', onClick: handleShare },
     ];
 
-    if (loading) return <div style={{textAlign: 'center', padding: '50px'}}>Đang tải dữ liệu thiệp mời...</div>;
+    if (loading) return <DetailSkeleton isMobile={isMobile} isTablet={isTablet} />;
     if (!invitation) return <div style={{textAlign: 'center', padding: '50px'}}>Không tìm thấy thiệp mời.</div>;
 
     // const pageStyle = { backgroundColor: "white", width: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: isMobile ? '20px 15px' : '40px 50px', boxSizing: 'border-box' };

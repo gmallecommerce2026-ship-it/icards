@@ -1,126 +1,210 @@
-// FE/Pages/BlogsDetailPage/Components/Content/BlogDetailsPageContent.js
+// FrontendClient/Pages/BlogsDetailPage/Components/Content/BlogDetailsPageContent.js
 
-import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../../../services/api';
 import SEO from '../../../../Features/SEO';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import '../../../../tiptap-content.css';
 import './BlogDetailsPageContent.css';
 
+gsap.registerPlugin(ScrollTrigger);
+
 const BlogDetailsPageContent = () => {
     const [blog, setBlog] = useState(null);
+    const [latestPosts, setLatestPosts] = useState([]); // ++ MỚI: State cho bài mới nhất
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null); // Thêm state để quản lý lỗi
+    const [scrollWidth, setScrollWidth] = useState(0);
     const { slug } = useParams();
     const navigate = useNavigate();
+    const contentRef = useRef(null);
 
-    const pageWrapperRef = useRef(null);
-    const cursorRef = useRef(null);
-
+    // --- 1. Effect: Scroll Progress Bar (Giữ nguyên) ---
     useEffect(() => {
-        const cursor = cursorRef.current;
-        if (!cursor) return;
-        const moveCursor = (e) => {
-            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, ease: "power2.out" });
+        const handleScroll = () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (scrollTop / docHeight) * 100;
+            setScrollWidth(scrolled);
         };
-        document.addEventListener('mousemove', moveCursor);
-        return () => document.removeEventListener('mousemove', moveCursor);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    useEffect(() => {
-        if (!loading && blog) {
-            const ctx = gsap.context(() => {
-                gsap.from('.blog-detail-title', { duration: 1, y: 50, opacity: 0, ease: 'power3.out' });
-                gsap.from('.blog-meta-info span', { duration: 0.8, y: 30, opacity: 0, stagger: 0.2, delay: 0.3, ease: 'power3.out' });
-                // Selector này sẽ hoạt động tốt hơn với cấu trúc DOM mới
-                gsap.from('.blog-content-body > *', { duration: 0.8, y: 40, opacity: 0, stagger: 0.15, delay: 1, ease: 'power3.out' });
-            }, pageWrapperRef);
-            return () => ctx.revert();
-        }
-    }, [loading, blog]);
-
-
+    // --- 2. Fetch Data ---
     useEffect(() => {
         const fetchBlogDetails = async () => {
             setLoading(true);
-            setError(null); // Reset lỗi mỗi khi fetch lại
             try {
                 const response = await api.get(`/pages/${slug}`);
-                setBlog(response.data.data);
+                // Cấu trúc response mới: { data: pageObject, related: { latestPosts: [] } }
+                const pageData = response.data?.data;
+                const relatedData = response.data?.related;
+
+                setBlog(pageData);
+                if (relatedData?.latestPosts) {
+                    setLatestPosts(relatedData.latestPosts);
+                }
+                
+                setTimeout(() => {
+                    gsap.fromTo(".blog-animate", 
+                        { y: 20, opacity: 0 }, 
+                        { y: 0, opacity: 1, duration: 0.6, stagger: 0.1 }
+                    );
+                }, 100);
+
             } catch (err) {
-                console.error("Lỗi khi tải chi tiết blog:", err);
-                setError("Không thể tải được nội dung bài viết. Vui lòng thử lại sau.");
+                console.error("Lỗi tải bài viết:", err);
             } finally {
-                setTimeout(() => setLoading(false), 500);
+                setLoading(false);
             }
         };
-
-        if (slug) {
-            fetchBlogDetails();
-        }
+        if (slug) fetchBlogDetails();
     }, [slug]);
 
-    const handleGoBack = () => {
-        navigate('/page');
-    };
+    if (loading) return <div className="loading-wrapper">Đang tải nội dung...</div>;
+    if (!blog) return <div className="loading-wrapper">Bài viết không tồn tại.</div>;
 
-
-    if (loading) {
-        return (
-            <div className="luxury-blog-wrapper">
-                <div className="loading-luxury">
-                    <div className="loading-text">Đang tải nội dung...</div>
-                </div>
-            </div>
-        );
-    }
-
-    if (error || !blog) {
-         return (
-            <div className="luxury-blog-wrapper">
-                <div className="no-results">
-                    <h3>{error || 'Bài viết không tồn tại hoặc có lỗi'}</h3>
-                    <p>Đã xảy ra lỗi khi tải dữ liệu. Hãy kiểm tra Console (F12) để xem chi tiết.</p>
-                    <button onClick={handleGoBack} className="back-button">Quay lại</button>
-                </div>
-            </div>
-        );
-    }
+    //const blogHtmlContent = blog.content || '';
     
-    // Nối nội dung của tất cả các block thành một chuỗi HTML duy nhất
-    const blogHtmlContent = (blog.content && Array.isArray(blog.content))
-        ? blog.content.map(block => block.content).join('')
-        : '';
+    // ++ MỚI: Lấy relatedProducts từ dữ liệu thật
+    const relatedProducts = blog.relatedProducts || [];
 
     return (
         <>
-            <SEO title={`${blog.title} | iCards Premium`} description={blog.excerpt || ''} />
-            <div ref={cursorRef} className="custom-cursor"></div>
-            <div className="luxury-blog-detail-wrapper" ref={pageWrapperRef}>
-                <button onClick={handleGoBack} className="back-button">← Quay lại</button>
-                <article className="blog-detail-container">
-                    <header className="blog-detail-header">
-                        <h1 className="blog-detail-title">{blog.title}</h1>
-                        <div className="blog-meta-info">
-                            <span className="meta-author">Tác giả: {blog.author?.name || 'iCards'}</span>
-                            <span className="meta-date">Ngày đăng: {new Date(blog.createdAt).toLocaleDateString('vi-VN')}</span>
-                            <span className="meta-category">Chuyên mục: {blog.category?.name || 'Chưa phân loại'}</span>
-                        </div>
-                    </header>
+            <SEO title={blog.title} description={blog.seo?.metaDescription || blog.excerpt} />
 
-                    {/* --- PHẦN THAY ĐỔI CHÍNH --- */}
-                    <div
-                        className="tiptap-content"
-                        dangerouslySetInnerHTML={{ __html: blogHtmlContent }}
-                        style={{color: 'black !important'}}
-                    />
-                    
-                    {/* Hiển thị thông báo nếu không có nội dung */}
-                    {!blogHtmlContent && (
-                        <p style={{ color: 'yellow', textAlign: 'center' }}>Không có nội dung để hiển thị.</p>
-                    )}
-                </article>
+            <div className="scroll-progress-container">
+                <div className="scroll-progress-bar" style={{ width: `${scrollWidth}%` }}></div>
+            </div>
+
+            <div className="luxury-blog-detail-wrapper">
+                <div onClick={() => navigate(-1)} className="nav-back">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    Quay lại
+                </div>
+
+                <div className="blog-layout">
+                    {/* --- CỘT TRÁI (Giữ nguyên) --- */}
+                    <article className="main-content" ref={contentRef}>
+                        <header className="blog-header blog-animate">
+                            <span className="blog-category-badge">{blog.category?.name || 'Blog'}</span>
+                            <h1 className="blog-title">{blog.title}</h1>
+                            <div className="author-meta">
+                                <img src={blog.author?.avatar || "https://ui-avatars.com/api/?name=Admin"} alt="Author" className="author-avatar" />
+                                <div className="author-info">
+                                    <h4>{blog.author?.name || 'Ban biên tập'}</h4>
+                                    <span>{new Date(blog.createdAt).toLocaleDateString('vi-VN')}</span>
+                                </div>
+                            </div>
+                        </header>
+
+                        {blog.thumbnail && (
+                            <div className="blog-thumbnail blog-animate" style={{marginBottom: '2rem', borderRadius: '8px', overflow: 'hidden'}}>
+                                <img src={blog.thumbnail} alt={blog.title} style={{width:'100%', display:'block'}} />
+                            </div>
+                        )}
+
+                        <div className="blog-content-body blog-animate ck-content">
+                            {Array.isArray(blog.content) ? (
+                                // Nếu content là mảng các block (cấu trúc mới)
+                                blog.content.map((block, index) => {
+                                    if (block.type === 'text') {
+                                        return (
+                                            <div 
+                                                key={block._id || index} 
+                                                dangerouslySetInnerHTML={{ __html: block.content }} 
+                                            />
+                                        );
+                                    }
+                                    if (block.type === 'image') {
+                                        return (
+                                            <img 
+                                                key={block._id || index} 
+                                                src={block.content} 
+                                                alt={block.alt || "blog-image"} 
+                                                style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0' }}
+                                            />
+                                        );
+                                    }
+                                    return null;
+                                })
+                            ) : (
+                                // Nếu content là một chuỗi string HTML (cấu trúc cũ/fallback)
+                                typeof blog.content === 'string' ? (
+                                    <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+                                ) : null
+                            )}
+                        </div>
+                    </article>
+
+                    {/* --- CỘT PHẢI: SIDEBAR --- */}
+                    <aside className="sidebar-wrapper">
+                        <div className="sidebar-sticky">
+                            
+                            {/* Widget 1: Sản phẩm liên quan (REAL DATA) */}
+                            {relatedProducts.length > 0 && (
+                                <div className="widget-box blog-animate">
+                                    <div className="widget-title" style={{ color: '#2563eb' }}>Sản phẩm gợi ý</div>
+                                    <div className="products-list">
+                                        {relatedProducts.map(prod => (
+                                            // [FIX 1]: Route trong App.js là /product/:productId (số ít), không phải /products/
+                                            // [FIX 2]: Ưu tiên dùng _id nếu không có slug sản phẩm
+                                            <Link 
+                                                to={`/product/${prod._id}`} 
+                                                key={prod._id} 
+                                                className="mini-product-card"
+                                            >
+                                                <img 
+                                                    // [FIX 3]: Logic lấy ảnh từ Product Model
+                                                    // Model có: images (array string) và imgSrc (string)
+                                                    // Frontend cũ dùng: images?.[0]?.url (sai cấu trúc)
+                                                    src={prod.imgSrc || (prod.images && prod.images[0]) || "https://placehold.co/100"} 
+                                                    
+                                                    // [FIX 4]: Dùng prod.title thay vì prod.name
+                                                    alt={prod.title} 
+                                                    className="mini-product-img" 
+                                                />
+                                                <div className="mini-product-info">
+                                                    {/* [FIX 4]: Dùng prod.title */}
+                                                    <h5>{prod.title}</h5>
+                                                    <div className="price-tag">
+                                                        {prod.price?.toLocaleString('vi-VN')}đ
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Widget 2: Bài viết mới nhất (REAL DATA) */}
+                            {latestPosts.length > 0 && (
+                                <div className="widget-box blog-animate">
+                                    <div className="widget-title">Bài viết mới nhất</div>
+                                    <ul style={{listStyle: 'none', padding: 0, margin: 0}}>
+                                        {latestPosts.map(post => (
+                                            <li key={post._id} style={{marginBottom: '1rem', fontSize: '0.9rem'}}>
+                                                <Link 
+                                                    // [FIX]: Sửa từ /blog/ thành /page/ để khớp với App.js
+                                                    to={`/page/${post.slug}`} 
+                                                    style={{textDecoration: 'none', color: '#374151', fontWeight: '500', display:'block', marginBottom: '4px'}}
+                                                >
+                                                    {post.title}
+                                                </Link>
+                                                <span style={{fontSize: '0.75rem', color: '#9ca3af'}}>
+                                                    {new Date(post.createdAt).toLocaleDateString('vi-VN')}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+
+                        </div>
+                    </aside>
+                </div>
             </div>
         </>
     );

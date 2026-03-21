@@ -112,7 +112,7 @@ body {
 .occasion-image-wrapper img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
 }
 
 .occasion-title {
@@ -201,7 +201,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 .product-item:hover .product-image {
@@ -373,4 +373,100 @@ body {
     text-align: center;
     line-height: 1.5;
     font-weight: 500;
+}
+
+.section-intro {
+    width: 100%;
+    max-width: 1000px; /* Giới hạn chiều rộng để dễ đọc text */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    margin-top: 40px; /* Cách xa section trên */
+}
+
+.intro-content-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    transition: max-height 0.5s ease-in-out;
+}
+
+.intro-content-wrapper.collapsed {
+    max-height: 200px; /* Chiều cao khi thu gọn */
+}
+
+.intro-content-wrapper.expanded {
+    max-height: 2000px; /* Chiều cao đủ lớn để hiện hết nội dung */
+}
+
+/* Định dạng nội dung HTML bên trong */
+.intro-html-content {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #444;
+    text-align: justify;
+}
+
+.intro-html-content h3, 
+.intro-html-content h4 {
+    margin-top: 20px;
+    margin-bottom: 12px;
+    color: #222;
+    font-family: 'Playfair Display', serif;
+}
+
+.intro-html-content ul {
+    margin-left: 20px;
+    margin-bottom: 16px;
+}
+
+.intro-html-content p {
+    margin-bottom: 16px;
+}
+
+/* Hiệu ứng mờ dần ở chân khi thu gọn */
+.content-fade-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: linear-gradient(to bottom, rgba(254,253,253,0), rgba(254,253,253,1));
+    pointer-events: none; /* Để click xuyên qua nếu cần */
+}
+
+/* Nút Xem thêm/Thu gọn */
+.intro-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    border: 1px solid #ddd;
+    background-color: transparent;
+    border-radius: 30px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.intro-toggle-btn:hover {
+    border-color: #333;
+    color: #222;
+    background-color: #f9f9f9;
+}
+
+/* Responsive cho Intro */
+@media (max-width: 768px) {
+    .section-intro {
+        max-width: 100%;
+    }
+    .intro-html-content {
+        text-align: left; /* Mobile để canh trái dễ đọc hơn justify */
+        padding: 0 10px;
+    }
 }

@@ -290,3 +290,26 @@
     border: 1px solid var(--color-border-light);
     box-shadow: var(--shadow-xs);
 }
+
+.event-settings-preview-container .story-image-wrapper {
+    width: 100%;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    background-color: #f5f5f5; /* Màu nền nhẹ phòng khi ảnh đang load */
+}
+
+.event-settings-preview-container .story-image {
+    width: 100%;
+    height: auto;
+    max-height: 250px; /* Giới hạn chiều cao để không phá vỡ timeline */
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+/* Hiệu ứng zoom nhẹ khi di chuột vào nội dung */
+.event-settings-preview-container .story-content:hover .story-image {
+    transform: scale(1.03);
+}
