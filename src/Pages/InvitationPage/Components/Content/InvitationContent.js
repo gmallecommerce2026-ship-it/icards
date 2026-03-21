@@ -118,12 +118,12 @@ const InvitationPageContent = () => {
     }, []);
 
     // [SỬA LỖI LOGIC] - Lấy ra các 'type' để làm bộ lọc, thay vì 'group'
-    const typesForCurrentCategory = useMemo(() => {
-        if (!categoryName) return [];
-        const templatesInCategory = allTemplates.filter(t => titleToSlug(t.category) === categoryName);
-        // Trả về danh sách các 'type' duy nhất trong category hiện tại
-        return [...new Set(templatesInCategory.map(t => t.type).filter(Boolean))];
-    }, [allTemplates, categoryName]);
+    // const typesForCurrentCategory = useMemo(() => {
+    //     if (!categoryName) return [];
+    //     const templatesInCategory = allTemplates.filter(t => titleToSlug(t.category) === categoryName);
+    //     // Trả về danh sách các 'type' duy nhất trong category hiện tại
+    //     return [...new Set(templatesInCategory.map(t => t.type).filter(Boolean))];
+    // }, [allTemplates, categoryName]);
 
     // Lọc template để hiển thị ra lưới dựa trên categoryName và typeName
     const filteredTemplates = useMemo(() => {
