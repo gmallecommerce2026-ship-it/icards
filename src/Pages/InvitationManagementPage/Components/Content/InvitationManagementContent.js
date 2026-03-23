@@ -7,7 +7,7 @@ import _ from 'lodash';
 import './InvitationManagementContent.css';
 import { FiMail } from 'react-icons/fi';
 
-const MasterGuestPanel = ({ user, onAddGuestsToInvitation }) => {
+const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
     const [masterGuests, setMasterGuests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedGuests, setSelectedGuests] = useState(new Set());
