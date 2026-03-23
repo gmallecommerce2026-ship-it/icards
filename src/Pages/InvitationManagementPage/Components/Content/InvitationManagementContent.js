@@ -78,51 +78,62 @@ const MasterGuestPanel = ({ user, onAddGuestsToInvitation }) => {
     if (loading) return <p>Đang tải danh bạ...</p>;
 
     return (
-        <div style={{ padding: '20px' }}>
-             <h3>Danh bạ khách mời</h3>
-             <p>Chọn khách mời từ danh bạ để thêm vào sự kiện hiện tại.</p>
-             <div style={{display: 'flex', gap: '20px', margin: '20px 0', alignItems: 'center'}}>
-                <input 
-                    className="filter-input"
-                    placeholder="Tìm kiếm trong danh bạ..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                />
-                <button 
-                    className="guest-action-btn"
-                    onClick={handleAddSelectedToInvitation} 
-                    disabled={selectedGuests.size === 0}
-                >
-                    Thêm {selectedGuests.size} khách đã chọn
-                </button>
-                {/* Thêm checkbox "Chọn tất cả" */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <input
-                        type="checkbox"
-                        ref={selectAllCheckboxRef}
-                        onChange={handleSelectAllGuests}
-                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                    />
-                    <label>Chọn tất cả</label>
+        <div style={{ backgroundColor: "rgba(255,255,255,1)", display: "flex", flexDirection: "column", width: "100%" }}>
+            {/* Header của Popup */}
+            <div style={{ backgroundColor: "rgba(39,84,138,1)", height: "53.4px", width: "100%", display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: "12px 20px", boxSizing: 'border-box' }}>
+                <div style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "20px", color: "rgba(255,255,255,1)", fontWeight: "700" }}>Danh bạ khách mời</div>
+                <div onClick={onClose} style={{ cursor: 'pointer', backgroundColor: "rgba(255,255,255,1)", borderRadius: "59px", width: "29.4px", height: "29.4px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                    <CloseIcon />
                 </div>
-             </div>
-            
-            <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
-                {filteredGuests.length > 0 ? filteredGuests.map(guest => (
-                    <div key={guest._id} style={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '1px solid #eee', cursor: 'pointer' }} onClick={() => handleSelectGuest(guest._id)}>
+            </div>
+
+            {/* Phần Content bên trong */}
+            <div style={{ padding: '20px' }}>
+                 <p style={{ marginTop: 0 }}>Chọn khách mời từ danh bạ để thêm vào sự kiện hiện tại.</p>
+                 <div style={{display: 'flex', gap: '20px', margin: '20px 0', alignItems: 'center'}}>
+                    <input 
+                        className="filter-input"
+                        placeholder="Tìm kiếm trong danh bạ..."
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                    />
+                    <button 
+                        className="guest-action-btn"
+                        onClick={handleAddSelectedToInvitation} 
+                        disabled={selectedGuests.size === 0}
+                    >
+                        Thêm {selectedGuests.size} khách đã chọn
+                    </button>
+                    {/* Checkbox "Chọn tất cả" */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <input
                             type="checkbox"
-                            checked={selectedGuests.has(guest._id)}
-                            onChange={() => handleSelectGuest(guest._id)}
-                            style={{ marginRight: '15px' }}
-                            onClick={(e) => e.stopPropagation()} // Ngăn sự kiện click lan ra div cha
+                            ref={selectAllCheckboxRef}
+                            onChange={handleSelectAllGuests}
+                            style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                         />
-                        <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 'bold' }}>{guest.name}</div>
-                            <div style={{ color: '#666', fontSize: '14px' }}>{guest.email}</div>
-                        </div>
+                        <label>Chọn tất cả</label>
                     </div>
-                )) : <p style={{textAlign: 'center', color: '#666', marginTop: '20px'}}>Không tìm thấy khách mời nào.</p>}
+                 </div>
+                
+                <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                    {/* ... (giữ nguyên phần render danh sách filteredGuests) ... */}
+                    {filteredGuests.length > 0 ? filteredGuests.map(guest => (
+                        <div key={guest._id} style={{ display: 'flex', alignItems: 'center', padding: '10px', borderBottom: '1px solid #eee', cursor: 'pointer' }} onClick={() => handleSelectGuest(guest._id)}>
+                            <input
+                                type="checkbox"
+                                checked={selectedGuests.has(guest._id)}
+                                onChange={() => handleSelectGuest(guest._id)}
+                                style={{ marginRight: '15px' }}
+                                onClick={(e) => e.stopPropagation()}
+                            />
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontWeight: 'bold' }}>{guest.name}</div>
+                                <div style={{ color: '#666', fontSize: '14px' }}>{guest.email}</div>
+                            </div>
+                        </div>
+                    )) : <p style={{textAlign: 'center', color: '#666', marginTop: '20px'}}>Không tìm thấy khách mời nào.</p>}
+                </div>
             </div>
         </div>
     );
@@ -860,6 +871,7 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
     const [isBulkDeleteModalOpen, setBulkDeleteModalOpen] = useState(false);
     const [isAddToGroupModalOpen, setAddToGroupModalOpen] = useState(false);
     const [hasMasterGuests, setHasMasterGuests] = useState(false); // <-- THÊM STATE MỚI
+    const [isMasterGuestModalOpen, setMasterGuestModalOpen] = useState(false);
     const selectAllCheckboxRef = useRef(null);
 
     useEffect(() => {
@@ -1157,10 +1169,10 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
                     <div style={{ display: "flex", flexDirection: "row", gap: "20px", flexWrap: 'wrap' }}>
                         <button onClick={openAddModal} className="guest-action-btn"> <AddIcon /> <span>Thêm khách mời</span> </button>
                         {hasMasterGuests && (
-                             <button onClick={() => onTabChange('master-guests')} className="guest-action-btn">
-                                 <GroupIcon />
-                                 <span>Thêm từ danh bạ</span>
-                             </button>
+                            <button onClick={() => setMasterGuestModalOpen(true)} className="guest-action-btn">
+                                <GroupIcon />
+                                <span>Thêm từ danh bạ</span>
+                            </button>
                         )}
                         <button onClick={() => setManageGroupsModalOpen(true)} className="guest-action-btn"> <GroupIcon /> <span>Quản lý nhóm</span> </button>
                         
@@ -1379,6 +1391,20 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
             )}
             {isImportHelpModalOpen && (
                  <ImportHelpModal onClose={() => handleUploadFile()} />
+            )}
+
+            {/* 3. THÊM MODAL RENDER MASTER GUEST VÀO ĐÂY */}
+            {isMasterGuestModalOpen && (
+                <Modal onClose={() => setMasterGuestModalOpen(false)} size="large">
+                    <MasterGuestPanel
+                        user={invitation?.user}
+                        onAddGuestsToInvitation={(guests) => {
+                            onDataChange(guests, 'add-guests-bulk'); // Gọi API thêm khách
+                            setMasterGuestModalOpen(false); // Đóng popup sau khi thêm
+                        }}
+                        onClose={() => setMasterGuestModalOpen(false)} // Truyền hàm đóng cho nút X
+                    />
+                </Modal>
             )}
         </div>
     );
@@ -2123,7 +2149,7 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
     const tabs = [
         { id: 'dashboard', title: 'Tổng quan' },
         { id: 'guests', title: 'Quản lý khách mời' },
-        { id: 'master-guests', title: 'Danh bạ khách mời' },
+        // { id: 'master-guests', title: 'Danh bạ khách mời' },
         { id: 'event-management', title: 'Quản lí sự kiện' },
         { id: 'tasks', title: 'Kế hoạch cưới' },
         { id: 'invitation-settings', title: 'Cài đặt thiệp mời' },
@@ -2175,8 +2201,8 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
                 return <GuestManagementPanel invitationId={invitation._id} guests={invitation.guests || []} onDataChange={onDataChange} invitation={invitation} onTabChange={onTabChange} />;
             case 'wishes':
                 return <WishManagementPanel />;
-            case 'master-guests': // <-- RENDER PANEL MỚI
-                return <MasterGuestPanel user={invitation.user} onAddGuestsToInvitation={handleAddGuestsFromMaster} />;
+            // case 'master-guests': // <-- RENDER PANEL MỚI
+            //     return <MasterGuestPanel user={invitation.user} onAddGuestsToInvitation={handleAddGuestsFromMaster} />;
             case 'tasks':
                 return <TaskManagementPanel invitationId={invitation._id} initialTasks={invitation.tasks || []} onDataChange={onDataChange} />;
             case 'event-management': // <- BỔ SUNG SWITCH CASE
