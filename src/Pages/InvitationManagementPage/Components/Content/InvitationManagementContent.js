@@ -1981,7 +1981,10 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
         e.preventDefault();
         if (!newTaskTitle.trim()) return;
         const newTask = { id: Date.now().toString(), title: newTaskTitle, completed: false };
-        const updatedTasks = [newTask, ...tasks];
+        
+        // Đã sửa lại: Đẩy task mới vào CUỐI danh sách
+        const updatedTasks = [...tasks, newTask]; 
+        
         setTasks(updatedTasks);
         saveTasksToDB(updatedTasks);
         setNewTaskTitle('');
@@ -2032,7 +2035,7 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
 
     return (
         <div className="task-management-wrapper">
-            {/* 1. Header & Progress - Thiết kế lại sang trọng hơn */}
+            {/* 1. Header & Progress - Style chuẩn design system */}
             <div className="task-progress-card">
                 <div className="task-progress-header">
                     <h3 className="task-progress-title">Tiến độ chuẩn bị cưới</h3>
@@ -2043,10 +2046,9 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
                 <div className="task-progress-track">
                     <div className="task-progress-fill" style={{ width: `${progress}%` }} />
                 </div>
-                <p className="task-progress-text">{progress}% chặng đường đã qua. Hãy tiếp tục nhé!</p>
             </div>
 
-            {/* 2. Thêm mới Task - Form hiện đại */}
+            {/* 2. Thêm mới Task */}
             <form onSubmit={handleAddTask} className="task-add-form">
                 <div className="task-input-wrapper">
                     <input 
@@ -2057,7 +2059,7 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
                         className="task-add-input"
                     />
                     <button type="submit" className="task-add-submit-btn" disabled={!newTaskTitle.trim()}>
-                        <AddIcon /> <span>Thêm việc</span>
+                        <AddIcon /> <span style={{marginLeft: '6px'}}>Thêm việc</span>
                     </button>
                 </div>
             </form>
@@ -2066,7 +2068,6 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
             <div className="timeline-container">
                 {tasks.length === 0 ? (
                     <div className="timeline-empty-state">
-                        <div className="timeline-empty-icon">📝</div>
                         <p>Chưa có công việc nào. Hãy thêm công việc mới để bắt đầu kế hoạch của bạn!</p>
                     </div>
                 ) : (
@@ -2087,7 +2088,6 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
                             <div 
                                 className="timeline-node" 
                                 onClick={() => handleToggleComplete(task.id)}
-                                title={task.completed ? "Đánh dấu chưa hoàn thành" : "Đánh dấu hoàn thành"}
                             >
                                 {task.completed && <CheckIcon />}
                             </div>
@@ -2119,7 +2119,7 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
                                     <div className="drag-handle" title="Kéo thả để sắp xếp">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
                                     </div>
-                                    <button onClick={() => handleDeleteTask(task.id)} className="timeline-delete-btn" title="Xóa công việc">
+                                    <button onClick={() => handleDeleteTask(task.id)} className="timeline-delete-btn table-action-btn" title="Xóa công việc">
                                         <DeleteIcon width="18" height="18" />
                                     </button>
                                 </div>

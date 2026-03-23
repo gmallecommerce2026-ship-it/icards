@@ -787,74 +787,66 @@ body {
     border-bottom: 1px solid #E5E7EB;
     background-color: #fff;
 }
+/* ============================================================
+   WEDDING TIMELINE UI (TASK MANAGEMENT) - MATCHED DESIGN
+============================================================ */
+
 .task-management-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 30px;
     width: 100%;
-    padding: 24px 0;
-    max-width: 900px;
-    margin: 0 auto;
+    padding: 20px 0;
 }
 
 /* --- 1. Progress Card --- */
 .task-progress-card {
-    background: linear-gradient(145deg, #ffffff, #f8fafc);
-    padding: 28px;
-    border-radius: 16px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    background-color: white;
+    padding: 24px;
+    border-radius: 8px;
+    border: 0.5px solid rgb(128,128,128);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .task-progress-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .task-progress-title {
     font-family: "'SVN-Gilroy', sans-serif";
-    color: #1e293b;
+    color: rgba(39,84,138,1);
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 20px;
     font-weight: 700;
 }
 
 .task-progress-badge {
-    background-color: #f1f5f9;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: #64748b;
+    color: #666;
+    font-size: 15px;
+    font-weight: 500;
 }
 
 .task-progress-badge span {
-    color: #10B981; /* Xanh lá hoàn thành */
-    font-size: 1.1rem;
+    color: #10B981;
+    font-weight: 700;
 }
 
 .task-progress-track {
     width: 100%;
-    background-color: #e2e8f0;
-    height: 10px;
-    border-radius: 10px;
+    background-color: #E0E0E0;
+    height: 12px;
+    border-radius: 6px;
     overflow: hidden;
 }
 
 .task-progress-fill {
-    background: linear-gradient(90deg, #10B981, #34d399);
+    background-color: #10B981;
     height: 100%;
-    border-radius: 10px;
-    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.task-progress-text {
-    margin: 12px 0 0 0;
-    color: #64748b;
-    font-size: 0.875rem;
-    font-weight: 500;
+    border-radius: 6px;
+    transition: width 0.3s ease;
 }
 
 /* --- 2. Add Task Form --- */
@@ -865,110 +857,85 @@ body {
 .task-input-wrapper {
     display: flex;
     gap: 12px;
-    position: relative;
-    background: #fff;
-    padding: 8px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-    border: 1px solid #e2e8f0;
-    transition: border-color 0.3s ease;
-}
-
-.task-input-wrapper:focus-within {
-    border-color: #27548a;
-    box-shadow: 0 4px 12px rgba(39, 84, 138, 0.1);
 }
 
 .task-add-input {
     flex: 1;
-    border: none;
-    background: transparent;
-    padding: 0 16px;
-    font-size: 1rem;
-    color: #1e293b;
+    border: 1px solid #ccc;
+    background: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    color: #111827;
     outline: none;
 }
 
-.task-add-input::placeholder {
-    color: #94a3b8;
+.task-add-input:focus {
+    border-color: rgba(39,84,138,1);
 }
 
 .task-add-submit-btn {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 24px;
-    background-color: #27548a;
+    justify-content: center;
+    padding: 0 24px;
+    background-color: rgba(39,84,138,1);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     font-weight: 600;
+    font-family: "'SVN-Gilroy', sans-serif";
+    font-size: 16px;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: opacity 0.2s;
 }
 
 .task-add-submit-btn:disabled {
-    background-color: #94a3b8;
+    background-color: #9CA3AF;
     cursor: not-allowed;
-    opacity: 0.7;
 }
 
-.task-add-submit-btn:not(:disabled):hover {
-    background-color: #1e4270;
-    transform: translateY(-1px);
-}
-
-/* --- 3. Timeline Concept --- */
+/* --- 3. Timeline --- */
 .timeline-container {
     display: flex;
     flex-direction: column;
-    padding: 10px 0 10px 10px; /* Thụt vào một chút để line nằm giữa */
+    padding-left: 10px;
 }
 
 .timeline-empty-state {
     text-align: center;
-    padding: 60px 20px;
-    background-color: #f8fafc;
-    border: 2px dashed #cbd5e1;
-    border-radius: 16px;
-    color: #64748b;
-}
-
-.timeline-empty-icon {
-    font-size: 3rem;
-    margin-bottom: 16px;
-    opacity: 0.5;
+    padding: 40px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    color: #999;
 }
 
 .timeline-item {
     position: relative;
     display: flex;
     align-items: flex-start;
-    padding-bottom: 24px; /* Khoảng cách giữa các task */
-    transition: opacity 0.3s;
+    padding-bottom: 24px;
 }
 
 .timeline-item.dragging {
-    opacity: 0.4;
+    opacity: 0.5;
 }
 
-/* Đường line dọc nối các node */
 .timeline-line {
     position: absolute;
-    left: 15px; /* Căn giữa node (32px / 2 - 1px) */
-    top: 32px; /* Bắt đầu từ dưới node */
+    left: 15px; 
+    top: 32px; 
     bottom: 0;
     width: 2px;
-    background-color: #e2e8f0;
+    background-color: #E0E0E0;
     z-index: 1;
 }
 
-/* Ẩn đường line của phần tử cuối cùng */
 .timeline-item:last-child .timeline-line {
     display: none;
 }
 
-/* Điểm mốc (Node) */
 .timeline-node {
     position: relative;
     z-index: 2;
@@ -977,56 +944,40 @@ body {
     height: 32px;
     border-radius: 50%;
     background-color: #fff;
-    border: 2px solid #cbd5e1;
+    border: 2px solid #ccc;
     display: flex;
     justify-content: center;
     align-items: center;
     margin-right: 20px;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     color: white;
+    transition: all 0.2s;
 }
 
-.timeline-item:hover .timeline-node {
-    border-color: #94a3b8;
-    box-shadow: 0 0 0 4px #f1f5f9;
-}
-
-/* Trạng thái hoàn thành */
 .timeline-item.completed .timeline-node {
     background-color: #10B981;
     border-color: #10B981;
-    box-shadow: 0 0 0 4px #d1fae5; /* Hào quang xanh */
 }
 
 .timeline-item.completed .timeline-line {
-    background-color: #10B981; /* Line chuyển xanh nếu đã xong */
+    background-color: #10B981; 
 }
 
-/* Thẻ chứa Task (Card) */
 .timeline-card {
     flex: 1;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #ffffff;
+    background-color: white;
     padding: 16px 20px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-    transition: all 0.2s ease;
-    margin-top: -8px; /* Đẩy lên 1 chút để giữa với node */
-}
-
-.timeline-item:hover .timeline-card {
-    border-color: #cbd5e1;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transform: translateX(4px); /* Hover effect trượt nhẹ */
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    margin-top: -8px; 
+    transition: all 0.2s;
 }
 
 .timeline-item.completed .timeline-card {
-    background-color: #f8fafc;
-    border-color: #f1f5f9;
+    background-color: #f0fdf4;
 }
 
 .timeline-card-content {
@@ -1034,89 +985,47 @@ body {
 }
 
 .timeline-task-title {
-    font-size: 1.05rem;
+    font-size: 16px;
     font-weight: 500;
-    color: #1e293b;
+    color: #111827;
     cursor: text;
-    transition: color 0.2s;
 }
 
 .timeline-item.completed .timeline-task-title {
-    color: #94a3b8;
+    color: #9ca3af;
     text-decoration: line-through;
 }
 
 .timeline-edit-input {
     width: 100%;
-    padding: 8px 12px;
-    font-size: 1.05rem;
-    color: #1e293b;
-    border: 1px solid #27548a;
-    border-radius: 6px;
+    padding: 8px;
+    border: 1px solid rgba(39,84,138,1);
+    border-radius: 4px;
     outline: none;
-    background-color: #f8fafc;
 }
 
-/* Hành động (Kéo thả, Xóa) */
 .timeline-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
-    opacity: 0; /* Ẩn đi, chỉ hiện khi hover */
-    transition: opacity 0.2s;
-}
-
-.timeline-item:hover .timeline-actions {
-    opacity: 1;
+    gap: 16px;
 }
 
 .drag-handle {
-    color: #94a3b8;
+    color: #aaa;
     cursor: grab;
     display: flex;
     align-items: center;
 }
 
-.drag-handle:active {
-    cursor: grabbing;
-}
-
 .timeline-delete-btn {
-    background: none;
-    border: none;
-    color: #ef4444;
-    cursor: pointer;
-    padding: 6px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    transition: background-color 0.2s;
+    color: #EF4444;
 }
 
-.timeline-delete-btn:hover {
-    background-color: #fef2f2;
-}
-
-/* Mobile Responsive */
 @media (max-width: 768px) {
-    .task-management-wrapper {
-        padding: 16px;
-    }
-    
-    .timeline-actions {
-        opacity: 1; /* Luôn hiện trên mobile */
-    }
-    
-    .timeline-item:hover .timeline-card {
-        transform: none; /* Tắt hiệu ứng trượt trên mobile */
-    }
-    
     .task-input-wrapper {
         flex-direction: column;
     }
-    
     .task-add-submit-btn {
-        justify-content: center;
-        width: 100%;
+        height: 48px;
     }
 }
