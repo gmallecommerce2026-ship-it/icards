@@ -2156,9 +2156,9 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
         { id: 'delete', title: 'Xóa thiệp mời' },
     ];
     
-    const handleAddGuestsFromMaster = (guests) => {
-        onDataChange(guests, 'add-guests-bulk');
-    };
+    // const handleAddGuestsFromMaster = (guests) => {
+    //     onDataChange(guests, 'add-guests-bulk');
+    // };
 
     const handleTabClick = (tabId) => {
         if (tabId === 'edit') {
