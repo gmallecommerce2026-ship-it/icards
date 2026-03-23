@@ -279,7 +279,7 @@ const RequiredIcon = () => (<svg width="12px" height="12px" viewBox="0 0 24 24" 
 const SaveIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>);
 const CancelIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
 const SendEmailIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0 1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>);
-
+const CheckIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>);
 const StatItem = ({ label, value }) => (
     <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: "12px", flex: 1, height: "96px", backgroundColor: '#fff', width: '100%' }}>
         <div style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "16px", textAlign: "center", color: "rgba(102,102,102,1)", fontWeight: "500" }}>{label}</div>
@@ -1968,7 +1968,6 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
         setTasks(initialTasks);
     }, [initialTasks]);
 
-    // Gọi API để lưu toàn bộ mảng (Bulk Sync)
     const saveTasksToDB = async (updatedTasks) => {
         try {
             const response = await api.put(`/invitations/${invitationId}/tasks`, { tasks: updatedTasks });
@@ -2016,29 +2015,15 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
     // --- Drag & Drop Handlers ---
     const dragStart = (e, position) => {
         dragItem.current = position;
-        e.target.style.opacity = 0.5;
+        e.target.classList.add('dragging');
     };
 
     const dragEnter = (e, position) => {
         dragOverItem.current = position;
     };
 
-    // const drop = (e) => {
-    //     e.target.style.opacity = 1;
-    //     const copyListItems = [...tasks];
-    //     const dragItemContent = copyListItems[dragItem.current];
-    //     copyListItems.splice(dragItem.current, 1);
-    //     copyListItems.splice(dragOverItem.current, 0, dragItemContent);
-        
-    //     dragItem.current = null;
-    //     dragOverItem.current = null;
-        
-    //     setTasks(copyListItems);
-    //     saveTasksToDB(copyListItems);
-    // };
-
     const dragEnd = (e) => {
-        e.target.style.opacity = 1;
+        e.target.classList.remove('dragging');
     };
 
     // Calculate progress
@@ -2046,35 +2031,43 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
     const progress = tasks.length === 0 ? 0 : Math.round((completedCount / tasks.length) * 100);
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', width: '100%', padding: '20px 0' }}>
-            {/* Header & Progress */}
-            <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '8px', border: '0.5px solid #ccc', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-                <h3 style={{ fontFamily: "'SVN-Gilroy', sans-serif", color: '#27548a', margin: '0 0 16px 0' }}>Tiến độ chuẩn bị cưới</h3>
-                <div style={{ width: '100%', backgroundColor: '#E0E0E0', height: '12px', borderRadius: '6px', overflow: 'hidden' }}>
-                    <div style={{ width: `${progress}%`, backgroundColor: '#10B981', height: '100%', transition: 'width 0.3s ease' }} />
+        <div className="task-management-wrapper">
+            {/* 1. Header & Progress - Thiết kế lại sang trọng hơn */}
+            <div className="task-progress-card">
+                <div className="task-progress-header">
+                    <h3 className="task-progress-title">Tiến độ chuẩn bị cưới</h3>
+                    <div className="task-progress-badge">
+                        <span>{completedCount}</span> / {tasks.length} hoàn thành
+                    </div>
                 </div>
-                <p style={{ marginTop: '10px', color: '#666', fontWeight: 500 }}>Hoàn thành {completedCount}/{tasks.length} công việc ({progress}%)</p>
+                <div className="task-progress-track">
+                    <div className="task-progress-fill" style={{ width: `${progress}%` }} />
+                </div>
+                <p className="task-progress-text">{progress}% chặng đường đã qua. Hãy tiếp tục nhé!</p>
             </div>
 
-            {/* Thêm mới Task */}
-            <form onSubmit={handleAddTask} style={{ display: 'flex', gap: '12px' }}>
-                <input 
-                    type="text" 
-                    value={newTaskTitle} 
-                    onChange={(e) => setNewTaskTitle(e.target.value)} 
-                    placeholder="Thêm công việc mới (VD: Đặt cọc nhà hàng, Thử váy cưới...)" 
-                    style={{ flex: 1, padding: '12px 20px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '16px' }}
-                />
-                <button type="submit" className="guest-action-btn" style={{ height: 'auto', padding: '0 24px', backgroundColor: '#27548a', color: 'white' }}>
-                    <AddIcon /> Thêm việc
-                </button>
+            {/* 2. Thêm mới Task - Form hiện đại */}
+            <form onSubmit={handleAddTask} className="task-add-form">
+                <div className="task-input-wrapper">
+                    <input 
+                        type="text" 
+                        value={newTaskTitle} 
+                        onChange={(e) => setNewTaskTitle(e.target.value)} 
+                        placeholder="Thêm công việc mới (VD: Đặt cọc nhà hàng, Thử váy cưới...)" 
+                        className="task-add-input"
+                    />
+                    <button type="submit" className="task-add-submit-btn" disabled={!newTaskTitle.trim()}>
+                        <AddIcon /> <span>Thêm việc</span>
+                    </button>
+                </div>
             </form>
 
-            {/* Danh sách Task */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {/* 3. Khung Timeline hiển thị danh sách công việc */}
+            <div className="timeline-container">
                 {tasks.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '40px', color: '#999', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-                        Chưa có công việc nào. Hãy thêm công việc mới để bắt đầu kế hoạch của bạn!
+                    <div className="timeline-empty-state">
+                        <div className="timeline-empty-icon">📝</div>
+                        <p>Chưa có công việc nào. Hãy thêm công việc mới để bắt đầu kế hoạch của bạn!</p>
                     </div>
                 ) : (
                     tasks.map((task, index) => (
@@ -2085,55 +2078,52 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
                             onDragEnter={(e) => dragEnter(e, index)}
                             onDragEnd={dragEnd}
                             onDragOver={(e) => e.preventDefault()}
-                            style={{ 
-                                display: 'flex', alignItems: 'center', padding: '16px 20px', 
-                                backgroundColor: task.completed ? '#f0fdf4' : 'white', 
-                                border: '1px solid #e0e0e0', borderRadius: '6px', cursor: 'grab',
-                                transition: 'all 0.2s ease', gap: '16px'
-                            }}
+                            className={`timeline-item ${task.completed ? 'completed' : ''}`}
                         >
-                            {/* Nút kéo thả */}
-                            <div style={{ color: '#aaa', cursor: 'grab' }}>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                            {/* Đường thẳng kết nối (line) */}
+                            <div className="timeline-line"></div>
+
+                            {/* Node (Điểm mốc trên timeline) */}
+                            <div 
+                                className="timeline-node" 
+                                onClick={() => handleToggleComplete(task.id)}
+                                title={task.completed ? "Đánh dấu chưa hoàn thành" : "Đánh dấu hoàn thành"}
+                            >
+                                {task.completed && <CheckIcon />}
                             </div>
 
-                            {/* Checkbox */}
-                            <input 
-                                type="checkbox" 
-                                checked={task.completed} 
-                                onChange={() => handleToggleComplete(task.id)}
-                                style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#10B981' }}
-                            />
+                            {/* Nội dung Task Card */}
+                            <div className="timeline-card">
+                                <div className="timeline-card-content">
+                                    {editingTaskId === task.id ? (
+                                        <input 
+                                            autoFocus
+                                            value={editTitle}
+                                            onChange={(e) => setEditTitle(e.target.value)}
+                                            onBlur={() => handleSaveEdit(task.id)}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit(task.id)}
+                                            className="timeline-edit-input"
+                                        />
+                                    ) : (
+                                        <span 
+                                            onClick={() => startEditing(task)}
+                                            className="timeline-task-title"
+                                        >
+                                            {task.title}
+                                        </span>
+                                    )}
+                                </div>
 
-                            {/* Tiêu đề / Sửa */}
-                            <div style={{ flex: 1 }}>
-                                {editingTaskId === task.id ? (
-                                    <input 
-                                        autoFocus
-                                        value={editTitle}
-                                        onChange={(e) => setEditTitle(e.target.value)}
-                                        onBlur={() => handleSaveEdit(task.id)}
-                                        onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit(task.id)}
-                                        style={{ width: '100%', padding: '8px', border: '1px solid #27548a', borderRadius: '4px' }}
-                                    />
-                                ) : (
-                                    <span 
-                                        onClick={() => startEditing(task)}
-                                        style={{ 
-                                            fontSize: '16px', fontWeight: 500, cursor: 'pointer',
-                                            textDecoration: task.completed ? 'line-through' : 'none',
-                                            color: task.completed ? '#9ca3af' : '#111827'
-                                        }}
-                                    >
-                                        {task.title}
-                                    </span>
-                                )}
+                                {/* Actions */}
+                                <div className="timeline-actions">
+                                    <div className="drag-handle" title="Kéo thả để sắp xếp">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                                    </div>
+                                    <button onClick={() => handleDeleteTask(task.id)} className="timeline-delete-btn" title="Xóa công việc">
+                                        <DeleteIcon width="18" height="18" />
+                                    </button>
+                                </div>
                             </div>
-
-                            {/* Xóa */}
-                            <button onClick={() => handleDeleteTask(task.id)} className="table-action-btn" style={{ color: '#EF4444' }}>
-                                <DeleteIcon width="20" height="20" />
-                            </button>
                         </div>
                     ))
                 )}
