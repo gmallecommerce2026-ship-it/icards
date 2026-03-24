@@ -2199,246 +2199,167 @@ END: STYLES MỚI
     top: -10%;
     position: relative;
 }
-/* ==============================================
-   PREMIUM LOVE STORY TIMELINE - XỊN & PARALLAX
-============================================== */
-.premium-love-story-timeline {
+.lovestory-timeline-wrapper {
     position: relative;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: var(--spacing-3xl) 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-3xl);
-    height: auto; /* Bỏ giới hạn 100vh cũ, để content tự đẩy chiều cao */
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px 0;
 }
 
-/* Đường line trung tâm mờ ảo */
-.timeline-glow-line {
+/* Đường track (kẻ dọc) ở giữa */
+.lovestory-track {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 50%;
     width: 2px;
-    background: linear-gradient(to bottom, transparent, var(--color-accent), var(--color-accent-light), var(--color-accent), transparent);
+    background-color: #e6d3d3; /* Màu đường kẻ, chỉnh theo tone dự án */
     transform: translateX(-50%);
-    opacity: 0.5;
-    z-index: 0;
+    z-index: 1;
 }
 
-/* Base item - Chuẩn bị cho hiệu ứng Scroll Reveal */
-.premium-story-item {
+.lovestory-timeline-item {
     position: relative;
     width: 100%;
+    margin-bottom: 60px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    opacity: 0; /* Ẩn đi trước khi cuộn tới */
-    transition: opacity 1s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-/* Setup vị trí bay vào */
-.premium-story-item.left-align { transform: translateX(-80px) translateY(50px); }
-.premium-story-item.right-align { transform: translateX(80px) translateY(50px); }
-
-/* Class được thêm bằng JS khi cuộn tới */
-.premium-story-item.is-visible {
+/* Hiệu ứng scroll từ Observer */
+.lovestory-timeline-item.is-visible {
     opacity: 1;
-    transform: translate(0, 0);
+    transform: translateY(0);
 }
 
-.premium-story-content {
-    display: flex;
-    align-items: center;
-    width: 50%;
+.lovestory-timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Định vị cấu trúc trái/phải */
+.lovestory-left {
+    flex-direction: row-reverse;
+}
+
+.lovestory-right {
+    flex-direction: row;
+}
+
+/* Card chứa nội dung chiếm 45% (chừa khoảng trống cho đường kẻ giữa) */
+.lovestory-card {
+    width: 45%;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
     position: relative;
     z-index: 2;
+    transition: transform 0.3s ease;
 }
 
-/* Căn trái phải xen kẽ */
-.left-align .premium-story-content {
-    padding-right: 60px;
-    justify-content: flex-end;
-}
-.right-align .premium-story-content {
-    margin-left: 50%;
-    padding-left: 60px;
-    justify-content: flex-start;
-}
-
-/* --- Khung Ảnh với góc nhìn 3D --- */
-.premium-image-wrapper {
-    position: relative;
-    width: 100%;
-    max-width: 480px;
-    height: 380px;
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.6s ease;
-}
-
-/* Nghiêng ảnh nhẹ vào trong tạo chiều sâu */
-.left-align .premium-image-wrapper { transform: perspective(1000px) rotateY(6deg); }
-.right-align .premium-image-wrapper { transform: perspective(1000px) rotateY(-6deg); }
-
-.premium-image-wrapper:hover { 
-    transform: perspective(1000px) rotateY(0deg) scale(1.02); 
-    box-shadow: 0 30px 60px rgba(0,0,0,0.25);
-    z-index: 10;
-}
-
-.premium-story-image {
-    width: 100%;
-    height: 125%; /* Tăng height để ảnh trượt parallax mượt hơn */
-    object-fit: cover;
-    top: -12.5%;
-    position: relative;
-}
-
-.premium-image-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 60%);
-    pointer-events: none;
-}
-
-/* --- Khối Text Glassmorphism --- */
-.premium-text-glass {
-    position: absolute;
-    width: 85%;
-    max-width: 420px;
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.9);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
+.lovestory-card:hover {
+    transform: translateY(-5px);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    z-index: 3;
-    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.5s ease;
 }
 
-.premium-text-glass:hover {
-    box-shadow: 0 25px 50px rgba(212, 175, 55, 0.2);
-    transform: translateY(-8px);
-}
-
-/* Vị trí Glass card so le đè lên ảnh */
-.left-align .premium-text-glass {
-    right: 0;
-    transform: translateX(35%);
-}
-.right-align .premium-text-glass {
-    left: 0;
-    transform: translateX(-35%);
-}
-
-.premium-text-glass:hover.left-align .premium-text-glass { transform: translateX(35%) translateY(-8px); }
-.premium-text-glass:hover.right-align .premium-text-glass { transform: translateX(-35%) translateY(-8px); }
-
-/* --- Text details --- */
-.premium-story-date { margin-bottom: var(--spacing-sm); }
-.date-highlight {
-    display: inline-block;
-    background: var(--color-accent-light);
-    color: var(--color-primary);
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-.premium-story-title {
-    font-family: var(--font-display);
-    font-size: 2.2rem;
-    color: var(--color-primary);
-    margin-bottom: var(--spacing-sm);
-    line-height: 1.2;
-}
-.premium-story-description {
-    font-size: 1rem;
-    color: var(--color-text-medium);
-    line-height: 1.7;
-    margin: 0;
-}
-
-/* --- Timeline Node (Dấu chấm chớp nháy) --- */
-.timeline-node {
+/* Dấu chấm mốc thời gian */
+.lovestory-dot {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     width: 24px;
     height: 24px;
+    background-color: #fff;
+    border: 3px solid #d4af37; /* Màu nhấn (Vàng gold/Hồng đào tuỳ theme) */
+    border-radius: 50%;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 4;
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
 }
 
-.node-core {
-    width: 14px;
-    height: 14px;
-    background-color: var(--color-accent);
+.lovestory-dot .dot-inner {
+    width: 8px;
+    height: 8px;
+    background-color: #d4af37;
     border-radius: 50%;
-    z-index: 2;
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.8);
-    border: 2px solid var(--color-white);
 }
 
-.node-pulse {
-    position: absolute;
+/* Hình ảnh trong Timeline */
+.lovestory-image-container {
+    width: 100%;
+    height: 240px;
+    overflow: hidden;
+}
+
+.lovestory-image {
     width: 100%;
     height: 100%;
-    background-color: var(--color-accent);
-    border-radius: 50%;
-    z-index: 1;
-    animation: timelinePulse 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    object-fit: cover;
+    display: block;
 }
 
-/* --- RESPONSIVE CHO MOBILE & TABLET --- */
-@media (max-width: 900px) {
-    .timeline-glow-line { left: 30px; }
-    .timeline-node { 
-        left: 30px; 
-        top: 150px; 
-    }
-    
-    .premium-story-item.left-align,
-    .premium-story-item.right-align {
-        transform: translateY(40px); /* Bỏ translate X ở mobile để cuộn lên mượt hơn */
+/* Phần Text */
+.lovestory-content {
+    padding: 24px;
+    text-align: center;
+}
+
+.lovestory-date {
+    display: inline-block;
+    padding: 6px 16px;
+    background: #f8f1f1;
+    color: #b5838d;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+}
+
+.lovestory-title {
+    font-size: 1.4rem;
+    color: #333;
+    margin: 0 0 12px 0;
+    font-family: var(--font-primary, serif);
+}
+
+.lovestory-desc {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ==========================================
+   RESPONSIVE CHO MOBILE (Dưới 768px)
+========================================== */
+@media screen and (max-width: 768px) {
+    .lovestory-track {
+        left: 30px; /* Đẩy đường track sang mép trái */
     }
 
-    .premium-story-content,
-    .left-align .premium-story-content,
-    .right-align .premium-story-content {
-        width: 100%;
-        margin: 0 0 0 60px;
-        padding: 0 20px 0 0;
+    .lovestory-timeline-item {
+        flex-direction: column;
+        align-items: flex-end; /* Đẩy nội dung sang phải */
+    }
+
+    .lovestory-left, .lovestory-right {
         flex-direction: column;
     }
 
-    .left-align .premium-image-wrapper,
-    .right-align .premium-image-wrapper {
-        transform: perspective(1000px) rotateY(0deg); /* Bỏ nghiêng 3D trên mobile */
-        height: 280px;
-        max-width: 100%;
+    .lovestory-card {
+        width: calc(100% - 70px); /* Lấy full chiều rộng trừ đi khoảng trống track */
     }
 
-    /* Đẩy Text Box trồi lên đè vào giữa ảnh */
-    .left-align .premium-text-glass,
-    .right-align .premium-text-glass {
-        position: relative;
-        left: auto;
-        right: auto;
-        transform: translateY(-40px);
-        width: 90%;
-        margin: 0 auto;
-    }
-    
-    .premium-text-glass:hover.left-align .premium-text-glass,
-    .premium-text-glass:hover.right-align .premium-text-glass { 
-        transform: translateY(-48px); 
+    .lovestory-dot {
+        left: 30px; /* Định vị lại chấm tròn trùng với track */
+        top: 40px;  /* Nằm gần trên đỉnh của card thay vì ở giữa */
     }
 }
