@@ -159,26 +159,22 @@ const SectionHeader2 = React.memo(({ title, titleStyle }) => (
     </div>
 ));
 // ===================================================================
-// ++ PREMIUM UPDATE: THE ETHEREAL JOURNEY TIMELINE ++
-// Concept: Glassmorphism, Glowing Axis, Minimalist & Versatile
-// Phù hợp cho Wedding, Corporate Milestones, Anniversaries...
+// ++ UPDATED: LOVE STORY TIMELINE (3D WRAPPED RIBBON & SEGMENTED POLE) ++
+// ===================================================================
+// ===================================================================
+// ++ UPDATED: ARTISAN LOVE STORY TIMELINE (INTERLOCKING TRAPEZOID POLES) ++
 // ===================================================================
 const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    entry.target.classList.add('is-revealed');
-                    // Unobserve sau khi đã hiện để tối ưu hiệu năng
-                    observer.unobserve(entry.target);
+                    entry.target.classList.add('is-visible');
                 }
             });
-        }, { 
-            threshold: 0.2, 
-            rootMargin: "0px 0px -100px 0px" // Trigger sớm hơn một chút để tạo cảm giác mượt
-        });
+        }, { threshold: 0.2, rootMargin: "0px 0px -50px 0px" });
 
-        const items = document.querySelectorAll('.journey-node');
+        const items = document.querySelectorAll('.art-timeline-row');
         items.forEach(item => observer.observe(item));
 
         return () => items.forEach(item => observer.unobserve(item));
@@ -187,48 +183,60 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
     if (!stories || stories.length === 0) return null;
 
     return (
-        <section className="premium-journey-section fade-in-up">
-            <SectionHeader2 title={title || "Hành Trình Của Chúng Ta"} titleStyle={titleStyle}/>
+        <section className="art-lovestory-section">
+            <SectionHeader2 title={title} titleStyle={titleStyle}/>
             
-            <div className="journey-timeline-container">
-                {/* Trục ánh sáng trung tâm */}
-                <div className="journey-glowing-axis"></div>
-
+            <div className="art-timeline-container">
                 {stories.map((story, index) => {
-                    const isLeft = index % 2 === 0;
+                    const theme = artThemes[index % artThemes.length];
+                    const isImgLeft = index % 2 === 0;
 
                     return (
                         <div 
                             key={story.id || index} 
-                            className={`journey-node ${isLeft ? 'node-left' : 'node-right'}`}
+                            className={`art-timeline-row ${isImgLeft ? 'layout-img-left' : 'layout-img-right'} fade-in-up`}
+                            style={{ 
+                                '--c-main': theme.main, 
+                                '--c-dark': theme.dark 
+                            }}
                         >
-                            {/* Điểm mốc thời gian (Dot) */}
-                            <div className="journey-dot">
-                                <div className="journey-dot-core"></div>
-                                <div className="journey-dot-pulse"></div>
+                            {/* KHỐI TRỤC ĐOẠN: Thanh hình thang đan xen mang màu sắc riêng */}
+                            <div className="art-pole-segment"></div>
+
+                            {/* KHỐI HÌNH ẢNH */}
+                            <div className="art-col-img">
+                                {story.imageUrl ? (
+                                    <div className="art-img-frame parallax-image" data-speed="0.03">
+                                        <img src={story.imageUrl} alt={story.title} loading="lazy" />
+                                    </div>
+                                ) : (
+                                    <div className="art-img-placeholder"></div>
+                                )}
                             </div>
 
-                            {/* Khung nội dung */}
-                            <div className="journey-card-wrapper">
-                                <div className="journey-card">
-                                    {/* Ảnh đại diện sự kiện */}
-                                    {story.imageUrl && (
-                                        <div className="journey-image-box parallax-image" data-speed="0.05">
-                                            <img src={story.imageUrl} alt={story.title} loading="lazy" />
-                                            {/* Badge Ngày Tháng lơ lửng trên ảnh */}
-                                            <div className="journey-date-badge">
-                                                <span>{story.date}</span>
-                                            </div>
-                                        </div>
-                                    )}
+                            {/* KHỐI TRUNG TÂM: LÁ CỜ QUẤN QUANH CỘT ĐOẠN */}
+                            <div className="art-col-center">
+                                {/* Đuôi cờ: Nằm MẶT SAU cột, hướng về phía ảnh */}
+                                <div className="art-ribbon-tail">
+                                    <div className="art-anchor-dot"></div> {/* Điểm chấm liên kết */}
+                                </div>
+                                
+                                {/* Mặt trước cờ: Nằm ĐÈ LÊN cột, chứa text */}
+                                <div className="art-ribbon-front">
+                                    <span className="art-ribbon-text">{story.date}</span>
+                                </div>
+                            </div>
 
-                                    {/* Nội dung Text */}
-                                    <div className="journey-text-box">
-                                        {!story.imageUrl && (
-                                            <div className="journey-date-text">{story.date}</div>
-                                        )}
-                                        <h3 className="journey-title">{story.title}</h3>
-                                        <p className="journey-desc">{story.description}</p>
+                            {/* KHỐI VĂN BẢN */}
+                            <div className="art-col-text">
+                                <div className="art-content-wrapper">
+                                    <div className="art-text-block">
+                                        {/* Tiêu đề: Serif đậm, màu đồng bộ với cờ */}
+                                        <h3 className="art-title" style={{ color: theme.main }}>
+                                            {story.title}
+                                        </h3>
+                                        {/* Mô tả: Sans-serif màu trung tính */}
+                                        <p className="art-desc">{story.description}</p>
                                     </div>
                                 </div>
                             </div>

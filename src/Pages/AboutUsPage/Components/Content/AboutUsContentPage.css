@@ -2200,249 +2200,289 @@ END: STYLES MỚI
     position: relative;
 }
 /* ===================================================================
-   PREMIUM ETHEREAL JOURNEY TIMELINE (REPLACES OLD LOVE STORY)
+   ARTISAN LOVE STORY TIMELINE (INTERLOCKING TRAPEZOIDS & 3D WRAP)
 =================================================================== */
 
-.premium-journey-section {
+.art-lovestory-section {
     padding: 100px 20px;
-    background: transparent;
-    position: relative;
-    overflow: hidden;
+    background-color: #fdfbf9;
+    font-family: var(--font-primary, sans-serif);
 }
 
-.journey-timeline-container {
+.art-section-header { text-align: center; margin-bottom: 80px; }
+.art-section-title { font-size: 3rem; color: #333; font-weight: bold; margin-bottom: 15px; }
+.art-section-divider { width: 60px; height: 3px; background-color: #d4af37; margin: 0 auto; border-radius: 2px; }
+
+.art-timeline-container {
     position: relative;
-    max-width: 1000px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 40px 0;
 }
 
-/* 1. Trục Ánh Sáng Trung Tâm (Glowing Axis) */
-.journey-glowing-axis {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 2px;
-    transform: translateX(-50%);
-    background: linear-gradient(
-        to bottom, 
-        rgba(212, 175, 55, 0) 0%, 
-        var(--color-accent) 15%, 
-        var(--color-accent) 85%, 
-        rgba(212, 175, 55, 0) 100%
-    );
-    opacity: 0.6;
-    z-index: 1;
-}
-
-/* 2. Cấu trúc Node (Từng sự kiện) */
-.journey-node {
-    position: relative;
+/* =========================================
+   1. BỐ CỤC TỔNG THỂ CỦA HÀNG (ROW)
+========================================= */
+.art-timeline-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    margin-bottom: 80px;
+    margin-bottom: 120px;
     opacity: 0;
-    z-index: 2;
+    transform: translateY(50px);
+    transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative; /* Context cho Pole Segment */
 }
+.art-timeline-row.is-visible { opacity: 1; transform: translateY(0); }
 
-/* Animation khi scroll tới */
-.journey-node.is-revealed {
-    animation: journeyReveal 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-}
+.layout-img-left { flex-direction: row; }
+.layout-img-right { flex-direction: row-reverse; }
 
-@keyframes journeyReveal {
-    from { opacity: 0; transform: translateY(50px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* 3. Điểm Mốc Thời Gian (Glowing Dot) */
-.journey-dot {
+/* =========================================
+   2. CỘT ĐOẠN HÌNH THANG ĐAN XEN (INTERLOCKING POLE SEGMENTS)
+========================================= */
+.art-pole-segment {
     position: absolute;
     left: 50%;
-    top: 50px; /* Căn chỉnh với đỉnh của card */
-    transform: translate(-50%, -50%);
-    width: 24px;
-    height: 24px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 3;
+    width: 30px; /* Độ dày của cột */
+    margin-left: -15px; /* Căn giữa hoàn hảo */
+    top: -65px; /* Vươn lên để khớp với đoạn trên */
+    bottom: -65px; /* Vươn xuống để khớp với đoạn dưới */
+    z-index: 2; /* Nằm giữa lớp lá cờ sau (1) và trước (3) */
+    background: linear-gradient(135deg, var(--c-main) 0%, var(--c-dark) 100%);
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.25), 5px 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.5s ease;
 }
 
-.journey-dot-core {
-    width: 12px;
-    height: 12px;
-    background-color: var(--color-white);
-    border: 3px solid var(--color-accent);
+/* Các lát cắt hình thang đan xen (Interlocking Trapezes) */
+.layout-img-left .art-pole-segment {
+    /* Cắt xéo: Trên / (Trái thấp phải cao) - Dưới \ (Trái cao phải thấp) */
+    clip-path: polygon(0 30px, 100% 0, 100% 100%, 0 calc(100% - 30px));
+}
+.layout-img-right .art-pole-segment {
+    /* Cắt xéo: Trên \ (Trái cao phải thấp) - Dưới / (Trái thấp phải cao) */
+    clip-path: polygon(0 0, 100% 30px, 100% calc(100% - 30px), 0 100%);
+}
+
+/* Xử lý 2 đầu cột cho mượt mà (không vươn nhọn ra ngoài) */
+.art-timeline-row:first-child .art-pole-segment {
+    top: -20px;
+    clip-path: none; /* Cắt thẳng ở đầu */
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+.art-timeline-row:last-child .art-pole-segment {
+    bottom: -20px;
+    clip-path: none; /* Cắt thẳng ở đáy */
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+/* Áp dụng lại clip-path đặc biệt kết hợp bo tròn cho first/last child nếu cần */
+.layout-img-left.art-timeline-row:first-child .art-pole-segment {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 30px));
+}
+.layout-img-right.art-timeline-row:last-child .art-pole-segment {
+    clip-path: polygon(0 0, 100% 30px, 100% 100%, 0 100%);
+}
+
+/* =========================================
+   3. KHUNG HÌNH ẢNH (MATCHING BORDER)
+========================================= */
+.art-col-img { width: 40%; display: flex; }
+.layout-img-left .art-col-img { justify-content: flex-end; padding-right: 60px; }
+.layout-img-right .art-col-img { justify-content: flex-start; padding-left: 60px; }
+
+.art-img-frame, .art-img-placeholder {
+    width: 260px; height: 260px;
     border-radius: 50%;
-    z-index: 2;
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-    transition: all 0.3s ease;
+    overflow: hidden;
+    border: 8px solid var(--c-main);
+    background-color: #fff;
+    box-shadow: 
+        inset 0 0 20px rgba(0,0,0,0.1),
+        0 15px 35px rgba(0,0,0,0.12),
+        0 5px 15px rgba(var(--c-main), 0.3);
+}
+.art-img-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+/* =========================================
+   4. NGHỆ THUẬT LÁ CỜ QUẤN (THE 3D PHYSICS WRAP)
+========================================= */
+.art-col-center {
+    position: absolute;
+    left: 50%;
+    width: 0; height: 0;
+    display: flex; justify-content: center; align-items: center;
 }
 
-.journey-dot-pulse {
+/* --- MẶT TRƯỚC (NẰM TRÊN CỘT) --- */
+.art-ribbon-front {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    background-color: var(--color-accent);
+    background: var(--c-main);
+    color: #fff;
+    z-index: 3; /* Đè lên cột (z=2) */
+    padding: 12px 25px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.25));
+}
+
+/* NẾP GẤP TẠO 3D (Bóng đổ khuất sau mép cột) */
+.art-ribbon-front::before {
+    content: ''; 
+    position: absolute;
+    top: 100%; /* Rớt xuống từ mép dưới lá cờ trước */
+    width: 15px; /* Chiều rộng nếp gấp (bằng nửa cột) */
+    height: 18px; /* Độ dốc / độ sâu của nếp gấp */
+    background: var(--c-dark); /* Màu tối chìm vào trong */
+    filter: brightness(0.7); /* Tối thêm để tạo chiều sâu chân thực */
+}
+
+/* --- MẶT SAU (CHUI SAU CỘT & ĐIỂM CHẤM) --- */
+.art-ribbon-tail {
+    position: absolute;
+    background: var(--c-dark); 
+    height: 35px; /* Nhỏ hơn mặt trước một chút */
+    z-index: 1; /* Chui ra sau cột (z=2) */
+    display: flex; align-items: center;
+}
+
+/* ĐIỂM CHẤM NEO VÀO HÌNH ẢNH */
+.art-anchor-dot {
+    position: absolute;
+    width: 14px; height: 14px;
     border-radius: 50%;
-    opacity: 0.4;
-    z-index: 1;
-    animation: pulseGlow 2s infinite ease-in-out;
+    background: #fff;
+    border: 4px solid var(--c-main);
+    box-shadow: 0 0 12px var(--c-main);
 }
 
-@keyframes pulseGlow {
-    0% { transform: scale(0.8); opacity: 0.5; }
-    100% { transform: scale(2.5); opacity: 0; }
+/* -- LOGIC QUẤN TRÁI/PHẢI (VẬT LÝ QUẤN CỘT CHUẨN XÁC) -- */
+
+/* HÀNG ẢNH TRÁI (Ảnh bên trái, Text bên phải) */
+.layout-img-left .art-ribbon-front {
+    left: -15px; /* Cạnh trái cờ bám sát mép trái cột */
+    padding-left: 35px; /* Thụt text nhường chỗ cho cột */
+    clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 50%, 100% 100%, 0 100%);
 }
-
-/* 4. Thẻ Nội Dung (Glassmorphism Card) */
-.journey-card-wrapper {
-    width: 45%; /* Chừa không gian cho trục giữa */
+.layout-img-left .art-ribbon-front::before {
+    left: 0; /* Gắn vào mép TRÁI cờ trước */
+    clip-path: polygon(100% 0, 0 0, 100% 100%); /* Cắt xéo từ mép ngoài đâm vào trong sau cột */
 }
-
-.node-left .journey-card-wrapper { padding-right: 40px; }
-.node-right .journey-card-wrapper { padding-left: 40px; margin-left: auto; }
-
-.journey-card {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 24px;
-    overflow: hidden;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
+.layout-img-left .art-ribbon-tail {
+    right: 15px; /* Đuôi chui ra từ mép TRÁI cột, vươn về ảnh bên trái */
+    width: 70px; 
+    top: 18px; /* Khớp với độ sâu nếp gấp */
 }
+.layout-img-left .art-anchor-dot { left: -7px; } 
 
-.journey-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--color-accent-light);
+/* HÀNG ẢNH PHẢI (Ảnh bên phải, Text bên trái) */
+.layout-img-right .art-ribbon-front {
+    right: -15px; /* Cạnh phải cờ bám sát mép phải cột */
+    padding-right: 35px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 15px 50%);
 }
-
-.journey-card:hover .journey-dot-core {
-    transform: scale(1.3);
-    background-color: var(--color-accent);
+.layout-img-right .art-ribbon-front::before {
+    right: 0; /* Gắn vào mép PHẢI cờ trước */
+    clip-path: polygon(0 0, 100% 0, 0 100%); /* Cắt xéo góc đổ bóng */
 }
+.layout-img-right .art-ribbon-tail {
+    left: 15px; /* Đuôi chui ra từ mép PHẢI cột, vươn về ảnh bên phải */
+    width: 70px; 
+    top: 18px;
+}
+.layout-img-right .art-anchor-dot { right: -7px; }
 
-/* 5. Khung Ảnh Nghệ Thuật */
-.journey-image-box {
-    position: relative;
+/* =========================================
+   5. NỘI DUNG VĂN BẢN
+========================================= */
+.art-col-text { width: 40%; display: flex; align-items: center; }
+.layout-img-left .art-col-text { justify-content: flex-start; padding-left: 60px; text-align: left; }
+.layout-img-right .art-col-text { justify-content: flex-end; padding-right: 60px; text-align: right; }
+
+.art-content-wrapper {
     width: 100%;
-    height: 280px;
-    overflow: hidden;
 }
 
-.journey-image-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.7s ease;
+.art-text-block {
+    background: #fff;
+    padding: 35px 40px;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.04);
 }
 
-.journey-card:hover .journey-image-box img {
-    transform: scale(1.08); /* Phóng to nhẹ khi hover card */
+/* Tiêu đề: Font Serif đậm, màu chính của cờ */
+.art-title {
+    font-size: 2rem;
+    margin-bottom: 12px;
+    font-weight: 800;
 }
 
-/* 6. Badge Ngày Tháng (Floating Date) */
-.journey-date-badge {
-    position: absolute;
-    bottom: -15px; /* Tràn nhẹ ra khỏi ảnh */
-    left: 30px;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
-    color: var(--color-white);
-    padding: 8px 20px;
-    border-radius: 30px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-    z-index: 2;
-    border: 2px solid var(--color-white);
-}
-
-.node-right .journey-date-badge {
-    left: auto;
-    right: 30px;
-}
-
-/* 7. Khung Chữ */
-.journey-text-box {
-    padding: 40px 30px 30px 30px;
-    text-align: left;
-}
-
-.journey-date-text {
-    font-size: 0.9rem;
-    color: var(--color-accent);
-    font-weight: 600;
-    margin-bottom: 10px;
-    letter-spacing: 1px;
-}
-
-.journey-title {
-    font-family: var(--font-display);
-    font-size: 1.8rem;
-    color: var(--color-primary);
-    margin-bottom: 15px;
-    line-height: 1.3;
-    font-weight: 700;
-}
-
-.journey-desc {
-    font-size: 1.05rem;
-    color: var(--color-text-medium);
-    line-height: 1.7;
+/* Mô tả: Font Sans-serif màu trung tính, dễ đọc */
+.art-desc {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.8;
     margin: 0;
 }
 
 /* =========================================
-   RESPONSIVE (MOBILE & TABLET TỐI ƯU)
+   RESPONSIVE MOBILE TỐI ƯU HÓA 3D
 ========================================= */
 @media screen and (max-width: 992px) {
-    .premium-journey-section { padding: 60px 15px; }
+    .love-story-timeline-art { padding: 60px 15px; }
+    .art-section-title { font-size: 2.2rem; }
+
+    .art-timeline-row {
+        flex-direction: column !important;
+        padding-left: 60px; /* Chừa lề cho trục */
+        margin-bottom: 80px;
+    }
     
-    .journey-glowing-axis {
-        left: 30px; /* Dời trục sang sát lề trái */
+    /* Ép cột kim loại sang sát lề trái */
+    .art-master-pole-3d {
+        left: 30px;
+        transform: none;
+    }
+    .art-col-center {
+        left: 30px;
+        top: 20px; /* Căn cờ ngang với ảnh sự kiện */
     }
 
-    .journey-node {
-        margin-bottom: 60px;
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .journey-dot {
-        left: 30px; /* Căn dot theo trục */
-        top: 30px;
-    }
-
-    .journey-card-wrapper {
+    .art-col-img, .art-col-text {
         width: 100%;
-        padding-left: 70px !important; /* Đẩy nội dung sang phải chừa chỗ cho trục */
-        padding-right: 0 !important;
-        margin-left: 0 !important;
+        justify-content: flex-start !important;
+        padding: 0 !important;
+        text-align: left !important;
     }
 
-    .journey-card {
-        border-radius: 16px;
+    /* Trên Mobile, bắt buộc tất cả cờ bay sang phải (như Layout Left) */
+    .art-ribbon-3d-flag {
+        left: -10px !important; right: auto !important;
+        padding-left: 25px !important; padding-right: 30px !important;
+        clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 50%, 100% 100%, 0 100%) !important;
+        filter: drop-shadow(2px 6px 6px rgba(0,0,0,0.15));
     }
-
-    .journey-image-box { height: 220px; }
-
-    .journey-date-badge {
-        left: 20px !important;
-        right: auto !important;
-        bottom: -15px;
+    .art-ribbon-3d-flag::before {
+        left: 0 !important; right: auto !important;
+        clip-path: polygon(100% 0, 0 0, 100% 100%) !important;
     }
+    .art-image-anchor-dot { left: -7px !important; right: auto !important; }
 
-    .journey-text-box {
-        padding: 35px 20px 20px 20px;
+    .art-img-wrapper-3d {
+        width: 180px; height: 180px;
+        border-width: 8px;
+        margin-bottom: 25px;
     }
-
-    .journey-title { font-size: 1.5rem; }
-    .journey-desc { font-size: 0.95rem; }
+    
+    .art-text-block {
+        padding: 25px;
+        background: transparent;
+        box-shadow: none;
+        border-left: 4px solid var(--c-main);
+        border-radius: 0;
+    }
+    .art-title { font-size: 1.6rem; }
 }
