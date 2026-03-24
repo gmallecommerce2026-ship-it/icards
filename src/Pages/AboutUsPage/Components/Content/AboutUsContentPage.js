@@ -12,6 +12,58 @@ import { useSettings } from '../../../../Context/SettingsContext';
 import { generateGoogleCalendarLink, generateOutlookCalendarLink, downloadIcsFile } from '../../../../Utils/calendar-links';
 import "./customeditor.css"
 
+const useSmoothParallax = (isOpen) => {
+    useEffect(() => {
+        if (!isOpen) return; // Chỉ chạy khi thiệp đã mở
+
+        let ticking = false;
+        const handleScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const scrolled = window.scrollY;
+                    const windowHeight = window.innerHeight;
+
+                    // 1. Parallax cho Banner (Cuộn chậm hơn trang)
+                    document.querySelectorAll('.parallax-banner').forEach(el => {
+                        const speed = parseFloat(el.dataset.speed || 0.4);
+                        el.style.transform = `translate3d(0, ${scrolled * speed}px, 0)`;
+                    });
+
+                    // 2. Parallax cho Ảnh (Couple, Event) - Hiệu ứng ảnh trượt trong khung
+                    document.querySelectorAll('.parallax-image').forEach(el => {
+                        const rect = el.parentElement.getBoundingClientRect();
+                        // Chỉ tính toán khi element nằm trong viewport
+                        if (rect.top <= windowHeight && rect.bottom >= 0) {
+                            const speed = parseFloat(el.dataset.speed || 0.15);
+                            // Tính khoảng cách từ tâm màn hình đến thẻ
+                            const yPos = (windowHeight / 2 - rect.top) * speed;
+                            el.style.transform = `translate3d(0, ${yPos}px, 0) scale(1.15)`;
+                        }
+                    });
+
+                    // 3. Parallax cho Decorative Elements (Hoa văn bay lơ lửng)
+                    document.querySelectorAll('.parallax-float').forEach(el => {
+                        const rect = el.closest('.section-container').getBoundingClientRect();
+                        if (rect.top <= windowHeight && rect.bottom >= 0) {
+                            const speed = parseFloat(el.dataset.speed || -0.2);
+                            const yPos = (windowHeight - rect.top) * speed;
+                            el.style.transform = `translate3d(0, ${yPos}px, 0)`;
+                        }
+                    });
+
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        // Kích hoạt lần đầu
+        handleScroll();
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isOpen]);
+};
 
 const CustomHtmlSection = React.memo(({ content, title, titleStyle }) => {
     if (!content) return null;
@@ -53,7 +105,7 @@ const SectionHeader = React.memo(({ title, subtitle, decorative = true, titleSty
     return (
         <div className="modern-section-header">
             {decorative && (
-                <div className="decorative-element">
+                <div className="decorative-element parallax-float" data-speed="-0.15">
                       <svg width="200" height="50" viewBox="0 0 400 100" className="decorative-swirl" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <path d="M50 50 C 80 20, 120 20, 150 50" stroke="var(--color-accent)" strokeWidth="2" />
                           <path d="M350 50 C 320 20, 280 20, 250 50" stroke="var(--color-accent)" strokeWidth="2" />
@@ -308,7 +360,7 @@ const BannerCarousel = ({ images }) => {
                         key={index}
                         className={`modern-slide ${index === currentIndex ? 'active' : ''}`}
                     >
-                        <img src={getImageUrl(image)} alt={`Banner ${index + 1}`} className="modern-slide-image" />
+                        <img src={getImageUrl(image)} alt={`Banner ${index + 1}`} className="modern-slide-image parallax-banner" data-speed="0.4" />
                         <div className="modern-slide-overlay"></div>
                     </div>
                 ))}
@@ -789,32 +841,34 @@ const Countdown = ({ targetDate, title, titleStyle }) => {
     );
 };
 const CoupleImageDisplay = ({ src, alt, position }) => {
-    // Lấy thông số position, nếu không có thì mặc định là 0, 0, 1
     const x = position?.x || 0;
     const y = position?.y || 0;
     const scale = position?.scale || 1;
 
     return (
         <div 
-            className="modern-couple-image" // Giữ class cũ để lấy kích thước/bo tròn từ CSS
+            className="modern-couple-image" 
             style={{ 
                 position: 'relative', 
-                overflow: 'hidden',
+                overflow: 'hidden', // Quan trọng: giấu phần ảnh thừa khi parallax
                 padding: 0,
-                display: 'block' // Đảm bảo div hoạt động như khung chứa
+                display: 'block' 
             }}
         >
             <img
                 src={src}
                 alt={alt}
+                className="parallax-image" // <-- Thêm class kích hoạt Parallax
+                data-speed="0.15" // <-- Tốc độ trượt
                 style={{
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
-                    // --- LOGIC QUAN TRỌNG: Đồng bộ với Editor ---
-                    transform: `scale(${scale}) translate(${x / scale}px, ${y / scale}px)`,
+                    // Sửa lại transform để dự phòng (hook sẽ overwrite translateY)
+                    transform: `scale(${Math.max(scale, 1.15)}) translate(${x / scale}px, ${y / scale}px)`,
                     transformOrigin: 'center center',
-                    willChange: 'transform' // Tối ưu hiệu năng render
+                    willChange: 'transform',
+                    transition: 'transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94)' // Smooth movement
                 }}
             />
         </div>
@@ -1060,7 +1114,7 @@ const WeddingInvitation = () => {
     const particleCanvasRef = useRef(null); 
     const [customFonts, setCustomFonts] = useState([]);
     const isPreview = searchParams.get('preview') === 'true'; 
-
+    useSmoothParallax(isOpen);
     // ===================================================================
     // ++ START: STATE MỚI CHO OVERLAY ++
     // ===================================================================

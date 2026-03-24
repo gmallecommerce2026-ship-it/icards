@@ -2174,3 +2174,28 @@ END: STYLES MỚI
     opacity: 0;
     transition: opacity 0.2s ease;
 }
+
+.parallax-banner, .parallax-image, .parallax-float {
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    transform-style: preserve-3d;
+}
+
+/* Đảm bảo wrapper ảnh (như Couple, Event, Banner) che đi phần trôi ra ngoài */
+.banner-slides-wrapper,
+.modern-couple-image,
+.gallery-image-wrapper,
+.event-card-image-wrapper {
+    overflow: hidden !important;
+    position: relative;
+    /* Loại bỏ border-radius nếu bị bug ở một số trình duyệt khi overflow: hidden kết hợp transform */
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+/* Fix scale nhẹ cho ảnh Gallery để khi parallax trượt lên không bị hở viền trắng */
+.gallery-image-wrapper img.parallax-image {
+    height: 120%; /* Tăng chiều cao lên 20% để có không gian trượt */
+    top: -10%;
+    position: relative;
+}
