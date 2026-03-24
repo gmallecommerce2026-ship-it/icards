@@ -145,47 +145,69 @@ const ParticipantsSection = React.memo(({ participants, title, titleStyle }) => 
     );
 });
 const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
+    // Thêm Intersection Observer để làm hiệu ứng cuộn tới đâu, show ra tới đó
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.2, rootMargin: "0px 0px -100px 0px" }); // Kích hoạt khi cuộn qua 20% thẻ
+
+        const items = document.querySelectorAll('.premium-story-item');
+        items.forEach(item => observer.observe(item));
+
+        return () => items.forEach(item => observer.unobserve(item));
+    }, [stories]);
+
     if (!stories || stories.length === 0) return null;
 
-    // Hàm để tạo vị trí ngẫu nhiên không trùng lặp
-    const getRandomOffset = (index) => {
-        const baseValues = [
-            { top: '10%', left: '15%' },
-            { top: '30%', right: '10%' },
-            { top: '50%', left: '5%' },
-            { top: '70%', right: '20%' }
-        ];
-        return baseValues[index % baseValues.length];
-    };
-
     return (
-        <section className="section-container fade-in-up" style={{ overflow: 'hidden' }}>
+        <section className="section-container" style={{ overflow: 'hidden' }}>
             <SectionHeader title={title || "Chuyện Tình Yêu"} titleStyle={titleStyle}/>
             <div className="premium-love-story-timeline">
+                
+                {/* Đường line trung tâm phát sáng chạy dọc timeline */}
+                <div className="timeline-glow-line parallax-float" data-speed="-0.1"></div>
+
                 {stories.map((story, index) => {
-                    const randomOffset = getRandomOffset(index);
+                    // Logic tính toán trái/phải xen kẽ
+                    const isEven = index % 2 === 0;
+                    const alignmentClass = isEven ? 'left-align' : 'right-align';
+                    
+                    // Tốc độ parallax xen kẽ tạo chiều sâu
+                    const imageParallaxSpeed = isEven ? "0.05" : "-0.05";
+                    const textParallaxSpeed = isEven ? "-0.08" : "0.08";
+
                     return (
-                        <div key={story.id} className="premium-story-item" style={randomOffset}>
+                        <div key={story.id} className={`premium-story-item ${alignmentClass}`}>
                             
+                            {/* Dấu chấm nhịp đập giữa Timeline */}
+                            <div className="timeline-node">
+                                <div className="node-core"></div>
+                                <div className="node-pulse"></div>
+                            </div>
+
                             {/* Khối nội dung chính */}
                             <div className="premium-story-content">
                                 
-                                {/* 1. Khung Ảnh với hiệu ứng Parallax */}
+                                {/* 1. Khung Ảnh với hiệu ứng Parallax & 3D Tilt */}
                                 {story.imageUrl && (
-                                    <div className="premium-image-wrapper parallax-float" data-speed="0.05">
+                                    <div className="premium-image-wrapper parallax-float" data-speed={imageParallaxSpeed}>
                                         <img
                                             src={story.imageUrl}
                                             alt={story.title || "Cột mốc"}
                                             className="premium-story-image parallax-image"
-                                            data-speed="0.2"
+                                            data-speed="0.15"
                                             loading="lazy"
                                         />
                                         <div className="premium-image-overlay"></div>
                                     </div>
                                 )}
 
-                                {/* 2. Khối Text Glassmorphism */}
-                                <div className="premium-text-glass parallax-float" data-speed="-0.1">
+                                {/* 2. Khối Text Glassmorphism lơ lửng */}
+                                <div className="premium-text-glass parallax-float" data-speed={textParallaxSpeed}>
                                     <div className="premium-story-date">
                                         <span className="date-highlight">{story.date}</span>
                                     </div>
