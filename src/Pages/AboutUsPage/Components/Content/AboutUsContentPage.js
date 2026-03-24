@@ -144,21 +144,35 @@ const ParticipantsSection = React.memo(({ participants, title, titleStyle }) => 
         </section>
     );
 });
+const themeColors = [
+    '#5c9ead', // Xanh mờ kim loại
+    '#e58b8b', // Đỏ hồng san hô
+    '#d4af37', // Vàng gold ánh kim
+    '#7fb07f', // Xanh mint đậm
+    '#b095c5'  // Tím pastel
+];
+
+const SectionHeader2 = React.memo(({ title, titleStyle }) => (
+    <div className="section-header" style={titleStyle}>
+        <h2 className="section-title">{title || "Chuyện Tình Yêu"}</h2>
+    </div>
+));
 // ===================================================================
 // ++ UPDATED: LOVE STORY TIMELINE (3D WRAPPED RIBBON & SEGMENTED POLE) ++
 // ===================================================================
 const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
+    // Kế thừa Intersection Observer cho hiệu ứng scroll
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('is-visible');
-                    entry.target.classList.add('animate');
+                    //entry.target.classList.add('animate'); // trigger cả animate chung nếu có
                 }
             });
-        }, { threshold: 0.2, rootMargin: "0px 0px -50px 0px" });
+        }, { threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
 
-        const items = document.querySelectorAll('.lovestory-zigzag-row');
+        const items = document.querySelectorAll('.lovestory-3d-item');
         items.forEach(item => observer.observe(item));
 
         return () => items.forEach(item => observer.unobserve(item));
@@ -166,20 +180,14 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
 
     if (!stories || stories.length === 0) return null;
 
-    // Bảng màu kẹo ngọt/pastel cho Cột, Lá cờ và Viền ảnh
-    const themeColors = [
-        '#8cb8d9', // Xanh dương
-        '#e58b8b', // Đỏ hồng
-        '#e6c27a', // Vàng gold
-        '#95c596', // Xanh mint
-        '#b695c5'  // Tím pastel
-    ];
-
     return (
-        <section className="section-container" style={{ overflow: 'hidden' }}>
-            <SectionHeader title={title || "Chuyện Tình Yêu"} titleStyle={titleStyle}/>
+        <section className="love-story-section-3d" style={{ overflow: 'hidden' }}>
+            <SectionHeader2 title={title} titleStyle={titleStyle}/>
             
-            <div className="lovestory-zigzag-wrapper">
+            <div className="lovestory-3d-container">
+                {/* ++ NEW: CỘT DỌC 3D LIỀN MẠCH, TO BẢN (TRỤC CHÍNH) ++ */}
+                <div className="lovestory-main-pole-3d"></div>
+
                 {stories.map((story, index) => {
                     const themeColor = themeColors[index % themeColors.length];
                     const isEvenRow = index % 2 === 0;
@@ -187,42 +195,44 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
                     return (
                         <div 
                             key={story.id || index} 
-                            className={`lovestory-zigzag-row ${isEvenRow ? 'row-left' : 'row-right'} fade-in-up`}
-                            style={{ '--theme-color': themeColor }} 
+                            // Định tuyến bố cục zik-zak: hàng chẵn ảnh trái, hàng lẻ ảnh phải
+                            className={`lovestory-3d-item ${isEvenRow ? 'row-img-left' : 'row-img-right'} fade-in-up`}
+                            style={{ '--item-theme-color': themeColor }} // Truyền màu cho CSS variables
                         >
-                            {/* Cột 1: Hình Ảnh */}
-                            <div className="lovestory-col-img">
+                            {/* Cột 1: Hình Ảnh Sự Kiện */}
+                            <div className="lovestory-col-image-3d">
                                 {story.imageUrl ? (
-                                    <img
-                                        src={story.imageUrl}
-                                        alt={story.title || "Kỷ niệm"}
-                                        className="lovestory-bordered-img parallax-image"
-                                        data-speed="0.05"
-                                        loading="lazy"
-                                    />
+                                    <div className="lovestory-img-wrapper-3d">
+                                        <img
+                                            src={story.imageUrl}
+                                            alt={story.title || "Kỷ niệm"}
+                                            className="lovestory-img-3d parallax-image" // Kế thừa parallax
+                                            data-speed="0.05"
+                                            loading="lazy"
+                                        />
+                                    </div>
                                 ) : (
-                                    <div className="lovestory-bordered-placeholder"></div>
+                                    <div className="lovestory-img-placeholder-3d"></div>
                                 )}
                             </div>
 
-                            {/* Cột 2: Cột dọc nối mốc & Lá cờ cuốn 3D */}
-                            <div className="lovestory-col-center">
-                                {/* Đoạn cột dọc mang màu của chính hàng này */}
-                                <div className="lovestory-pole"></div>
-                                
-                                {/* Lá cờ cuốn */}
-                                <div className="lovestory-ribbon">
+                            {/* ++ NEW: CỘT GIỮA VỚI LÁ CỜ 3D CUỐN VÀ ĐIỂM KẾT NỐI ++ */}
+                            <div className="lovestory-col-center-3d">
+                                {/* Lá cờ cuốn 3D, một phía bay, một phía cuốn vào cột */}
+                                <div className="lovestory-ribbon-3d-flag">
                                     {story.date}
+                                    {/* ++ NEW: ĐIỂM CHẤM & ĐƯỜNG NỐI HÌNH ẢNH ++ */}
+                                    <div className="image-link-dot-3d"></div>
                                 </div>
                             </div>
 
-                            {/* Cột 3: Nội Dung */}
-                            <div className="lovestory-col-text">
-                                <div className="lovestory-text-content">
-                                    <h3 className="lovestory-title" style={{ color: themeColor }}>
+                            {/* Cột 3: Nội Dung Văn Bản */}
+                            <div className="lovestory-col-text-3d">
+                                <div className="lovestory-text-card-3d">
+                                    <h3 className="lovestory-title-3d" style={{ color: themeColor }}>
                                         {story.title}
                                     </h3>
-                                    <p className="lovestory-desc">{story.description}</p>
+                                    <p className="lovestory-desc-3d">{story.description}</p>
                                 </div>
                             </div>
                         </div>
