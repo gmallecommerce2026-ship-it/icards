@@ -175,7 +175,7 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
             });
         }, { threshold: 0.2, rootMargin: "0px 0px -50px 0px" });
 
-        const items = document.querySelectorAll('.art-timeline-row');
+        const items = document.querySelectorAll('.lux-timeline-row');
         items.forEach(item => observer.observe(item));
 
         return () => items.forEach(item => observer.unobserve(item));
@@ -184,10 +184,13 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
     if (!stories || stories.length === 0) return null;
 
     return (
-        <section className="art-lovestory-section">
+        <section className="lux-lovestory-section">
             <SectionHeader2 title={title} titleStyle={titleStyle}/>
             
-            <div className="art-timeline-container">
+            <div className="lux-timeline-container">
+                {/* Trục kim loại thanh lịch chạy xuyên suốt */}
+                <div className="lux-timeline-spine"></div>
+
                 {stories.map((story, index) => {
                     const theme = artThemes[index % artThemes.length];
                     const isImgLeft = index % 2 === 0;
@@ -195,50 +198,48 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
                     return (
                         <div 
                             key={story.id || index} 
-                            className={`art-timeline-row ${isImgLeft ? 'layout-img-left' : 'layout-img-right'} fade-in-up`}
+                            className={`lux-timeline-row ${isImgLeft ? 'lux-layout-left' : 'lux-layout-right'} fade-in-up`}
                             style={{ 
                                 '--c-main': theme.main, 
                                 '--c-dark': theme.dark 
                             }}
                         >
-                            {/* KHỐI TRỤC ĐOẠN: Thanh hình thang đan xen mang màu sắc riêng */}
-                            <div className="art-pole-segment"></div>
-
                             {/* KHỐI HÌNH ẢNH */}
-                            <div className="art-col-img">
+                            <div className="lux-col-img">
                                 {story.imageUrl ? (
-                                    <div className="art-img-frame parallax-image" data-speed="0.03">
+                                    <div className="lux-img-frame parallax-image" data-speed="0.03">
                                         <img src={story.imageUrl} alt={story.title} loading="lazy" />
+                                        {/* Điểm neo (Anchor Ring) đính ngay trên viền khung ảnh */}
+                                        <div className="lux-anchor-ring"></div>
                                     </div>
                                 ) : (
-                                    <div className="art-img-placeholder"></div>
+                                    <div className="lux-img-placeholder">
+                                        <div className="lux-anchor-ring"></div>
+                                    </div>
                                 )}
                             </div>
 
-                            {/* KHỐI TRUNG TÂM: LÁ CỜ QUẤN QUANH CỘT ĐOẠN */}
-                            <div className="art-col-center">
-                                {/* Đuôi cờ: Nằm MẶT SAU cột, hướng về phía ảnh */}
-                                <div className="art-ribbon-tail">
-                                    <div className="art-anchor-dot"></div> {/* Điểm chấm liên kết */}
-                                </div>
+                            {/* KHỐI TRUNG TÂM: RUY BĂNG 3D VÀ ĐƯỜNG NỐI */}
+                            <div className="lux-col-center">
+                                {/* Đường nối cong mềm mại */}
+                                <div className="lux-curved-tail"></div>
                                 
-                                {/* Mặt trước cờ: Nằm ĐÈ LÊN cột, chứa text */}
-                                <div className="art-ribbon-front">
-                                    <span className="art-ribbon-text">{story.date}</span>
+                                {/* Nút thắt/Nếp gấp tạo 3D (Nằm sau trục) */}
+                                <div className="lux-ribbon-fold"></div>
+                                
+                                {/* Mặt trước Ruy băng (Nằm trước trục) */}
+                                <div className="lux-ribbon-front">
+                                    <span className="lux-ribbon-text">{story.date}</span>
                                 </div>
                             </div>
 
                             {/* KHỐI VĂN BẢN */}
-                            <div className="art-col-text">
-                                <div className="art-content-wrapper">
-                                    <div className="art-text-block">
-                                        {/* Tiêu đề: Serif đậm, màu đồng bộ với cờ */}
-                                        <h3 className="art-title" style={{ color: theme.main }}>
-                                            {story.title}
-                                        </h3>
-                                        {/* Mô tả: Sans-serif màu trung tính */}
-                                        <p className="art-desc">{story.description}</p>
-                                    </div>
+                            <div className="lux-col-text">
+                                <div className="lux-text-block">
+                                    <h3 className="lux-title" style={{ color: theme.main }}>
+                                        {story.title}
+                                    </h3>
+                                    <p className="lux-desc">{story.description}</p>
                                 </div>
                             </div>
                         </div>
