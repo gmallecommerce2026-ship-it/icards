@@ -2199,3 +2199,225 @@ END: STYLES MỚI
     top: -10%;
     position: relative;
 }
+/* ==============================================
+   PREMIUM LOVE STORY TIMELINE (PARALLAX & GLASSMORPHISM)
+============================================== */
+.premium-love-story-timeline {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--spacing-3xl) 0;
+}
+
+/* Đường line trung tâm mờ ảo */
+.premium-love-story-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--color-accent), var(--color-accent-light), transparent);
+    transform: translateX(-50%);
+    opacity: 0.6;
+}
+
+.premium-story-item {
+    display: flex;
+    position: relative;
+    width: 100%;
+    margin-bottom: 120px;
+    justify-content: center;
+}
+
+.premium-story-item:last-child {
+    margin-bottom: 0;
+}
+
+/* --- Container nội dung --- */
+.premium-story-content {
+    position: relative;
+    width: 45%;
+    display: flex;
+    align-items: center;
+}
+
+.premium-story-item.left .premium-story-content {
+    margin-right: 55%;
+    justify-content: flex-end;
+}
+
+.premium-story-item.right .premium-story-content {
+    margin-left: 55%;
+    justify-content: flex-start;
+}
+
+/* --- Khung Ảnh --- */
+.premium-image-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 350px;
+    border-radius: var(--radius-xl);
+    overflow: hidden; /* Quan trọng: để ảnh con trượt bên trong */
+    box-shadow: var(--shadow-xl);
+    z-index: 1;
+}
+
+.premium-story-image {
+    width: 100%;
+    height: 120%; /* Cao hơn khung để có không gian trượt parallax */
+    object-fit: cover;
+    top: -10%;
+    position: relative;
+}
+
+.premium-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+/* --- Khối Text Glassmorphism (Kính mờ) đè lên ảnh --- */
+.premium-text-glass {
+    position: absolute;
+    width: 90%;
+    max-width: 380px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    z-index: 2;
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.premium-text-glass:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Đẩy Text Box so le với Ảnh */
+.premium-story-item.left .premium-text-glass {
+    right: -20%; /* Tràn qua phải */
+    top: 50%;
+}
+
+.premium-story-item.right .premium-text-glass {
+    left: -20%; /* Tràn qua trái */
+    top: 50%;
+}
+
+/* --- Chi tiết Text --- */
+.premium-story-date {
+    margin-bottom: var(--spacing-sm);
+}
+
+.date-highlight {
+    display: inline-block;
+    background: var(--color-accent-light);
+    color: var(--color-primary);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.premium-story-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--color-primary);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.2;
+}
+
+.premium-story-description {
+    font-size: 0.95rem;
+    color: var(--color-text-medium);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* --- Timeline Node (Dấu chấm chớp nháy) --- */
+.premium-timeline-node {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+}
+
+.node-core {
+    width: 12px;
+    height: 12px;
+    background-color: var(--color-accent);
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.node-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-accent);
+    border-radius: 50%;
+    z-index: 1;
+    animation: timelinePulse 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+@keyframes timelinePulse {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    70% { transform: scale(2.5); opacity: 0; }
+    100% { transform: scale(3); opacity: 0; }
+}
+
+/* --- RESPONSIVE CHO MOBILE & TABLET --- */
+@media (max-width: 900px) {
+    .premium-love-story-timeline::before {
+        left: 30px; /* Đẩy line sang trái */
+    }
+    
+    .premium-story-item {
+        margin-bottom: var(--spacing-3xl);
+        justify-content: flex-start;
+    }
+
+    .premium-story-content,
+    .premium-story-item.left .premium-story-content,
+    .premium-story-item.right .premium-story-content {
+        width: 100%;
+        margin: 0 0 0 60px; /* Chừa chỗ cho timeline line */
+        flex-direction: column;
+    }
+
+    .premium-image-wrapper {
+        max-width: 100%;
+        height: 250px;
+    }
+
+    /* Kéo hộp text lên đè vào giữa ảnh thay vì lệch sang 2 bên */
+    .premium-story-item.left .premium-text-glass,
+    .premium-story-item.right .premium-text-glass {
+        position: relative;
+        left: 0 !important;
+        right: 0 !important;
+        top: -50px !important; /* Đẩy trồi lên đè vào ảnh */
+        width: 90%;
+        margin: 0 auto;
+    }
+
+    .premium-timeline-node {
+        left: 30px;
+        top: 120px; /* Căn ngang với ảnh */
+    }
+}

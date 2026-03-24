@@ -145,34 +145,55 @@ const ParticipantsSection = React.memo(({ participants, title, titleStyle }) => 
     );
 });
 const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
-    if (!stories || stories.length === 0) return null;
+    if (!stories || stories.length === 0) return null;
 
-    return (
-        <section className="section-container fade-in-up">
-            <SectionHeader title={title || "Chuyện Tình Yêu"} titleStyle={titleStyle}/>
-            <div className="love-story-timeline">
-                {stories.map((story, index) => (
-                    <div key={story.id} className={`story-item ${index % 2 === 0 ? 'left' : 'right'}`}>
-                        <div className="story-content">
-                            <div className="story-details">
-                            {story.imageUrl && (
-                                <img
-                                    src={story.imageUrl}
-                                    alt={story.title || "Cột mốc"}
-                                    className="story-image"
-                                    loading="lazy"
-                                />
-                            )}
-                             <h3 className="story-title">{story.title}</h3>
-                                <p className="story-date">{story.date}</p>
-                                <p className="story-description">{story.description}</p>
-                            </div>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
+    return (
+        <section className="section-container fade-in-up" style={{ overflow: 'hidden' }}>
+            <SectionHeader title={title || "Chuyện Tình Yêu"} titleStyle={titleStyle}/>
+            <div className="premium-love-story-timeline">
+                {stories.map((story, index) => {
+                    const isLeft = index % 2 === 0;
+                    return (
+                        <div key={story.id} className={`premium-story-item ${isLeft ? 'left' : 'right'}`}>
+                            
+                            {/* Khối nội dung chính */}
+                            <div className="premium-story-content">
+                                
+                                {/* 1. Khung Ảnh với hiệu ứng Parallax Trượt trong (Image Mask Parallax) */}
+                                {story.imageUrl && (
+                                    <div className="premium-image-wrapper parallax-float" data-speed={isLeft ? "0.03" : "-0.03"}>
+                                        <img
+                                            src={story.imageUrl}
+                                            alt={story.title || "Cột mốc"}
+                                            className="premium-story-image parallax-image"
+                                            data-speed="0.15" // Tận dụng hook có sẵn để ảnh trượt bên trong khung
+                                            loading="lazy"
+                                        />
+                                        <div className="premium-image-overlay"></div>
+                                    </div>
+                                )}
+
+                                {/* 2. Khối Text Glassmorphism nổi lên trên ảnh với tốc độ Parallax khác (Tạo chiều sâu 3D) */}
+                                <div className="premium-text-glass parallax-float" data-speed={isLeft ? "-0.08" : "0.08"}>
+                                    <div className="premium-story-date">
+                                        <span className="date-highlight">{story.date}</span>
+                                    </div>
+                                    <h3 className="premium-story-title">{story.title}</h3>
+                                    <p className="premium-story-description">{story.description}</p>
+                                </div>
+                            </div>
+
+                            {/* Node Timeline chớp nháy (Pulsing Node) */}
+                            <div className="premium-timeline-node">
+                                <div className="node-core"></div>
+                                <div className="node-pulse"></div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </section>
+    );
 });
 
 const EventSchedule = React.memo(({ events, title, titleStyle }) => {
