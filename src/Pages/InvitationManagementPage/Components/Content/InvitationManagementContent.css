@@ -1222,3 +1222,69 @@ body {
     color: #9CA3AF;
     cursor: not-allowed;
 }
+
+/* src/Pages/InvitationManagementPage/Components/Content/InvitationManagementContent.css */
+
+/* Nâng cấp Card chứa Tiến độ */
+.task-progress-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%); /* Gradient nhẹ cho nền */
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Shadow nổi khối */
+    margin-bottom: 20px;
+}
+
+.task-progress-header {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-progress-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.task-progress-badge {
+    background-color: #eff6ff;
+    color: #2563eb;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid #bfdbfe;
+}
+
+/* Nâng cấp Track (Thanh nền) */
+.task-progress-track {
+    height: 12px; /* Tăng độ dày */
+    background-color: #e5e7eb;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden; /* Để bo góc phần fill bên trong */
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Hiệu ứng chìm */
+}
+
+/* Nâng cấp Phần Fill (Thanh chạy) */
+.task-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%); /* Gradient màu xanh */
+    border-radius: 10px;
+    transition: width 0.5s ease-out; /* Animation mượt mà */
+    position: relative;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Hiệu ứng lấp lánh (Sparkle) trên thanh fill */
+.task-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.2) 75%, transparent 75%, transparent);
+    background-size: 20px 20px;
+    opacity: 0.3;
+}
