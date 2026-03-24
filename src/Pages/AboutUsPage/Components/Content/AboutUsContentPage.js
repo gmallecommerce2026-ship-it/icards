@@ -229,11 +229,15 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
 
                             {/* KHỐI VĂN BẢN */}
                             <div className="art-col-text">
-                                <div className="art-text-content">
-                                    <h3 className="art-title" style={{ color: theme.main }}>
-                                        {story.title}
-                                    </h3>
-                                    <p className="art-desc">{story.description}</p>
+                                <div className="art-content-wrapper">
+                                    <div className="art-text-block">
+                                        {/* Tiêu đề: Serif đậm, màu đồng bộ với cờ */}
+                                        <h3 className="art-title" style={{ color: theme.main }}>
+                                            {event.title}
+                                        </h3>
+                                        {/* Mô tả: Sans-serif màu trung tính */}
+                                        <p className="art-desc">{event.description}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>

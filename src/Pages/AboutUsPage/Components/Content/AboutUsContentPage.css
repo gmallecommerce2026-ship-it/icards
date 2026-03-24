@@ -2402,33 +2402,53 @@ END: STYLES MỚI
 .layout-img-left .art-col-text { justify-content: flex-start; padding-left: 60px; text-align: left; }
 .layout-img-right .art-col-text { justify-content: flex-end; padding-right: 60px; text-align: right; }
 
-.art-text-content {
+.art-content-wrapper {
+    width: 100%;
+}
+
+.art-text-block {
     background: #fff;
     padding: 35px 40px;
-    border-radius: 24px;
+    border-radius: 12px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.04);
 }
-.art-title { font-size: 2rem; margin-bottom: 15px; font-weight: 800; }
-.art-desc { font-size: 1.1rem; color: #666; line-height: 1.8; margin: 0; }
+
+/* Tiêu đề: Font Serif đậm, màu chính của cờ */
+.art-title {
+    font-size: 2rem;
+    margin-bottom: 12px;
+    font-weight: 800;
+}
+
+/* Mô tả: Font Sans-serif màu trung tính, dễ đọc */
+.art-desc {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.8;
+    margin: 0;
+}
 
 /* =========================================
    RESPONSIVE MOBILE TỐI ƯU HÓA 3D
 ========================================= */
 @media screen and (max-width: 992px) {
+    .love-story-timeline-art { padding: 60px 15px; }
+    .art-section-title { font-size: 2.2rem; }
+
     .art-timeline-row {
         flex-direction: column !important;
-        padding-left: 60px; /* Chừa không gian trục bên trái */
+        padding-left: 60px; /* Chừa lề cho trục */
         margin-bottom: 80px;
     }
     
-    /* Ép cột sang sát lề trái */
-    .art-master-pole {
+    /* Ép cột kim loại sang sát lề trái */
+    .art-master-pole-3d {
         left: 30px;
         transform: none;
     }
     .art-col-center {
         left: 30px;
-        top: 20px; /* Căn cờ ngang với ảnh */
+        top: 20px; /* Căn cờ ngang với ảnh sự kiện */
     }
 
     .art-col-img, .art-col-text {
@@ -2439,30 +2459,30 @@ END: STYLES MỚI
     }
 
     /* Trên Mobile, bắt buộc tất cả cờ bay sang phải (như Layout Left) */
-    .art-ribbon-front {
+    .art-ribbon-3d-flag {
         left: -10px !important; right: auto !important;
         padding-left: 25px !important; padding-right: 30px !important;
         clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 50%, 100% 100%, 0 100%) !important;
+        filter: drop-shadow(2px 6px 6px rgba(0,0,0,0.15));
     }
-    .art-ribbon-front::before {
+    .art-ribbon-3d-flag::before {
         left: 0 !important; right: auto !important;
         clip-path: polygon(100% 0, 0 0, 100% 100%) !important;
     }
-    
-    /* Ẩn đuôi cờ và dấu chấm trên Mobile vì không gian hẹp, giữ mặt trước để đảm bảo tính thanh lịch */
-    .art-ribbon-tail { display: none; }
+    .art-image-anchor-dot { left: -7px !important; right: auto !important; }
 
-    .art-img-frame, .art-img-placeholder {
+    .art-img-wrapper-3d {
         width: 180px; height: 180px;
         border-width: 8px;
         margin-bottom: 25px;
     }
     
-    .art-text-content {
+    .art-text-block {
         padding: 25px;
         background: transparent;
         box-shadow: none;
         border-left: 4px solid var(--c-main);
         border-radius: 0;
     }
+    .art-title { font-size: 1.6rem; }
 }
