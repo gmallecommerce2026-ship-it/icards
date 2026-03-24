@@ -147,26 +147,37 @@ const ParticipantsSection = React.memo(({ participants, title, titleStyle }) => 
 const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
     if (!stories || stories.length === 0) return null;
 
+    // Hàm để tạo vị trí ngẫu nhiên không trùng lặp
+    const getRandomOffset = (index) => {
+        const baseValues = [
+            { top: '10%', left: '15%' },
+            { top: '30%', right: '10%' },
+            { top: '50%', left: '5%' },
+            { top: '70%', right: '20%' }
+        ];
+        return baseValues[index % baseValues.length];
+    };
+
     return (
         <section className="section-container fade-in-up" style={{ overflow: 'hidden' }}>
             <SectionHeader title={title || "Chuyện Tình Yêu"} titleStyle={titleStyle}/>
             <div className="premium-love-story-timeline">
                 {stories.map((story, index) => {
-                    const isLeft = index % 2 === 0;
+                    const randomOffset = getRandomOffset(index);
                     return (
-                        <div key={story.id} className={`premium-story-item ${isLeft ? 'left' : 'right'}`}>
+                        <div key={story.id} className="premium-story-item" style={randomOffset}>
                             
                             {/* Khối nội dung chính */}
                             <div className="premium-story-content">
                                 
                                 {/* 1. Khung Ảnh với hiệu ứng Parallax */}
                                 {story.imageUrl && (
-                                    <div className="premium-image-wrapper parallax-float" data-speed={isLeft ? "0.02" : "-0.02"}>
+                                    <div className="premium-image-wrapper parallax-float" data-speed="0.05">
                                         <img
                                             src={story.imageUrl}
                                             alt={story.title || "Cột mốc"}
                                             className="premium-story-image parallax-image"
-                                            data-speed="0.1"
+                                            data-speed="0.2"
                                             loading="lazy"
                                         />
                                         <div className="premium-image-overlay"></div>
@@ -174,7 +185,7 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
                                 )}
 
                                 {/* 2. Khối Text Glassmorphism */}
-                                <div className="premium-text-glass parallax-float" data-speed={isLeft ? "-0.05" : "0.05"}>
+                                <div className="premium-text-glass parallax-float" data-speed="-0.1">
                                     <div className="premium-story-date">
                                         <span className="date-highlight">{story.date}</span>
                                     </div>
@@ -182,9 +193,6 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
                                     <p className="premium-story-description">{story.description}</p>
                                 </div>
                             </div>
-
-                            {/* Nút mốc thời gian thanh lịch, không nhấp nháy */}
-                            <div className="elegant-timeline-dot"></div>
                         </div>
                     );
                 })}

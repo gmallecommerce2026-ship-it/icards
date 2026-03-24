@@ -2200,72 +2200,70 @@ END: STYLES MỚI
     position: relative;
 }
 /* ==============================================
-   PREMIUM LOVE STORY TIMELINE (FLEXBOX FIX)
+   PREMIUM LOVE STORY TIMELINE (PARALLAX & GLASSMORPHISM)
 ============================================== */
 .premium-love-story-timeline {
     position: relative;
-    max-width: 1000px;
+    max-width: 1200px; /* Tăng chiều rộng để có không gian sắp xếp */
     margin: 0 auto;
     padding: var(--spacing-3xl) 0;
+    height: 100vh; /* Đảm bảo đủ chiều cao để cuộn */
 }
 
-/* Đường line trung tâm thanh mảnh */
+/* Đường line trung tâm mờ ảo */
 .premium-love-story-timeline::before {
     content: '';
     position: absolute;
     top: 0;
     bottom: 0;
     left: 50%;
-    width: 1px;
-    background: var(--color-border); /* Dùng màu border có sẵn cho tinh tế */
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--color-accent), var(--color-accent-light), transparent);
     transform: translateX(-50%);
+    opacity: 0.6;
 }
 
 .premium-story-item {
-    position: relative;
+    position: absolute; /* Sử dụng absolute để sắp xếp ngẫu nhiên */
     width: 100%;
-    margin-bottom: 120px;
 }
 
 .premium-story-item:last-child {
     margin-bottom: 0;
 }
 
-/* --- Container chứa nội dung 1 bên (Chỉ chiếm 50% màn hình) --- */
+/* --- Container nội dung --- */
 .premium-story-content {
-    width: 50%;
     display: flex;
     align-items: center;
+    position: relative;
 }
 
-/* Item bên Trái: Ảnh nằm sát line giữa, Text nằm ngoài cùng bên trái */
 .premium-story-item.left .premium-story-content {
-    padding-right: 40px; /* Cắt một khoảng hở với đường line giữa */
-    flex-direction: row-reverse; 
+    margin-right: 55%;
+    justify-content: flex-end;
 }
 
-/* Item bên Phải: Ảnh nằm sát line giữa, Text nằm ngoài cùng bên phải */
 .premium-story-item.right .premium-story-content {
-    margin-left: 50%;
-    padding-left: 40px; /* Cắt một khoảng hở với đường line giữa */
-    flex-direction: row; 
+    margin-left: 55%;
+    justify-content: flex-start;
 }
 
 /* --- Khung Ảnh --- */
 .premium-image-wrapper {
-    flex-shrink: 0; /* Chống bị bóp méo khung ảnh */
-    width: 320px;
-    height: 380px;
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-    box-shadow: var(--shadow-md);
     position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 350px;
+    border-radius: var(--radius-xl);
+    overflow: hidden; /* Quan trọng: để ảnh con trượt bên trong */
+    box-shadow: var(--shadow-xl);
     z-index: 1;
 }
 
 .premium-story-image {
     width: 100%;
-    height: 120%;
+    height: 120%; /* Cao hơn khung để có không gian trượt parallax */
     object-fit: cover;
     top: -10%;
     position: relative;
@@ -2274,31 +2272,39 @@ END: STYLES MỚI
 .premium-image-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.2) 0%, transparent 40%);
+    background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%);
     pointer-events: none;
 }
 
-/* --- Khối Text Glassmorphism --- */
+/* --- Khối Text Glassmorphism (Kính mờ) đè lên ảnh --- */
 .premium-text-glass {
-    flex-shrink: 0;
-    width: 320px;
-    background: rgba(255, 255, 255, 0.9);
+    position: absolute;
+    width: 90%;
+    max-width: 380px;
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     z-index: 2;
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
 }
 
-/* KÉO KHỐI TEXT ĐÈ LÊN ẢNH BẰNG MARGIN ÂM (Ngăn chặn lỗi tràn qua line giữa) */
+.premium-text-glass:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* Đẩy Text Box so le với Ảnh */
 .premium-story-item.left .premium-text-glass {
-    margin-right: -60px; 
+    right: -20%; /* Tràn qua phải */
+    top: 50%;
 }
 
 .premium-story-item.right .premium-text-glass {
-    margin-left: -60px;
+    left: -20%; /* Tràn qua trái */
+    top: 50%;
 }
 
 /* --- Chi tiết Text --- */
@@ -2308,7 +2314,7 @@ END: STYLES MỚI
 
 .date-highlight {
     display: inline-block;
-    background: var(--color-background-subtle);
+    background: var(--color-accent-light);
     color: var(--color-primary);
     padding: 4px 12px;
     border-radius: 20px;
@@ -2316,7 +2322,6 @@ END: STYLES MỚI
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
-    border: 1px solid var(--color-border-light);
 }
 
 .premium-story-title {
@@ -2334,55 +2339,82 @@ END: STYLES MỚI
     margin: 0;
 }
 
-/* --- Elegant Timeline Dot (Dấu chấm tĩnh) --- */
-.elegant-timeline-dot {
+/* --- Timeline Node (Dấu chấm chớp nháy) --- */
+.premium-timeline-node {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    width: 14px;
-    height: 14px;
-    background-color: var(--color-white);
-    border: 2px solid var(--color-accent); /* Viền màu gold */
-    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 3;
+}
+
+.node-core {
+    width: 12px;
+    height: 12px;
+    background-color: var(--color-accent);
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+.node-pulse {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: var(--color-accent);
+    border-radius: 50%;
+    z-index: 1;
+    animation: timelinePulse 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+@keyframes timelinePulse {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    70% { transform: scale(2.5); opacity: 0; }
+    100% { transform: scale(3); opacity: 0; }
 }
 
 /* --- RESPONSIVE CHO MOBILE & TABLET --- */
 @media (max-width: 900px) {
     .premium-love-story-timeline::before {
-        left: 20px;
+        left: 30px; /* Đẩy line sang trái */
     }
     
     .premium-story-item {
-        margin-bottom: 80px;
+        margin-bottom: var(--spacing-3xl);
+        justify-content: flex-start;
     }
 
     .premium-story-content,
+    .premium-story-item.left .premium-story-content,
     .premium-story-item.right .premium-story-content {
         width: 100%;
-        margin-left: 0;
-        padding: 0 20px 0 50px; /* Chừa 50px bên trái cho đường line */
-        flex-direction: column !important; /* Xếp dọc trên mobile */
-        align-items: flex-start;
+        margin: 0 0 0 60px; /* Chừa chỗ cho timeline line */
+        flex-direction: column;
     }
 
     .premium-image-wrapper {
-        width: 100%;
-        max-width: 400px;
-        height: 300px;
+        max-width: 100%;
+        height: 250px;
     }
 
+    /* Kéo hộp text lên đè vào giữa ảnh thay vì lệch sang 2 bên */
     .premium-story-item.left .premium-text-glass,
     .premium-story-item.right .premium-text-glass {
+        position: relative;
+        left: 0 !important;
+        right: 0 !important;
+        top: -50px !important; /* Đẩy trồi lên đè vào ảnh */
         width: 90%;
-        margin-left: 20px !important;
-        margin-right: 0 !important;
-        margin-top: -50px; /* Đè text lên ảnh theo chiều dọc */
+        margin: 0 auto;
     }
 
-    .elegant-timeline-dot {
-        left: 20px;
-        top: 40px; /* Căn ngang với đỉnh ảnh trên mobile */
+    .premium-timeline-node {
+        left: 30px;
+        top: 120px; /* Căn ngang với ảnh */
     }
 }
