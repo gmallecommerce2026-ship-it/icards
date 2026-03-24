@@ -144,13 +144,13 @@ const ParticipantsSection = React.memo(({ participants, title, titleStyle }) => 
         </section>
     );
 });
-const artThemes = [
-    { main: '#D4A373', dark: '#B58252' }, // Vàng Cát / Gold
-    { main: '#84A59D', dark: '#63827B' }, // Xanh Sage (Lục bình)
-    { main: '#F28482', dark: '#D16260' }, // Đỏ San Hô
-    { main: '#9D8CA1', dark: '#7A6B7E' }, // Tím Dusty Rose
-    { main: '#6B8EAD', dark: '#4D6E8C' }  // Xanh Slate (Đá phiến)
-];
+// const artThemes = [
+//     { main: '#D4A373', dark: '#B58252' }, // Vàng Cát / Gold
+//     { main: '#84A59D', dark: '#63827B' }, // Xanh Sage (Lục bình)
+//     { main: '#F28482', dark: '#D16260' }, // Đỏ San Hô
+//     { main: '#9D8CA1', dark: '#7A6B7E' }, // Tím Dusty Rose
+//     { main: '#6B8EAD', dark: '#4D6E8C' }  // Xanh Slate (Đá phiến)
+// ];
 
 const SectionHeader2 = React.memo(({ title, titleStyle }) => (
     <div className="art-section-header" style={titleStyle}>
