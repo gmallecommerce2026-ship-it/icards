@@ -2200,26 +2200,14 @@ END: STYLES MỚI
     position: relative;
 }
 /* ===================================================================
-   LOVE STORY TIMELINE (CENTER LINE, BORDERS & FOLDED FLAG)
+   LOVE STORY TIMELINE (3D WRAPPED RIBBON & SEGMENTED POLE)
 =================================================================== */
 
 .lovestory-zigzag-wrapper {
     position: relative;
     max-width: 1000px;
     margin: 40px auto;
-    padding: 20px 0;
-}
-
-/* --- Trục kẻ dọc trung tâm --- */
-.lovestory-center-line {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 2px;
-    background-color: #dcdcdc; /* Màu của trục dọc */
-    transform: translateX(-50%);
-    z-index: 1;
+    padding: 0;
 }
 
 /* --- Layout Từng Hàng --- */
@@ -2227,7 +2215,7 @@ END: STYLES MỚI
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 70px;
+    margin-bottom: 70px; /* Khoảng cách giữa các hàng */
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.8s ease-out, transform 0.8s ease-out;
@@ -2240,7 +2228,6 @@ END: STYLES MỚI
     transform: translateY(0);
 }
 
-/* Layout zik-zak trái phải */
 .lovestory-zigzag-row.row-left {
     flex-direction: row;
 }
@@ -2255,76 +2242,104 @@ END: STYLES MỚI
     display: flex;
 }
 
-.row-left .lovestory-col-img {
-    justify-content: flex-end;
-    padding-right: 40px;
-}
+.row-left .lovestory-col-img { justify-content: flex-end; padding-right: 40px; }
+.row-right .lovestory-col-img { justify-content: flex-start; padding-left: 40px; }
 
-.row-right .lovestory-col-img {
-    justify-content: flex-start;
-    padding-left: 40px;
-}
-
-/* Ảnh bo tròn với viền dày lấy từ biến màu --theme-color */
 .lovestory-bordered-img,
 .lovestory-bordered-placeholder {
     width: 200px;
     height: 200px;
     border-radius: 50%;
     object-fit: cover;
-    border: 8px solid var(--theme-color); /* Đổi màu viền tự động theo React */
+    border: 8px solid var(--theme-color); 
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
     background-color: #fcfcfc;
 }
 
-/* --- Cột Trung Tâm (Lá Cờ Gấp) --- */
+/* --- Cột Trung Tâm (Chứa Cột & Lá Cờ) --- */
 .lovestory-col-center {
-    width: 20%;
+    width: 160px; /* Cố định width để dễ canh tọa độ tuyệt đối */
+    flex: 0 0 160px;
     display: flex;
-    justify-content: center;
     align-items: center;
     position: relative;
 }
 
-/* Tạo hình lá cờ chính (Mặt trước) */
-.lovestory-flag-badge {
-    position: relative;
+/* ĐOẠN CỘT DỌC CỦA TỪNG HÀNG */
+.lovestory-pole {
+    position: absolute;
+    /* Vươn lên trên và xuống dưới đúng bằng 1/2 khoảng cách margin-bottom (70px / 2 = 35px) 
+       để 2 đoạn cột của 2 hàng chạm khít vào nhau */
+    top: -35px; 
+    bottom: -35px;
+    left: 50%;
+    width: 6px; /* Độ dày của cột */
+    transform: translateX(-50%);
+    background-color: var(--theme-color);
+    z-index: 1;
+}
+
+/* Bo tròn 2 đầu mút của timeline trên cùng và dưới cùng */
+.lovestory-zigzag-row:first-child .lovestory-pole {
+    top: 0;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+.lovestory-zigzag-row:last-child .lovestory-pole {
+    bottom: 0;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+/* LÁ CỜ CUỐN QUANH CỘT (3D WRAPPED RIBBON) */
+.lovestory-ribbon {
+    position: absolute;
     background-color: var(--theme-color);
     color: #ffffff;
     font-weight: bold;
     font-size: 0.95rem;
-    padding: 10px 24px;
-    text-align: center;
-    white-space: nowrap;
+    padding: 10px 16px;
     z-index: 3;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    /* Sử dụng drop-shadow thay vì box-shadow để viền đổ bóng khớp với nét cắt clip-path */
+    filter: drop-shadow(2px 6px 6px rgba(0, 0, 0, 0.15));
 }
 
-/* Cắt chéo hai đầu lá cờ để tạo hình đuôi nheo (Swallowtail flag) */
-.lovestory-flag-badge::before,
-.lovestory-flag-badge::after {
+/* NẾP GẤP (MẶT SAU LUỒN QUA CỘT) CHUNG CHO CẢ 2 BÊN */
+.lovestory-ribbon::before {
     content: '';
     position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 15px;
+    top: 100%;
+    width: 12px; /* Độ dài cuốn ra sau cột */
+    height: 14px; /* Độ chéo của nếp gấp */
     background-color: var(--theme-color);
+    filter: brightness(0.65); /* Làm tối để tạo bóng đổ mặt khuất */
     z-index: -1;
 }
 
-/* Đuôi cờ bên trái */
-.lovestory-flag-badge::before {
-    left: -14px;
-    clip-path: polygon(100% 0, 100% 100%, 0 100%, 50% 50%, 0 0);
-    filter: brightness(0.85); /* Làm tối đuôi cờ một chút để tạo chiều sâu 3D */
+/* HÀNG LẺ (Ảnh Trái - Text Phải -> Cờ hướng sang Phải) */
+.row-left .lovestory-ribbon {
+    left: calc(50% + 3px); /* Bắt đầu từ mép phải của cột (cột 6px) */
+    clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 50%, 100% 100%, 0 100%);
+    padding-right: 30px; /* Chừa không gian cho phần đuôi nheo bị cắt */
+}
+.row-left .lovestory-ribbon::before {
+    left: -10px; /* Kéo nếp gấp vòng ra mép trái của cột */
+    /* Cắt hình tam giác: Nối từ góc trái dưới của cờ -> vòng qua trái -> đi xuống */
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
 }
 
-/* Đuôi cờ bên phải */
-.lovestory-flag-badge::after {
-    right: -14px;
-    clip-path: polygon(0 0, 0 100%, 100% 100%, 50% 50%, 100% 0);
-    filter: brightness(0.85);
+/* HÀNG CHẴN (Ảnh Phải - Text Trái -> Cờ hướng sang Trái) */
+.row-right .lovestory-ribbon {
+    right: calc(50% + 3px); /* Bắt đầu từ mép trái của cột */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 15px 50%);
+    padding-left: 30px;
 }
+.row-right .lovestory-ribbon::before {
+    right: -10px; /* Kéo nếp gấp vòng ra mép phải của cột */
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
 
 /* --- Cột Nội Dung Văn Bản --- */
 .lovestory-col-text {
@@ -2332,17 +2347,8 @@ END: STYLES MỚI
     display: flex;
 }
 
-.row-left .lovestory-col-text {
-    justify-content: flex-start;
-    padding-left: 40px;
-    text-align: left;
-}
-
-.row-right .lovestory-col-text {
-    justify-content: flex-end;
-    padding-right: 40px;
-    text-align: right;
-}
+.row-left .lovestory-col-text { justify-content: flex-start; padding-left: 30px; text-align: left; }
+.row-right .lovestory-col-text { justify-content: flex-end; padding-right: 30px; text-align: right; }
 
 .lovestory-title {
     font-size: 1.6rem;
@@ -2362,16 +2368,11 @@ END: STYLES MỚI
    RESPONSIVE CHO MOBILE (Dưới 768px)
 ========================================== */
 @media screen and (max-width: 768px) {
-    .lovestory-center-line {
-        left: 20px; /* Đẩy trục dọc bám sát lề trái */
-        transform: none;
-    }
-
     .lovestory-zigzag-row.row-left,
     .lovestory-zigzag-row.row-right {
         flex-direction: column;
         align-items: flex-start;
-        padding-left: 60px; /* Chừa không gian cho trục dọc và lá cờ */
+        padding-left: 50px; /* Chừa lề cho cột bên trái */
         margin-bottom: 50px;
     }
 
@@ -2383,21 +2384,39 @@ END: STYLES MỚI
         text-align: left !important;
     }
 
+    /* Đẩy cột sang sát mép trái trên điện thoại */
     .lovestory-col-center {
         position: absolute;
-        left: -10px; /* Đẩy lá cờ đè lên trục dọc bên trái */
-        top: 30px; 
-        width: auto;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 30px;
+        flex: auto;
     }
 
-    /* Ẩn đuôi cờ bên trái trên mobile để lá cờ trông như mọc ra từ cột */
-    .lovestory-flag-badge::before {
-        display: none;
+    .lovestory-pole {
+        left: 15px; /* Vị trí cột mới trên mobile */
+    }
+
+    /* Ép tất cả lá cờ hướng sang phải (như hàng lẻ) trên mobile */
+    .lovestory-ribbon {
+        top: 20px; /* Canh cờ song song với ảnh */
+        left: calc(15px + 3px) !important;
+        right: auto !important;
+        clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 50%, 100% 100%, 0 100%) !important;
+        padding-left: 16px !important;
+        padding-right: 30px !important;
+    }
+
+    .lovestory-ribbon::before {
+        left: -10px !important;
+        right: auto !important;
+        clip-path: polygon(100% 0, 0 0, 100% 100%) !important;
     }
 
     .lovestory-bordered-img {
-        width: 160px;
-        height: 160px;
+        width: 150px;
+        height: 150px;
         border-width: 6px;
         margin-bottom: 16px;
     }

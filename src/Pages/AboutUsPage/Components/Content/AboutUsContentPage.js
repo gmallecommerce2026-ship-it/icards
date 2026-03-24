@@ -145,10 +145,9 @@ const ParticipantsSection = React.memo(({ participants, title, titleStyle }) => 
     );
 });
 // ===================================================================
-// ++ UPDATED: LOVE STORY TIMELINE (ALTERNATING ROWS & COLORS) ++
+// ++ UPDATED: LOVE STORY TIMELINE (3D WRAPPED RIBBON & SEGMENTED POLE) ++
 // ===================================================================
 const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
-    // Giữ nguyên Intersection Observer cho hiệu ứng scroll
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -167,11 +166,11 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
 
     if (!stories || stories.length === 0) return null;
 
-    // Bảng màu áp dụng cho Viền ảnh & Lá cờ thời gian (Thay đổi mã màu theo ý thích)
+    // Bảng màu kẹo ngọt/pastel cho Cột, Lá cờ và Viền ảnh
     const themeColors = [
-        '#8cb8d9', // Xanh dương pastel (như ảnh 1)
-        '#e58b8b', // Đỏ/Hồng pastel (như ảnh 2)
-        '#e6c27a', // Vàng gold pastel
+        '#8cb8d9', // Xanh dương
+        '#e58b8b', // Đỏ hồng
+        '#e6c27a', // Vàng gold
         '#95c596', // Xanh mint
         '#b695c5'  // Tím pastel
     ];
@@ -181,22 +180,17 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
             <SectionHeader title={title || "Chuyện Tình Yêu"} titleStyle={titleStyle}/>
             
             <div className="lovestory-zigzag-wrapper">
-                {/* Đường kẻ dọc trung tâm */}
-                <div className="lovestory-center-line"></div>
-
                 {stories.map((story, index) => {
                     const themeColor = themeColors[index % themeColors.length];
-                    // Index chẵn (0, 2, 4...) -> Ảnh Trái. Index lẻ (1, 3, 5...) -> Ảnh Phải.
                     const isEvenRow = index % 2 === 0;
 
                     return (
                         <div 
                             key={story.id || index} 
-                            // Thêm class row-right để đảo ngược bố cục (Ảnh sang phải, Text sang trái)
                             className={`lovestory-zigzag-row ${isEvenRow ? 'row-left' : 'row-right'} fade-in-up`}
-                            style={{ '--theme-color': themeColor }} // Truyền biến màu trực tiếp vào CSS
+                            style={{ '--theme-color': themeColor }} 
                         >
-                            {/* Cột Hình Ảnh */}
+                            {/* Cột 1: Hình Ảnh */}
                             <div className="lovestory-col-img">
                                 {story.imageUrl ? (
                                     <img
@@ -211,14 +205,18 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
                                 )}
                             </div>
 
-                            {/* Cột Mốc Thời Gian (Nằm đè lên trục giữa) */}
+                            {/* Cột 2: Cột dọc nối mốc & Lá cờ cuốn 3D */}
                             <div className="lovestory-col-center">
-                                <div className="lovestory-flag-badge">
+                                {/* Đoạn cột dọc mang màu của chính hàng này */}
+                                <div className="lovestory-pole"></div>
+                                
+                                {/* Lá cờ cuốn */}
+                                <div className="lovestory-ribbon">
                                     {story.date}
                                 </div>
                             </div>
 
-                            {/* Cột Nội Dung Văn Bản */}
+                            {/* Cột 3: Nội Dung */}
                             <div className="lovestory-col-text">
                                 <div className="lovestory-text-content">
                                     <h3 className="lovestory-title" style={{ color: themeColor }}>
