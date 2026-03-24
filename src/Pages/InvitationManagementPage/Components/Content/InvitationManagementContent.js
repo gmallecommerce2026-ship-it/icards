@@ -2163,17 +2163,44 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
     return (
         <div className="task-management-wrapper">
             {/* 1. Header & Progress */}
-            <div className="task-progress-card">
-                <div className="task-progress-header">
-                    <h3 className="task-progress-title">Dòng thời gian chuẩn bị cưới</h3>
-                    <div className="task-progress-badge">
-                        <span>{completedTasks}</span> / {totalTasks} công việc hoàn thành
+            <div className="task-progress-card-creative">
+                <div className="task-progress-header-creative">
+                    <h3 className="task-progress-title-creative">
+                        Hành trình chuẩn bị cưới
+                    </h3>
+                    <div className="task-progress-badge-creative">
+                        <span>{completedTasks}</span> / {totalTasks} công việc
                     </div>
                 </div>
-                <div className="task-progress-track">
-                    <div className="task-progress-fill" style={{ width: `${progress}%` }}>
-                        {/* Thêm điểm mốc nhỏ ở đầu thanh chạy */}
-                        {progress > 5 && <div className="progress-fill-marker"></div>}
+
+                <div className="creative-timeline-wrapper">
+                    {/* Con số % bay lơ lửng trên cùng */}
+                    <div className="creative-timeline-percentage" style={{ left: `calc(${progress}% - 20px)` }}>
+                        {progress}%
+                    </div>
+
+                    <div className="creative-timeline-track">
+                        {/* Các mốc Milestone cố định */}
+                        {[25, 50, 75, 100].map(m => (
+                            <div key={m} className={`timeline-milestone ${progress >= m ? 'achieved' : ''}`} style={{ left: `${m}%` }}>
+                                <div className="milestone-dot"></div>
+                            </div>
+                        ))}
+                        
+                        {/* Thanh chạy tiến độ */}
+                        <div className="creative-timeline-fill" style={{ width: `${progress}%` }}>
+                            {/* Tia sáng lướt qua */}
+                            <div className="timeline-light-sweep"></div>
+                            
+                            {/* Icon Trái tim nhịp đập ở đầu thanh */}
+                            {progress > 0 && (
+                                <div className="timeline-thumb-icon">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
