@@ -159,12 +159,6 @@ const SectionHeader2 = React.memo(({ title, titleStyle }) => (
     </div>
 ));
 
-// ===================================================================
-// ++ UPDATED: LOVE STORY TIMELINE (3D WRAPPED RIBBON & SEGMENTED POLE) ++
-// ===================================================================
-// ===================================================================
-// ++ UPDATED: ARTISAN LOVE STORY TIMELINE (INTERLOCKING TRAPEZOID POLES) ++
-// ===================================================================
 const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
