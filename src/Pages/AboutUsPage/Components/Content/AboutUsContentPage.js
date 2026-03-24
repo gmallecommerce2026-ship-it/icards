@@ -159,22 +159,22 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
                             {/* Khối nội dung chính */}
                             <div className="premium-story-content">
                                 
-                                {/* 1. Khung Ảnh với hiệu ứng Parallax Trượt trong (Image Mask Parallax) */}
+                                {/* 1. Khung Ảnh với hiệu ứng Parallax */}
                                 {story.imageUrl && (
-                                    <div className="premium-image-wrapper parallax-float" data-speed={isLeft ? "0.03" : "-0.03"}>
+                                    <div className="premium-image-wrapper parallax-float" data-speed={isLeft ? "0.02" : "-0.02"}>
                                         <img
                                             src={story.imageUrl}
                                             alt={story.title || "Cột mốc"}
                                             className="premium-story-image parallax-image"
-                                            data-speed="0.15" // Tận dụng hook có sẵn để ảnh trượt bên trong khung
+                                            data-speed="0.1"
                                             loading="lazy"
                                         />
                                         <div className="premium-image-overlay"></div>
                                     </div>
                                 )}
 
-                                {/* 2. Khối Text Glassmorphism nổi lên trên ảnh với tốc độ Parallax khác (Tạo chiều sâu 3D) */}
-                                <div className="premium-text-glass parallax-float" data-speed={isLeft ? "-0.08" : "0.08"}>
+                                {/* 2. Khối Text Glassmorphism */}
+                                <div className="premium-text-glass parallax-float" data-speed={isLeft ? "-0.05" : "0.05"}>
                                     <div className="premium-story-date">
                                         <span className="date-highlight">{story.date}</span>
                                     </div>
@@ -183,11 +183,8 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
                                 </div>
                             </div>
 
-                            {/* Node Timeline chớp nháy (Pulsing Node) */}
-                            <div className="premium-timeline-node">
-                                <div className="node-core"></div>
-                                <div className="node-pulse"></div>
-                            </div>
+                            {/* Nút mốc thời gian thanh lịch, không nhấp nháy */}
+                            <div className="elegant-timeline-dot"></div>
                         </div>
                     );
                 })}
