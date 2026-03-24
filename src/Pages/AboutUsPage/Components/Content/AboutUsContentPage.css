@@ -2199,271 +2199,103 @@ END: STYLES MỚI
     top: -10%;
     position: relative;
 }
-.lovestory-timeline-wrapper {
-    position: relative;
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px 0;
-}
-
-/* Đường track (kẻ dọc) ở giữa */
-.lovestory-track {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 2px;
-    background-color: #e6d3d3; /* Màu đường kẻ, chỉnh theo tone dự án */
-    transform: translateX(-50%);
-    z-index: 1;
-}
-
-.lovestory-timeline-item {
-    position: relative;
-    width: 100%;
-    margin-bottom: 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-/* Hiệu ứng scroll từ Observer */
-.lovestory-timeline-item.is-visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.lovestory-timeline-item:last-child {
-    margin-bottom: 0;
-}
-
-/* Định vị cấu trúc trái/phải */
-.lovestory-left {
-    flex-direction: row-reverse;
-}
-
-.lovestory-right {
-    flex-direction: row;
-}
-
-/* Card chứa nội dung chiếm 45% (chừa khoảng trống cho đường kẻ giữa) */
-.lovestory-card {
-    width: 45%;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-    position: relative;
-    z-index: 2;
-    transition: transform 0.3s ease;
-}
-
-.lovestory-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-}
-
-/* Dấu chấm mốc thời gian */
-.lovestory-dot {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 24px;
-    height: 24px;
-    background-color: #fff;
-    border: 3px solid #d4af37; /* Màu nhấn (Vàng gold/Hồng đào tuỳ theme) */
-    border-radius: 50%;
-    z-index: 3;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
-}
-
-.lovestory-dot .dot-inner {
-    width: 8px;
-    height: 8px;
-    background-color: #d4af37;
-    border-radius: 50%;
-}
-
-/* Hình ảnh trong Timeline */
-.lovestory-image-container {
-    width: 100%;
-    height: 240px;
-    overflow: hidden;
-}
-
-.lovestory-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-/* Phần Text */
-.lovestory-content {
-    padding: 24px;
-    text-align: center;
-}
-
-.lovestory-date {
-    display: inline-block;
-    padding: 6px 16px;
-    background: #f8f1f1;
-    color: #b5838d;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border-radius: 20px;
-    margin-bottom: 12px;
-    letter-spacing: 0.5px;
-}
-
-.lovestory-title {
-    font-size: 1.4rem;
-    color: #333;
-    margin: 0 0 12px 0;
-    font-family: var(--font-primary, serif);
-}
-
-.lovestory-desc {
-    font-size: 1rem;
-    color: #666;
-    line-height: 1.6;
-    margin: 0;
-}
-
-/* ==========================================
-   RESPONSIVE CHO MOBILE (Dưới 768px)
-========================================== */
-@media screen and (max-width: 768px) {
-    .lovestory-track {
-        left: 30px; /* Đẩy đường track sang mép trái */
-    }
-
-    .lovestory-timeline-item {
-        flex-direction: column;
-        align-items: flex-end; /* Đẩy nội dung sang phải */
-    }
-
-    .lovestory-left, .lovestory-right {
-        flex-direction: column;
-    }
-
-    .lovestory-card {
-        width: calc(100% - 70px); /* Lấy full chiều rộng trừ đi khoảng trống track */
-    }
-
-    .lovestory-dot {
-        left: 30px; /* Định vị lại chấm tròn trùng với track */
-        top: 40px;  /* Nằm gần trên đỉnh của card thay vì ở giữa */
-    }
-}
-
 /* ===================================================================
-   LOVE STORY TIMELINE SECTION (HORIZONTAL ROW LAYOUT)
+   LOVE STORY TIMELINE (ALTERNATING ROWS & COLORS)
 =================================================================== */
 
-.lovestory-row-wrapper {
+.lovestory-color-wrapper {
     max-width: 1100px;
     margin: 40px auto;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 30px; /* Khoảng cách giữa các hàng */
+    padding: 0 20px;
 }
 
-.lovestory-row-item {
+/* Khối bao bọc mỗi hàng */
+.lovestory-color-row {
     display: flex;
-    align-items: stretch;
+    align-items: center;
+    justify-content: space-between;
+    padding: 40px;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
-.lovestory-row-item.is-visible {
+.lovestory-color-row.is-visible {
     opacity: 1;
     transform: translateY(0);
 }
 
-/* --- Cột Trái: Hình Ảnh --- */
-.lovestory-col-image {
-    flex: 0 0 250px; /* Độ rộng cố định cho hình ảnh */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px 0;
+/* Lật ngược layout cho hàng chẵn */
+.lovestory-color-row.row-reverse {
+    flex-direction: row-reverse;
 }
 
+/* --- Các Cột --- */
+.lovestory-col-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.lovestory-col-time {
+    flex: 0 0 160px; /* Cố định chiều rộng cột giữa để mốc thời gian luôn thẳng hàng dọc */
+    display: flex;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+.lovestory-col-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Định dạng text: Ép sát về phía mốc thời gian ở giữa */
+.lovestory-color-row .lovestory-col-text {
+    text-align: left;
+    padding-left: 20px;
+}
+
+.lovestory-color-row.row-reverse .lovestory-col-text {
+    text-align: right;
+    padding-left: 0;
+    padding-right: 20px;
+}
+
+/* --- Chi tiết phần tử --- */
 .lovestory-circle-img {
-    width: 200px;
-    height: 200px;
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
     object-fit: cover;
-    /* Cạnh border dày theo yêu cầu */
-    border: 12px solid #f9f1f1; 
+    border: 10px solid #ffffff; /* Viền trắng dày nổi bật trên nền màu */
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
 }
 
 .lovestory-circle-placeholder {
-    width: 200px;
-    height: 200px;
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
     background-color: #f2e8eb;
-    border: 12px solid #fff;
-}
-
-/* --- Cột Giữa: Mốc thời gian --- */
-.lovestory-col-time {
-    flex: 0 0 180px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-    padding-top: 100px; /* Đẩy mốc thời gian xuống giữa ảnh */
+    border: 10px solid #ffffff;
 }
 
 .time-badge {
-    position: relative;
-    z-index: 2;
     background: #ffffff;
-    color: #d8a0a0;
-    font-size: 0.95rem;
+    color: #333333;
+    font-size: 1rem;
     font-weight: bold;
-    padding: 10px 24px;
+    padding: 12px 24px;
     border-radius: 30px;
-    border: 2px solid #e8d0d0;
-    box-shadow: 0 4px 10px rgba(216, 160, 160, 0.15);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     white-space: nowrap;
-}
-
-/* Đường nối (Track line) giữa các mốc thời gian */
-.time-connector {
-    position: absolute;
-    top: 140px; /* Bắt đầu từ dưới mốc thời gian */
-    bottom: -100px; /* Kéo dài xuống item tiếp theo */
-    width: 2px;
-    background-color: #e8d0d0;
-    z-index: 1;
-}
-
-/* --- Cột Phải: Nội dung văn bản --- */
-.lovestory-col-text {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    padding: 20px 0 20px 30px;
-}
-
-.lovestory-text-card {
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-    width: 100%;
 }
 
 .lovestory-title {
@@ -2471,44 +2303,42 @@ END: STYLES MỚI
     color: #333333;
     margin-bottom: 12px;
     font-weight: bold;
+    font-family: var(--font-primary, serif);
 }
 
 .lovestory-desc {
     font-size: 1.05rem;
-    color: #666666;
+    color: #555555;
     line-height: 1.7;
     margin: 0;
 }
 
 /* ==========================================
-   RESPONSIVE CHO MOBILE & TABLET 
+   RESPONSIVE CHO MOBILE (Tự động gập thành 1 cột)
 ========================================== */
-@media screen and (max-width: 992px) {
-    .lovestory-row-item {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        margin-bottom: 40px;
+@media screen and (max-width: 868px) {
+    .lovestory-color-row,
+    .lovestory-color-row.row-reverse {
+        flex-direction: column !important; /* Luôn ép về dạng dọc trên mobile */
+        text-align: center !important;
+        padding: 30px 20px;
+        gap: 20px;
     }
 
-    .lovestory-col-image,
-    .lovestory-col-time,
-    .lovestory-col-text {
-        flex: auto;
-        padding: 10px 0;
+    .lovestory-color-row .lovestory-col-text,
+    .lovestory-color-row.row-reverse .lovestory-col-text {
+        text-align: center;
+        padding: 0;
+    }
+
+    .lovestory-circle-img,
+    .lovestory-circle-placeholder {
+        width: 180px;
+        height: 180px;
+        border-width: 8px;
     }
 
     .lovestory-col-time {
-        padding-top: 10px;
-    }
-
-    .time-connector {
-        display: none; /* Ẩn đường nối dọc trên mobile */
-    }
-
-    .lovestory-text-card {
-        padding: 20px;
-        background: transparent;
-        box-shadow: none;
+        flex: auto;
     }
 }
