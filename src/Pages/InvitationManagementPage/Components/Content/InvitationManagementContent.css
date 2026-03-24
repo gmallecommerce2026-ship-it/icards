@@ -1288,3 +1288,53 @@ body {
     background-size: 20px 20px;
     opacity: 0.3;
 }
+
+/* src/Pages/InvitationManagementPage/Components/Content/InvitationManagementContent.css */
+
+/* Icon Kéo (Drag Handle) */
+.category-drag-handle, .subtask-drag-handle {
+    color: #d1d5db;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+    margin-right: 8px;
+}
+
+.category-drag-handle:hover, .subtask-drag-handle:hover {
+    color: #6b7280;
+}
+
+/* Kiểu dáng khi đang kéo thả (Dragging) */
+.task-category-card.is-dragging {
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border-color: #93c5fd;
+    transform: rotate(1deg); /* Xoay nhẹ để tạo cảm giác "đang cầm" */
+    background-color: #f9fafb;
+}
+
+.subtask-item.is-dragging {
+    background-color: #ffffff;
+    border: 1px solid #bfdbfe;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+}
+
+/* Vùng Droppable khi có item kéo qua */
+.task-category-body.is-dragging-over {
+    background-color: #eff6ff;
+    border-radius: 6px;
+}
+
+/* Vị trí của Marker nhỏ trên thanh progress (tùy chọn) */
+.progress-fill-marker {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 6px;
+    height: 18px;
+    background-color: #ffffff;
+    border-radius: 3px;
+    box-shadow: 0 0 5px rgba(37, 99, 235, 0.5);
+}

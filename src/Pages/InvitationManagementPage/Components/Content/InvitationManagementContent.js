@@ -6,6 +6,7 @@ import { showSuccessToast, showErrorToast, handlePromiseToast } from '../../../.
 import _ from 'lodash';
 import './InvitationManagementContent.css';
 import { FiMail } from 'react-icons/fi';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'; // <--- Thêm Import
 
 const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
     const [masterGuests, setMasterGuests] = useState([]);
@@ -265,7 +266,12 @@ const useResponsive = (width) => {
     }, [updateTarget, width]);
     return targetReached;
 };
-
+const DragHandleIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line>
+        <line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
+    </svg>
+);
 const AddIcon = () => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>);
 const GroupIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>);
 const ExportIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>);
@@ -1989,6 +1995,66 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
         }
     };
 
+    const onDragEnd = (result) => {
+        const { source, destination, type } = result;
+
+        if (!destination) return;
+
+        if (source.droppableId === destination.droppableId && source.index === destination.index) {
+            return;
+        }
+
+        let updatedTasks = Array.from(tasks);
+
+        // 1. Kéo thả Category (Loại lớn)
+        if (type === 'CATEGORY') {
+            const [reorderedCategory] = updatedTasks.splice(source.index, 1);
+            updatedTasks.splice(destination.index, 0, reorderedCategory);
+        }
+
+        // 2. Kéo thả Sub-task (Tác con)
+        if (type === 'SUBTASK') {
+            const sourceParentId = source.droppableId;
+            const destParentId = destination.droppableId;
+
+            const sourceCategoryIndex = updatedTasks.findIndex(c => c.id === sourceParentId);
+            const destCategoryIndex = updatedTasks.findIndex(c => c.id === destParentId);
+
+            const sourceCategory = updatedTasks[sourceCategoryIndex];
+            const destCategory = updatedTasks[destCategoryIndex];
+
+            const newSourceSubTasks = Array.from(sourceCategory.subTasks || []);
+            const [movedSubTask] = newSourceSubTasks.splice(source.index, 1);
+
+            // Nếu kéo thả trong cùng một Category
+            if (sourceParentId === destParentId) {
+                newSourceSubTasks.splice(destination.index, 0, movedSubTask);
+                
+                updatedTasks[sourceCategoryIndex] = {
+                    ...sourceCategory,
+                    subTasks: newSourceSubTasks
+                };
+            } else {
+                // Nếu kéo từ Category này sang Category khác
+                const newDestSubTasks = Array.from(destCategory.subTasks || []);
+                newDestSubTasks.splice(destination.index, 0, movedSubTask);
+
+                updatedTasks[sourceCategoryIndex] = {
+                    ...sourceCategory,
+                    subTasks: newSourceSubTasks
+                };
+
+                updatedTasks[destCategoryIndex] = {
+                    ...destCategory,
+                    subTasks: newDestSubTasks
+                };
+            }
+        }
+
+        setTasks(updatedTasks);
+        saveTasksToDB(updatedTasks);
+    };
+
     // --- QUẢN LÝ CATEGORY (TÁC LỚN) ---
     const handleAddCategory = (e) => {
         e.preventDefault();
@@ -2023,7 +2089,7 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
             if (cat.id === catId) {
                 return {
                     ...cat,
-                    subTasks: [...cat.subTasks, { id: Date.now().toString(), title, completed: false }]
+                    subTasks: [...(cat.subTasks || []), { id: Date.now().toString(), title, completed: false }]
                 };
             }
             return cat;
@@ -2039,7 +2105,7 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
             if (cat.id === catId) {
                 return {
                     ...cat,
-                    subTasks: cat.subTasks.map(st => st.id === taskId ? { ...st, completed: !st.completed } : st)
+                    subTasks: (cat.subTasks || []).map(st => st.id === taskId ? { ...st, completed: !st.completed } : st)
                 };
             }
             return cat;
@@ -2051,7 +2117,7 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
     const handleDeleteSubTask = (catId, taskId) => {
         const updatedTasks = tasks.map(cat => {
             if (cat.id === catId) {
-                return { ...cat, subTasks: cat.subTasks.filter(st => st.id !== taskId) };
+                return { ...cat, subTasks: (cat.subTasks || []).filter(st => st.id !== taskId) };
             }
             return cat;
         });
@@ -2077,7 +2143,7 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
                 } else { // Edit SubTask
                     return {
                         ...cat,
-                        subTasks: cat.subTasks.map(st => st.id === editingItem.taskId ? { ...st, title: editingItem.title } : st)
+                        subTasks: (cat.subTasks || []).map(st => st.id === editingItem.taskId ? { ...st, title: editingItem.title } : st)
                     };
                 }
             }
@@ -2090,8 +2156,8 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
     };
 
     // --- TÍNH TOÁN PROGRESS ---
-    const totalTasks = tasks.reduce((sum, cat) => sum + cat.subTasks.length, 0);
-    const completedTasks = tasks.reduce((sum, cat) => sum + cat.subTasks.filter(st => st.completed).length, 0);
+    const totalTasks = tasks.reduce((sum, cat) => sum + (cat.subTasks?.length || 0), 0);
+    const completedTasks = tasks.reduce((sum, cat) => sum + (cat.subTasks?.filter(st => st.completed)?.length || 0), 0);
     const progress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
     return (
@@ -2099,13 +2165,16 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
             {/* 1. Header & Progress */}
             <div className="task-progress-card">
                 <div className="task-progress-header">
-                    <h3 className="task-progress-title">Tiến độ chuẩn bị cưới</h3>
+                    <h3 className="task-progress-title">Dòng thời gian chuẩn bị cưới</h3>
                     <div className="task-progress-badge">
-                        <span>{completedTasks}</span> / {totalTasks} hoàn thành
+                        <span>{completedTasks}</span> / {totalTasks} công việc hoàn thành
                     </div>
                 </div>
                 <div className="task-progress-track">
-                    <div className="task-progress-fill" style={{ width: `${progress}%` }} />
+                    <div className="task-progress-fill" style={{ width: `${progress}%` }}>
+                        {/* Thêm điểm mốc nhỏ ở đầu thanh chạy */}
+                        {progress > 5 && <div className="progress-fill-marker"></div>}
+                    </div>
                 </div>
             </div>
 
@@ -2125,107 +2194,149 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
                 </div>
             </form>
 
-            {/* 3. Danh sách công việc phân cấp */}
-            <div className="task-categories-container">
-                {tasks.length === 0 ? (
-                    <div className="timeline-empty-state">
-                        <p>Chưa có kế hoạch nào. Hãy thêm nhóm công việc để bắt đầu!</p>
-                    </div>
-                ) : (
-                    tasks.map(category => {
-                        const isCatEditing = editingItem?.catId === category.id && !editingItem?.taskId;
-                        
-                        return (
-                            <div key={category.id} className="task-category-card">
-                                {/* CATEGORY HEADER */}
-                                <div className="task-category-header">
-                                    <div className="task-category-header-left" onClick={() => handleToggleExpand(category.id)}>
-                                        <div className={`dropdown-icon ${category.isExpanded ? 'expanded' : ''}`}>
-                                            <BackArrowIcon /> 
-                                        </div>
-                                        {isCatEditing ? (
-                                            <input 
-                                                autoFocus
-                                                value={editingItem.title}
-                                                onChange={(e) => setEditingItem({...editingItem, title: e.target.value})}
-                                                onBlur={handleSaveEdit}
-                                                onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
-                                                onClick={e => e.stopPropagation()}
-                                                className="timeline-edit-input"
-                                            />
-                                        ) : (
-                                            <h4 className="task-category-title">{category.title}</h4>
-                                        )}
-                                        <span className="task-category-counter">({category.subTasks.length})</span>
-                                    </div>
-                                    
-                                    <div className="task-category-actions">
-                                        <button onClick={() => startEditing(category.id, null, category.title)} className="table-action-btn">
-                                            <EditIcon width="16" height="16" />
-                                        </button>
-                                        <button onClick={() => handleDeleteCategory(category.id)} className="table-action-btn timeline-delete-btn">
-                                            <DeleteIcon width="16" height="16" />
-                                        </button>
-                                    </div>
+            {/* 3. Danh sách công việc phân cấp có kéo thả */}
+            <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="all-categories" type="CATEGORY">
+                    {(provided) => (
+                        <div 
+                            className="task-categories-container"
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                        >
+                            {tasks.length === 0 ? (
+                                <div className="timeline-empty-state">
+                                    <p>Chưa có kế hoạch nào. Hãy thêm nhóm công việc để bắt đầu!</p>
                                 </div>
-
-                                {/* CATEGORY BODY (SUB-TASKS) */}
-                                {category.isExpanded && (
-                                    <div className="task-category-body">
-                                        <div className="subtasks-list">
-                                            {category.subTasks.map(task => {
-                                                const isTaskEditing = editingItem?.catId === category.id && editingItem?.taskId === task.id;
-                                                return (
-                                                    <div key={task.id} className={`subtask-item ${task.completed ? 'completed' : ''}`}>
-                                                        <div className="subtask-checkbox" onClick={() => handleToggleComplete(category.id, task.id)}>
-                                                            {task.completed && <CheckIcon />}
-                                                        </div>
-                                                        
-                                                        <div className="subtask-content">
-                                                            {isTaskEditing ? (
+                            ) : (
+                                tasks.map((category, index) => {
+                                    const isCatEditing = editingItem?.catId === category.id && !editingItem?.taskId;
+                                    
+                                    return (
+                                        <Draggable key={category.id} draggableId={category.id} index={index}>
+                                            {(providedCat, snapshotCat) => (
+                                                <div 
+                                                    className={`task-category-card ${snapshotCat.isDragging ? 'is-dragging' : ''}`}
+                                                    ref={providedCat.innerRef}
+                                                    {...providedCat.draggableProps}
+                                                >
+                                                    {/* CATEGORY HEADER */}
+                                                    <div className="task-category-header">
+                                                        <div className="task-category-header-left">
+                                                            <div className="category-drag-handle" {...providedCat.dragHandleProps}>
+                                                                <DragHandleIcon />
+                                                            </div>
+                                                            <div className={`dropdown-icon ${category.isExpanded ? 'expanded' : ''}`} onClick={() => handleToggleExpand(category.id)}>
+                                                                <BackArrowIcon /> 
+                                                            </div>
+                                                            {isCatEditing ? (
                                                                 <input 
                                                                     autoFocus
                                                                     value={editingItem.title}
                                                                     onChange={(e) => setEditingItem({...editingItem, title: e.target.value})}
                                                                     onBlur={handleSaveEdit}
                                                                     onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
+                                                                    onClick={e => e.stopPropagation()}
                                                                     className="timeline-edit-input"
                                                                 />
                                                             ) : (
-                                                                <span className="subtask-title" onClick={() => startEditing(category.id, task.id, task.title)}>
-                                                                    {task.title}
-                                                                </span>
+                                                                <h4 className="task-category-title" onClick={() => handleToggleExpand(category.id)}>{category.title}</h4>
                                                             )}
+                                                            <span className="task-category-counter">({category.subTasks?.length || 0})</span>
                                                         </div>
-
-                                                        <button onClick={() => handleDeleteSubTask(category.id, task.id)} className="table-action-btn subtask-delete-btn">
-                                                            <CancelIcon />
-                                                        </button>
+                                                        
+                                                        <div className="task-category-actions">
+                                                            <button onClick={() => startEditing(category.id, null, category.title)} className="table-action-btn">
+                                                                <EditIcon width="16" height="16" />
+                                                            </button>
+                                                            <button onClick={() => handleDeleteCategory(category.id)} className="table-action-btn timeline-delete-btn">
+                                                                <DeleteIcon width="16" height="16" />
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                )
-                                            })}
-                                        </div>
-                                        
-                                        {/* Thêm Sub-task Form */}
-                                        <form onSubmit={(e) => handleAddSubTask(e, category.id)} className="subtask-add-form">
-                                            <input 
-                                                type="text"
-                                                value={newSubTaskTitles[category.id] || ''}
-                                                onChange={e => setNewSubTaskTitles(prev => ({...prev, [category.id]: e.target.value}))}
-                                                placeholder="Thêm công việc chi tiết..."
-                                                className="subtask-add-input"
-                                            />
-                                            <button type="submit" disabled={!newSubTaskTitles[category.id]?.trim()} className="subtask-add-btn">
-                                                Lưu
-                                            </button>
-                                        </form>
-                                    </div>
-                                )}
-                            </div>
-                        )
-                    })
-                )}
-            </div>
+
+                                                    {/* CATEGORY BODY (SUB-TASKS Droppable) */}
+                                                    {category.isExpanded && (
+                                                        <Droppable droppableId={category.id} type="SUBTASK">
+                                                            {(providedSub, snapshotSub) => (
+                                                                <div 
+                                                                    className={`task-category-body ${snapshotSub.isDraggingOver ? 'is-dragging-over' : ''}`}
+                                                                    ref={providedSub.innerRef}
+                                                                    {...providedSub.droppableProps}
+                                                                >
+                                                                    <div className="subtasks-list">
+                                                                        {category.subTasks?.map((task, subIndex) => {
+                                                                            const isTaskEditing = editingItem?.catId === category.id && editingItem?.taskId === task.id;
+                                                                            return (
+                                                                                <Draggable key={task.id} draggableId={task.id} index={subIndex}>
+                                                                                    {(providedTask, snapshotTask) => (
+                                                                                        <div 
+                                                                                            className={`subtask-item ${task.completed ? 'completed' : ''} ${snapshotTask.isDragging ? 'is-dragging' : ''}`}
+                                                                                            ref={providedTask.innerRef}
+                                                                                            {...providedTask.draggableProps}
+                                                                                        >
+                                                                                            <div className="subtask-drag-handle" {...providedTask.dragHandleProps}>
+                                                                                                <DragHandleIcon />
+                                                                                            </div>
+                                                                                            <div className="subtask-checkbox" onClick={() => handleToggleComplete(category.id, task.id)}>
+                                                                                                {task.completed && <CheckIcon />}
+                                                                                            </div>
+                                                                                            
+                                                                                            <div className="subtask-content">
+                                                                                                {isTaskEditing ? (
+                                                                                                    <input 
+                                                                                                        autoFocus
+                                                                                                        value={editingItem.title}
+                                                                                                        onChange={(e) => setEditingItem({...editingItem, title: e.target.value})}
+                                                                                                        onBlur={handleSaveEdit}
+                                                                                                        onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
+                                                                                                        className="timeline-edit-input"
+                                                                                                    />
+                                                                                                ) : (
+                                                                                                    <span className="subtask-title" onClick={() => startEditing(category.id, task.id, task.title)}>
+                                                                                                        {task.title}
+                                                                                                    </span>
+                                                                                                )}
+                                                                                            </div>
+
+                                                                                            <button onClick={() => handleDeleteSubTask(category.id, task.id)} className="table-action-btn subtask-delete-btn">
+                                                                                                <CancelIcon />
+                                                                                            </button>
+                                                                                        </div>
+                                                                                    )}
+                                                                                </Draggable>
+                                                                            )
+                                                                        })}
+                                                                        {providedSub.placeholder}
+                                                                    </div>
+                                                                    
+                                                                    {/* Thêm Sub-task Form */}
+                                                                    <form onSubmit={(e) => handleAddSubTask(e, category.id)} className="subtask-add-form">
+                                                                        <input 
+                                                                            type="text"
+                                                                            value={newSubTaskTitles[category.id] || ''}
+                                                                            onChange={e => setNewSubTaskTitles(prev => ({...prev, [category.id]: e.target.value}))}
+                                                                            placeholder="Thêm công việc chi tiết..."
+                                                                            className="subtask-add-input"
+                                                                        />
+                                                                        <button type="submit" disabled={!newSubTaskTitles[category.id]?.trim()} className="subtask-add-btn">
+                                                                            Lưu
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            )}
+                                                        </Droppable>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </Draggable>
+                                    )
+                                })
+                            )}
+                            {provided.placeholder}
+                        </div>
+                    )}
+                </Droppable>
+            </DragDropContext>
         </div>
     );
 };
