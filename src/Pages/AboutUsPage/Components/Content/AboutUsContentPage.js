@@ -148,7 +148,7 @@ const ParticipantsSection = React.memo(({ participants, title, titleStyle }) => 
 // ++ UPDATED: LOVE STORY TIMELINE (ALTERNATING ROWS & COLORS) ++
 // ===================================================================
 const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
-    // Giữ nguyên hiệu ứng cuộn Observer
+    // Giữ nguyên Intersection Observer cho hiệu ứng scroll
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -159,7 +159,7 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
             });
         }, { threshold: 0.2, rootMargin: "0px 0px -50px 0px" });
 
-        const items = document.querySelectorAll('.lovestory-color-row');
+        const items = document.querySelectorAll('.lovestory-zigzag-row');
         items.forEach(item => observer.observe(item));
 
         return () => items.forEach(item => observer.unobserve(item));
@@ -167,58 +167,65 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
 
     if (!stories || stories.length === 0) return null;
 
-    // Bảng màu Pastel xoay vòng cho các hàng (Bạn có thể đổi mã màu tùy ý)
-    const rowColors = [
-        '#FDF3F4', // Hồng nhạt
-        '#F0F7F4', // Xanh mint nhạt
-        '#FFF6E9', // Cam đào/Be nhạt
-        '#F4F0F8', // Tím pastel
-        '#EAF4F4'  // Xanh dương nhạt
+    // Bảng màu áp dụng cho Viền ảnh & Lá cờ thời gian (Thay đổi mã màu theo ý thích)
+    const themeColors = [
+        '#8cb8d9', // Xanh dương pastel (như ảnh 1)
+        '#e58b8b', // Đỏ/Hồng pastel (như ảnh 2)
+        '#e6c27a', // Vàng gold pastel
+        '#95c596', // Xanh mint
+        '#b695c5'  // Tím pastel
     ];
 
     return (
         <section className="section-container" style={{ overflow: 'hidden' }}>
             <SectionHeader title={title || "Chuyện Tình Yêu"} titleStyle={titleStyle}/>
             
-            <div className="lovestory-color-wrapper">
+            <div className="lovestory-zigzag-wrapper">
+                {/* Đường kẻ dọc trung tâm */}
+                <div className="lovestory-center-line"></div>
+
                 {stories.map((story, index) => {
-                    // Lấy màu nền tương ứng (nếu có hơn 5 sự kiện sẽ tự động quay lại màu đầu tiên)
-                    const bgColor = rowColors[index % rowColors.length];
-                    
-                    // Xác định hàng chẵn/lẻ (Index 0 là hàng 1 -> Lẻ; Index 1 là hàng 2 -> Chẵn)
-                    const isEvenRow = (index + 1) % 2 === 0;
+                    const themeColor = themeColors[index % themeColors.length];
+                    // Index chẵn (0, 2, 4...) -> Ảnh Trái. Index lẻ (1, 3, 5...) -> Ảnh Phải.
+                    const isEvenRow = index % 2 === 0;
 
                     return (
                         <div 
                             key={story.id || index} 
-                            // Nếu là hàng chẵn, thêm class 'row-reverse' để đảo ngược layout
-                            className={`lovestory-color-row ${isEvenRow ? 'row-reverse' : ''} fade-in-up`}
-                            style={{ backgroundColor: bgColor }}
+                            // Thêm class row-right để đảo ngược bố cục (Ảnh sang phải, Text sang trái)
+                            className={`lovestory-zigzag-row ${isEvenRow ? 'row-left' : 'row-right'} fade-in-up`}
+                            style={{ '--theme-color': themeColor }} // Truyền biến màu trực tiếp vào CSS
                         >
-                            {/* Cột 1: Hình ảnh */}
-                            <div className="lovestory-col-image">
+                            {/* Cột Hình Ảnh */}
+                            <div className="lovestory-col-img">
                                 {story.imageUrl ? (
                                     <img
                                         src={story.imageUrl}
                                         alt={story.title || "Kỷ niệm"}
-                                        className="lovestory-circle-img parallax-image"
+                                        className="lovestory-bordered-img parallax-image"
                                         data-speed="0.05"
                                         loading="lazy"
                                     />
                                 ) : (
-                                    <div className="lovestory-circle-placeholder"></div>
+                                    <div className="lovestory-bordered-placeholder"></div>
                                 )}
                             </div>
 
-                            {/* Cột 2: Mốc thời gian (Luôn nằm ở giữa) */}
-                            <div className="lovestory-col-time">
-                                <div className="time-badge">{story.date}</div>
+                            {/* Cột Mốc Thời Gian (Nằm đè lên trục giữa) */}
+                            <div className="lovestory-col-center">
+                                <div className="lovestory-flag-badge">
+                                    {story.date}
+                                </div>
                             </div>
 
-                            {/* Cột 3: Nội dung */}
+                            {/* Cột Nội Dung Văn Bản */}
                             <div className="lovestory-col-text">
-                                <h3 className="lovestory-title">{story.title}</h3>
-                                <p className="lovestory-desc">{story.description}</p>
+                                <div className="lovestory-text-content">
+                                    <h3 className="lovestory-title" style={{ color: themeColor }}>
+                                        {story.title}
+                                    </h3>
+                                    <p className="lovestory-desc">{story.description}</p>
+                                </div>
                             </div>
                         </div>
                     );

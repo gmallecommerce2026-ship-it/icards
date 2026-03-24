@@ -2200,107 +2200,152 @@ END: STYLES MỚI
     position: relative;
 }
 /* ===================================================================
-   LOVE STORY TIMELINE (ALTERNATING ROWS & COLORS)
+   LOVE STORY TIMELINE (CENTER LINE, BORDERS & FOLDED FLAG)
 =================================================================== */
 
-.lovestory-color-wrapper {
-    max-width: 1100px;
+.lovestory-zigzag-wrapper {
+    position: relative;
+    max-width: 1000px;
     margin: 40px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 30px; /* Khoảng cách giữa các hàng */
-    padding: 0 20px;
+    padding: 20px 0;
 }
 
-/* Khối bao bọc mỗi hàng */
-.lovestory-color-row {
+/* --- Trục kẻ dọc trung tâm --- */
+.lovestory-center-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 2px;
+    background-color: #dcdcdc; /* Màu của trục dọc */
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+/* --- Layout Từng Hàng --- */
+.lovestory-zigzag-row {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 40px;
-    border-radius: 24px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    align-items: center;
+    margin-bottom: 70px;
     opacity: 0;
     transform: translateY(30px);
     transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.lovestory-color-row.is-visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* Lật ngược layout cho hàng chẵn */
-.lovestory-color-row.row-reverse {
-    flex-direction: row-reverse;
-}
-
-/* --- Các Cột --- */
-.lovestory-col-image {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-}
-
-.lovestory-col-time {
-    flex: 0 0 160px; /* Cố định chiều rộng cột giữa để mốc thời gian luôn thẳng hàng dọc */
-    display: flex;
-    justify-content: center;
     position: relative;
     z-index: 2;
 }
 
-.lovestory-col-text {
-    flex: 1;
+.lovestory-zigzag-row.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Layout zik-zak trái phải */
+.lovestory-zigzag-row.row-left {
+    flex-direction: row;
+}
+
+.lovestory-zigzag-row.row-right {
+    flex-direction: row-reverse;
+}
+
+/* --- Cột Hình Ảnh --- */
+.lovestory-col-img {
+    width: 40%;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
 }
 
-/* Định dạng text: Ép sát về phía mốc thời gian ở giữa */
-.lovestory-color-row .lovestory-col-text {
-    text-align: left;
-    padding-left: 20px;
+.row-left .lovestory-col-img {
+    justify-content: flex-end;
+    padding-right: 40px;
 }
 
-.lovestory-color-row.row-reverse .lovestory-col-text {
-    text-align: right;
-    padding-left: 0;
-    padding-right: 20px;
+.row-right .lovestory-col-img {
+    justify-content: flex-start;
+    padding-left: 40px;
 }
 
-/* --- Chi tiết phần tử --- */
-.lovestory-circle-img {
-    width: 220px;
-    height: 220px;
+/* Ảnh bo tròn với viền dày lấy từ biến màu --theme-color */
+.lovestory-bordered-img,
+.lovestory-bordered-placeholder {
+    width: 200px;
+    height: 200px;
     border-radius: 50%;
     object-fit: cover;
-    border: 10px solid #ffffff; /* Viền trắng dày nổi bật trên nền màu */
+    border: 8px solid var(--theme-color); /* Đổi màu viền tự động theo React */
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    background-color: #fcfcfc;
 }
 
-.lovestory-circle-placeholder {
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    background-color: #f2e8eb;
-    border: 10px solid #ffffff;
+/* --- Cột Trung Tâm (Lá Cờ Gấp) --- */
+.lovestory-col-center {
+    width: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
 }
 
-.time-badge {
-    background: #ffffff;
-    color: #333333;
-    font-size: 1rem;
+/* Tạo hình lá cờ chính (Mặt trước) */
+.lovestory-flag-badge {
+    position: relative;
+    background-color: var(--theme-color);
+    color: #ffffff;
     font-weight: bold;
-    padding: 12px 24px;
-    border-radius: 30px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    font-size: 0.95rem;
+    padding: 10px 24px;
+    text-align: center;
     white-space: nowrap;
+    z-index: 3;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Cắt chéo hai đầu lá cờ để tạo hình đuôi nheo (Swallowtail flag) */
+.lovestory-flag-badge::before,
+.lovestory-flag-badge::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 15px;
+    background-color: var(--theme-color);
+    z-index: -1;
+}
+
+/* Đuôi cờ bên trái */
+.lovestory-flag-badge::before {
+    left: -14px;
+    clip-path: polygon(100% 0, 100% 100%, 0 100%, 50% 50%, 0 0);
+    filter: brightness(0.85); /* Làm tối đuôi cờ một chút để tạo chiều sâu 3D */
+}
+
+/* Đuôi cờ bên phải */
+.lovestory-flag-badge::after {
+    right: -14px;
+    clip-path: polygon(0 0, 0 100%, 100% 100%, 50% 50%, 100% 0);
+    filter: brightness(0.85);
+}
+
+/* --- Cột Nội Dung Văn Bản --- */
+.lovestory-col-text {
+    width: 40%;
+    display: flex;
+}
+
+.row-left .lovestory-col-text {
+    justify-content: flex-start;
+    padding-left: 40px;
+    text-align: left;
+}
+
+.row-right .lovestory-col-text {
+    justify-content: flex-end;
+    padding-right: 40px;
+    text-align: right;
 }
 
 .lovestory-title {
     font-size: 1.6rem;
-    color: #333333;
     margin-bottom: 12px;
     font-weight: bold;
     font-family: var(--font-primary, serif);
@@ -2314,31 +2359,46 @@ END: STYLES MỚI
 }
 
 /* ==========================================
-   RESPONSIVE CHO MOBILE (Tự động gập thành 1 cột)
+   RESPONSIVE CHO MOBILE (Dưới 768px)
 ========================================== */
-@media screen and (max-width: 868px) {
-    .lovestory-color-row,
-    .lovestory-color-row.row-reverse {
-        flex-direction: column !important; /* Luôn ép về dạng dọc trên mobile */
-        text-align: center !important;
-        padding: 30px 20px;
-        gap: 20px;
+@media screen and (max-width: 768px) {
+    .lovestory-center-line {
+        left: 20px; /* Đẩy trục dọc bám sát lề trái */
+        transform: none;
     }
 
-    .lovestory-color-row .lovestory-col-text,
-    .lovestory-color-row.row-reverse .lovestory-col-text {
-        text-align: center;
-        padding: 0;
+    .lovestory-zigzag-row.row-left,
+    .lovestory-zigzag-row.row-right {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-left: 60px; /* Chừa không gian cho trục dọc và lá cờ */
+        margin-bottom: 50px;
     }
 
-    .lovestory-circle-img,
-    .lovestory-circle-placeholder {
-        width: 180px;
-        height: 180px;
-        border-width: 8px;
+    .lovestory-col-img,
+    .lovestory-col-text {
+        width: 100%;
+        justify-content: flex-start !important;
+        padding: 0 !important;
+        text-align: left !important;
     }
 
-    .lovestory-col-time {
-        flex: auto;
+    .lovestory-col-center {
+        position: absolute;
+        left: -10px; /* Đẩy lá cờ đè lên trục dọc bên trái */
+        top: 30px; 
+        width: auto;
+    }
+
+    /* Ẩn đuôi cờ bên trái trên mobile để lá cờ trông như mọc ra từ cột */
+    .lovestory-flag-badge::before {
+        display: none;
+    }
+
+    .lovestory-bordered-img {
+        width: 160px;
+        height: 160px;
+        border-width: 6px;
+        margin-bottom: 16px;
     }
 }
