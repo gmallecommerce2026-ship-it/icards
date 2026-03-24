@@ -2200,257 +2200,253 @@ END: STYLES MỚI
     position: relative;
 }
 /* ===================================================================
-   LOVE STORY TIMELINE (TRUE 3D SEGMENTED POLE & WRAPPED RIBBON)
-   ++ ENHANCED WITH REALISTIC LIGHTING, SHADOWS, & LINKING DOTS ++
+   ARTISAN LOVE STORY TIMELINE (GENUINE 3D WRAP & MATERIAL SHADING)
 =================================================================== */
 
-.love-story-section-3d {
-    padding: 80px 20px;
-    background-color: #faf8f5; /* Màu nền nhẹ nhàng, ấm áp */
+.art-lovestory-section {
+    padding: 100px 20px;
+    background-color: #fdfbf9;
+    font-family: var(--font-primary, sans-serif);
 }
 
-/* Header styles (kế thừa hoặc tự định nghĩa) */
-.section-header { text-align: center; margin-bottom: 60px; }
-.section-title { font-size: 2.8rem; font-weight: bold; font-family: 'Playfair Display', serif; }
+.art-section-header { text-align: center; margin-bottom: 80px; }
+.art-section-title { font-size: 3rem; color: #333; font-weight: bold; margin-bottom: 15px; }
+.art-section-divider { width: 60px; height: 3px; background-color: #d4af37; margin: 0 auto; border-radius: 2px; }
 
-.lovestory-3d-container {
+.art-timeline-container {
     position: relative;
     max-width: 1100px;
     margin: 0 auto;
-    padding: 0;
+    padding: 40px 0;
 }
 
-/* ++ 1. CỘT DỌC 3D LIỀN MẠCH, TO BẢN (TRỤC CHÍNH) ++ */
-.lovestory-main-pole-3d {
+/* =========================================
+   1. CỘT KIM LOẠI (THE MASTER POLE)
+========================================= */
+.art-master-pole {
     position: absolute;
-    top: -40px; 
-    bottom: -40px;
+    top: 0; bottom: 0;
     left: 50%;
-    width: 40px; /* To bản hơn */
-    transform: translateX(-50%);
-    z-index: 1;
+    width: 20px; /* Cột to bản, rõ ràng */
+    margin-left: -10px; /* Căn giữa hoàn hảo */
+    z-index: 2; /* Nằm giữa lớp lá cờ trước và sau */
     
-    /* Hiệu ứng 3D kim loại tròn phức tạp: sáng ở giữa, tối 2 bên */
+    /* Hiệu ứng hình trụ kim loại/đá cẩm thạch */
     background: linear-gradient(to right, 
-        #a1a1a1 0%, /* Cạnh trái tối */
-        #d4d4d4 15%, /* Chuyển tiếp */
-        #ffffff 50%, /* Điểm sáng trung tâm */
-        #d4d4d4 85%, /* Chuyển tiếp */
-        #a1a1a1 100% /* Cạnh phải tối */
+        #c8c8c8 0%, 
+        #f5f5f5 30%, 
+        #ffffff 50%, 
+        #e0e0e0 75%, 
+        #b8b8b8 100%
     );
-    
-    /* Thêm nhiều lớp inset shadow để tăng chiều sâu bên trong */
     box-shadow: 
-        inset 10px 0 15px -10px rgba(0,0,0,0.5), /* Bóng tối cạnh trái */
-        inset -10px 0 15px -10px rgba(0,0,0,0.5), /* Bóng tối cạnh phải */
-        0 10px 30px rgba(0,0,0,0.1); /* Bóng đổ ngoài nhẹ */
-    
-    border-radius: 20px; /* Bo tròn mượt mà */
+        10px 0 20px -5px rgba(0,0,0,0.15),
+        -10px 0 20px -5px rgba(0,0,0,0.05);
+    border-radius: 10px;
 }
 
-/* ++ 2. LAYOUT HÀNG ZIK-ZAK ++ */
-.lovestory-3d-item {
+/* =========================================
+   2. BỐ CỤC TỔNG THỂ CỦA HÀNG (ROW)
+========================================= */
+.art-timeline-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 90px; /* Khoảng cách giữa các hàng */
+    margin-bottom: 120px;
     opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 1s ease-out, transform 1s ease-out;
+    transform: translateY(50px);
+    transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     position: relative;
-    z-index: 2; /* Nổi lên trên cột */
 }
+.art-timeline-row.is-visible { opacity: 1; transform: translateY(0); }
 
-.lovestory-3d-item.is-visible {
-    opacity: 1;
-    transform: translateY(0);
-}
+.layout-img-left { flex-direction: row; }
+.layout-img-right { flex-direction: row-reverse; }
 
-/* Định hướng bố cục ảnh trái/phải */
-.lovestory-3d-item.row-img-left { flex-direction: row; }
-.lovestory-3d-item.row-img-right { flex-direction: row-reverse; }
+/* =========================================
+   3. KHUNG HÌNH ẢNH (MATCHING BORDER)
+========================================= */
+.art-col-img { width: 40%; display: flex; }
+.layout-img-left .art-col-img { justify-content: flex-end; padding-right: 60px; }
+.layout-img-right .art-col-img { justify-content: flex-start; padding-left: 60px; }
 
-/* -- Cột Hình Ảnh (40% width) -- */
-.lovestory-col-image-3d { width: 40%; display: flex; }
-.row-img-left .lovestory-col-image-3d { justify-content: flex-end; padding-right: 50px; }
-.row-img-right .lovestory-col-image-3d { justify-content: flex-start; padding-left: 50px; }
-
-.lovestory-img-wrapper-3d {
-    position: relative;
-    width: 240px;
-    height: 240px;
+.art-img-frame, .art-img-placeholder {
+    width: 260px; height: 260px;
     border-radius: 50%;
     overflow: hidden;
-    /* Viền ảnh 3D, màu kim loại/gold ấm */
-    border: 10px solid #ffffff; 
-    box-shadow: 
-        inset 0 0 15px rgba(0,0,0,0.1), /* Inner shadow mỏng */
-        0 12px 35px rgba(0,0,0,0.1); /* Drop shadow ngoài mạnh */
+    /* Border đồng bộ với màu lá cờ */
+    border: 12px solid var(--c-main);
     background-color: #fff;
-    transition: transform 0.3s ease;
+    /* Đổ bóng đa tầng cao cấp */
+    box-shadow: 
+        inset 0 0 20px rgba(0,0,0,0.1),
+        0 15px 35px rgba(0,0,0,0.12),
+        0 5px 15px rgba(var(--c-main), 0.3); /* Phát sáng nhẹ theo màu viền */
 }
-.lovestory-img-wrapper-3d:hover { transform: scale(1.03); }
+.art-img-frame img { width: 100%; height: 100%; object-fit: cover; }
 
-.lovestory-img-3d { width: 100%; height: 100%; object-fit: cover; display: block; }
-.lovestory-img-placeholder-3d { width: 240px; height: 240px; border-radius: 50%; background-color: #eee; border: 10px solid #fff; }
-
-/* -- Cột Trung Tâm (Chứa Cột & Lá Cờ) -- */
-.lovestory-col-center-3d {
-    width: 120px; 
-    flex: 0 0 120px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-}
-
-/* ++ 3. LÁ CỜ VẢI 3D CUỐN QUANH CỘT (WRAPPED RIBBON) ++ */
-.lovestory-ribbon-3d-flag {
+/* =========================================
+   4. NGHỆ THUẬT LÁ CỜ QUẤN (THE 3D WRAP)
+========================================= */
+.art-col-center {
     position: absolute;
-    color: #ffffff;
+    left: 50%;
+    width: 0; height: 0;
+    display: flex; justify-content: center; align-items: center;
+}
+
+/* --- MẶT TRƯỚC (NẰM TRÊN CỘT) --- */
+.art-ribbon-front {
+    position: absolute;
+    background: var(--c-main);
+    color: #fff;
+    z-index: 3; /* Đè lên cột */
+    padding: 12px 30px;
     font-weight: bold;
-    font-size: 1rem;
-    padding: 12px 20px;
-    z-index: 4; /* Trên cột */
+    font-size: 1.1rem;
     white-space: nowrap;
-    
-    /* ++ NEW: Hiệu ứng 3D VẢI CUỐN ++ */
-    /* Gradient tạo nếp gấp vải 3D: xen kẽ sáng tối mô phỏng uốn lượn */
-    background: linear-gradient(135deg, 
-        var(--item-theme-color) 0%, /* Màu chính phía trước */
-        var(--item-theme-color) 40%,
-        rgba(0,0,0,0.2) 55%, /* Nếp gấp tối (mặt khuất luồn sau) */
-        var(--item-theme-color) 70%, /* Chuyển tiếp lại màu chính */
-        var(--item-theme-color) 100%
-    );
-    
-    /* Hiệu ứng bóng đổ vật lý thực cho hình phức tạp (clip-path) */
-    filter: drop-shadow(4px 10px 10px rgba(0, 0, 0, 0.25)); 
-    border-radius: 2px; /* Bo nhẹ cạnh */
+    /* Drop shadow vật lý */
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.15));
 }
 
-/* Định vị và tạo hình lá cờ bay cho hàng LẺ (Ảnh Trái -> Cờ hướng sang Phải) */
-.row-img-left .lovestory-ribbon-3d-flag {
-    left: calc(50% + 5px); /* Cuốn ra từ mép phải của cột (cột 40px) */
-    padding-right: 35px; /* Chừa không gian cho đuôi cờ gợn sóng */
-    /* ++ NEW: Tạo hình ĐUÔI CỜ BAY GỢN SÓNG (complex swallowtail) ++ */
-    clip-path: polygon(0 0, 100% 0, calc(100% - 20px) 50%, 100% 100%, 0 100%);
+/* NẾP GẤP TẠO 3D (Bóng đổ khuất sau cột) */
+.art-ribbon-front::before {
+    content: ''; position: absolute;
+    top: 100%; /* Rớt xuống dưới lá cờ trước */
+    width: 20px; /* Đúng bằng chiều rộng của cột kim loại */
+    height: 14px; /* Độ dốc của nếp gấp */
+    background: var(--c-dark); /* Màu tối chìm vào trong */
 }
 
-/* Định vị và tạo hình lá cờ bay cho hàng CHẴN (Ảnh Phải -> Cờ hướng sang Trái) */
-.row-img-right .lovestory-ribbon-3d-flag {
-    right: calc(50% + 5px); /* Cuốn ra từ mép trái của cột */
-    padding-left: 35px;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 20px 50%);
-}
-
-/* ++ 4. ĐIỂM CHẤM & ĐƯỜNG NỐI HÌNH ẢNH 3D (IMAGE LINK) ++ */
-.image-link-dot-3d {
+/* --- MẶT SAU (CHUI SAU CỘT & ĐIỂM CHẤM) --- */
+.art-ribbon-tail {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 14px;
-    height: 14px;
+    background: var(--c-dark); /* Bị khuất sáng nên dùng màu Dark */
+    height: 40px; /* Nhỏ hơn mặt trước một chút */
+    z-index: 1; /* Chui ra sau cột */
+    display: flex; align-items: center;
+}
+
+/* ĐIỂM CHẤM NEO VÀO HÌNH ẢNH */
+.art-anchor-dot {
+    position: absolute;
+    width: 14px; height: 14px;
     border-radius: 50%;
-    background-color: var(--item-theme-color);
-    border: 3px solid #ffffff; /* Viền trắng dày nổi bật */
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 15px var(--item-theme-color); /* Phát sáng mượt */
-    z-index: 5; /* Trên cùng */
-}
-
-/* Đường nối mỏng phát sáng nối sang ảnh sự kiện */
-.image-link-dot-3d::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 250px; /* Độ dài đường nối tối đa */
-    height: 2px;
-    background-color: var(--item-theme-color);
-    box-shadow: 0 0 5px var(--item-theme-color); /* Phát sáng nhẹ dọc đường nối */
-    z-index: -1;
-}
-
-/* Định vị Dot & Line cho hàng LẺ (Nối Dot từ mép Trái cột sang Ảnh bên Trái) */
-.row-img-left .image-link-dot-3d {
-    left: -20px; /* Đặt dot ngay tại trục giữa/mép cuốn của cờ vào cột */
-}
-.row-img-left .image-link-dot-3d::after {
-    right: 100%; /* Kéo đường nối sang bên trái */
-}
-
-/* Định vị Dot & Line cho hàng CHẴN (Nối Dot từ mép Phải cột sang Ảnh bên Phải) */
-.row-img-right .image-link-dot-3d {
-    right: -20px; /* Đặt dot ngay tại trục giữa/mép cuốn của cờ vào cột */
-}
-.row-img-right .image-link-dot-3d::after {
-    left: 100%; /* Kéo đường nối sang bên phải */
+    background: #fff;
+    border: 4px solid var(--c-main);
+    box-shadow: 0 0 12px var(--c-main); /* Hào quang phát sáng */
 }
 
 
-/* -- Cột Nội Dung Văn Bản (40% width) -- */
-.lovestory-col-text-3d { width: 40%; display: flex; align-items: center; }
-.row-img-left .lovestory-col-text-3d { justify-content: flex-start; padding-left: 50px; text-align: left; }
-.row-img-right .lovestory-col-text-3d { justify-content: flex-end; padding-right: 50px; text-align: right; }
+/* -- LOGIC QUẤN TRÁI/PHẢI (CỰC KỲ QUAN TRỌNG) -- */
 
-.lovestory-text-card-3d { background: #ffffff; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); }
-.lovestory-title-3d { font-size: 1.8rem; margin-bottom: 12px; font-weight: bold; font-family: 'Playfair Display', serif; }
-.lovestory-desc-3d { font-size: 1.05rem; color: #555555; line-height: 1.8; margin: 0; }
+/* HÀNG ẢNH TRÁI (Cờ bay sang phải, Đuôi chui sang trái) */
+.layout-img-left .art-ribbon-front {
+    left: -10px; /* Bắt đầu từ mép trái cột */
+    padding-left: 25px; /* Thụt vào nhường chỗ cho cột */
+    /* Cắt đuôi nheo bay về bên phải */
+    clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 50%, 100% 100%, 0 100%);
+}
+.layout-img-left .art-ribbon-front::before {
+    left: 0; /* Gắn vào mép trái cờ trước */
+    /* Tam giác gấp từ mép trái chéo qua mép phải cột */
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
+}
+.layout-img-left .art-ribbon-tail {
+    right: -10px; /* Chui ra từ mép phải cột */
+    width: 80px; /* Kéo dài về phía hình ảnh */
+    top: 15px; /* Bị hạ thấp bằng đúng độ dốc của nếp gấp */
+}
+.layout-img-left .art-anchor-dot { left: -7px; } /* Chấm nằm ở đầu mút trái của đuôi */
 
-/* ==========================================
-   ++ RESPONSIVE CHO MOBILE (Dưới 992px) ++
-   Tự động gập thành 1 cột & ép cột 3D sang trái
-========================================== */
+/* HÀNG ẢNH PHẢI (Cờ bay sang trái, Đuôi chui sang phải) */
+.layout-img-right .art-ribbon-front {
+    right: -10px; /* Bắt đầu từ mép phải cột */
+    padding-right: 25px;
+    /* Cắt đuôi nheo bay về bên trái */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 15px 50%);
+}
+.layout-img-right .art-ribbon-front::before {
+    right: 0; /* Gắn vào mép phải cờ trước */
+    /* Tam giác gấp từ mép phải chéo qua mép trái cột */
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+.layout-img-right .art-ribbon-tail {
+    left: -10px; /* Chui ra từ mép trái cột */
+    width: 80px; 
+    top: 15px;
+}
+.layout-img-right .art-anchor-dot { right: -7px; } /* Chấm nằm ở đầu mút phải của đuôi */
+
+
+/* =========================================
+   5. NỘI DUNG VĂN BẢN
+========================================= */
+.art-col-text { width: 40%; display: flex; align-items: center; }
+.layout-img-left .art-col-text { justify-content: flex-start; padding-left: 60px; text-align: left; }
+.layout-img-right .art-col-text { justify-content: flex-end; padding-right: 60px; text-align: right; }
+
+.art-text-content {
+    background: #fff;
+    padding: 35px 40px;
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.04);
+}
+.art-title { font-size: 2rem; margin-bottom: 15px; font-weight: 800; }
+.art-desc { font-size: 1.1rem; color: #666; line-height: 1.8; margin: 0; }
+
+/* =========================================
+   RESPONSIVE MOBILE TỐI ƯU HÓA 3D
+========================================= */
 @media screen and (max-width: 992px) {
-    .lovestory-3d-item {
-        flex-direction: column !important; /* Luôn ép về dạng dọc */
-        align-items: flex-start;
-        padding-left: 70px; /* Chừa lề cho cột bên trái */
-        margin-bottom: 60px;
+    .art-timeline-row {
+        flex-direction: column !important;
+        padding-left: 60px; /* Chừa không gian trục bên trái */
+        margin-bottom: 80px;
     }
-
-    /* Đẩy cột sang sát mép trái trên điện thoại */
-    .lovestory-main-pole-3d {
-        left: 30px; 
+    
+    /* Ép cột sang sát lề trái */
+    .art-master-pole {
+        left: 30px;
         transform: none;
-        width: 30px; /* Thu nhỏ cột mỏng hơn một chút trên mobile */
+    }
+    .art-col-center {
+        left: 30px;
+        top: 20px; /* Căn cờ ngang với ảnh */
     }
 
-    .lovestory-col-image-3d,
-    .lovestory-col-text-3d {
+    .art-col-img, .art-col-text {
         width: 100%;
         justify-content: flex-start !important;
         padding: 0 !important;
         text-align: left !important;
     }
 
-    .lovestory-col-center-3d {
-        position: absolute;
-        left: 0;
-        top: 20px; /* Canh lá cờ ngang với ảnh sự kiện */
-        bottom: 0;
-        width: 50px;
-        flex: auto;
-        z-index: 5;
-    }
-
-    /* Ép tất cả lá cờ hướng sang phải (như hàng lẻ) trên mobile */
-    .lovestory-ribbon-3d-flag {
-        top: 0;
-        left: calc(30px + 3px) !important; /* Cuốn ra từ mép phải của cột mobile */
-        right: auto !important;
-        padding-left: 16px !important;
-        padding-right: 30px !important;
+    /* Trên Mobile, bắt buộc tất cả cờ bay sang phải (như Layout Left) */
+    .art-ribbon-front {
+        left: -10px !important; right: auto !important;
+        padding-left: 25px !important; padding-right: 30px !important;
         clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 50%, 100% 100%, 0 100%) !important;
-        filter: drop-shadow(2px 6px 6px rgba(0, 0, 0, 0.15));
     }
-
-    .lovestory-img-wrapper-3d {
-        width: 180px;
-        height: 180px;
-        border-width: 6px;
-        margin-bottom: 20px;
+    .art-ribbon-front::before {
+        left: 0 !important; right: auto !important;
+        clip-path: polygon(100% 0, 0 0, 100% 100%) !important;
     }
+    
+    /* Ẩn đuôi cờ và dấu chấm trên Mobile vì không gian hẹp, giữ mặt trước để đảm bảo tính thanh lịch */
+    .art-ribbon-tail { display: none; }
 
-    /* Ẩn Dot & Line trên mobile để tránh vỡ layout và quá nhiều chi tiết */
-    .image-link-dot-3d { display: none; }
+    .art-img-frame, .art-img-placeholder {
+        width: 180px; height: 180px;
+        border-width: 8px;
+        margin-bottom: 25px;
+    }
+    
+    .art-text-content {
+        padding: 25px;
+        background: transparent;
+        box-shadow: none;
+        border-left: 4px solid var(--c-main);
+        border-radius: 0;
+    }
 }
