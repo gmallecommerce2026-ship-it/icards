@@ -161,6 +161,9 @@ const SectionHeader2 = React.memo(({ title, titleStyle }) => (
 // ===================================================================
 // ++ UPDATED: LOVE STORY TIMELINE (3D WRAPPED RIBBON & SEGMENTED POLE) ++
 // ===================================================================
+// ===================================================================
+// ++ UPDATED: ARTISAN LOVE STORY TIMELINE (INTERLOCKING TRAPEZOID POLES) ++
+// ===================================================================
 const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
@@ -184,9 +187,6 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
             <SectionHeader2 title={title} titleStyle={titleStyle}/>
             
             <div className="art-timeline-container">
-                {/* TRỤC CỘT KIM LOẠI XUYÊN SUỐT */}
-                <div className="art-master-pole"></div>
-
                 {stories.map((story, index) => {
                     const theme = artThemes[index % artThemes.length];
                     const isImgLeft = index % 2 === 0;
@@ -200,6 +200,9 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
                                 '--c-dark': theme.dark 
                             }}
                         >
+                            {/* KHỐI TRỤC ĐOẠN: Thanh hình thang đan xen mang màu sắc riêng */}
+                            <div className="art-pole-segment"></div>
+
                             {/* KHỐI HÌNH ẢNH */}
                             <div className="art-col-img">
                                 {story.imageUrl ? (
@@ -211,14 +214,14 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
                                 )}
                             </div>
 
-                            {/* KHỐI TRUNG TÂM: LÁ CỜ QUẤN QUANH CỘT (THE WRAP) */}
+                            {/* KHỐI TRUNG TÂM: LÁ CỜ QUẤN QUANH CỘT ĐOẠN */}
                             <div className="art-col-center">
-                                {/* Đuôi cờ: Nằm sau cột, hướng về phía ảnh */}
+                                {/* Đuôi cờ: Nằm MẶT SAU cột, hướng về phía ảnh */}
                                 <div className="art-ribbon-tail">
                                     <div className="art-anchor-dot"></div> {/* Điểm chấm liên kết */}
                                 </div>
                                 
-                                {/* Mặt trước cờ: Nằm đè lên cột, chứa text, hướng về phía nội dung */}
+                                {/* Mặt trước cờ: Nằm ĐÈ LÊN cột, chứa text */}
                                 <div className="art-ribbon-front">
                                     <span className="art-ribbon-text">{story.date}</span>
                                 </div>
