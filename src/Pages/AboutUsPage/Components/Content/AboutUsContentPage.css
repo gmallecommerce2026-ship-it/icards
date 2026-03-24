@@ -2395,4 +2395,74 @@ END: STYLES MỚI
 }
 .layout-img-right .art-anchor-dot { right: -7px; }
 
-/* Các phần tử Text (.art-col-text) & Mobile Query giữ nguyên như cũ! */
+/* =========================================
+   5. NỘI DUNG VĂN BẢN
+========================================= */
+.art-col-text { width: 40%; display: flex; align-items: center; }
+.layout-img-left .art-col-text { justify-content: flex-start; padding-left: 60px; text-align: left; }
+.layout-img-right .art-col-text { justify-content: flex-end; padding-right: 60px; text-align: right; }
+
+.art-text-content {
+    background: #fff;
+    padding: 35px 40px;
+    border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.04);
+}
+.art-title { font-size: 2rem; margin-bottom: 15px; font-weight: 800; }
+.art-desc { font-size: 1.1rem; color: #666; line-height: 1.8; margin: 0; }
+
+/* =========================================
+   RESPONSIVE MOBILE TỐI ƯU HÓA 3D
+========================================= */
+@media screen and (max-width: 992px) {
+    .art-timeline-row {
+        flex-direction: column !important;
+        padding-left: 60px; /* Chừa không gian trục bên trái */
+        margin-bottom: 80px;
+    }
+    
+    /* Ép cột sang sát lề trái */
+    .art-master-pole {
+        left: 30px;
+        transform: none;
+    }
+    .art-col-center {
+        left: 30px;
+        top: 20px; /* Căn cờ ngang với ảnh */
+    }
+
+    .art-col-img, .art-col-text {
+        width: 100%;
+        justify-content: flex-start !important;
+        padding: 0 !important;
+        text-align: left !important;
+    }
+
+    /* Trên Mobile, bắt buộc tất cả cờ bay sang phải (như Layout Left) */
+    .art-ribbon-front {
+        left: -10px !important; right: auto !important;
+        padding-left: 25px !important; padding-right: 30px !important;
+        clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 50%, 100% 100%, 0 100%) !important;
+    }
+    .art-ribbon-front::before {
+        left: 0 !important; right: auto !important;
+        clip-path: polygon(100% 0, 0 0, 100% 100%) !important;
+    }
+    
+    /* Ẩn đuôi cờ và dấu chấm trên Mobile vì không gian hẹp, giữ mặt trước để đảm bảo tính thanh lịch */
+    .art-ribbon-tail { display: none; }
+
+    .art-img-frame, .art-img-placeholder {
+        width: 180px; height: 180px;
+        border-width: 8px;
+        margin-bottom: 25px;
+    }
+    
+    .art-text-content {
+        padding: 25px;
+        background: transparent;
+        box-shadow: none;
+        border-left: 4px solid var(--c-main);
+        border-radius: 0;
+    }
+}
