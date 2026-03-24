@@ -2200,266 +2200,289 @@ END: STYLES MỚI
     position: relative;
 }
 /* ===================================================================
-   LUXURY LOVE STORY TIMELINE (3D SILK RIBBON & CURVED ANCHOR)
+   ARTISAN LOVE STORY TIMELINE (INTERLOCKING TRAPEZOIDS & 3D WRAP)
 =================================================================== */
 
-.lux-lovestory-section {
+.art-lovestory-section {
     padding: 100px 20px;
-    background-color: transparent;
+    background-color: #fdfbf9;
     font-family: var(--font-primary, sans-serif);
-    position: relative;
 }
 
-.lux-timeline-container {
+.art-section-header { text-align: center; margin-bottom: 80px; }
+.art-section-title { font-size: 3rem; color: #333; font-weight: bold; margin-bottom: 15px; }
+.art-section-divider { width: 60px; height: 3px; background-color: #d4af37; margin: 0 auto; border-radius: 2px; }
+
+.art-timeline-container {
     position: relative;
     max-width: 1100px;
     margin: 0 auto;
-    padding: 60px 0;
+    padding: 40px 0;
 }
 
-/* TRỤC THỜI GIAN (SPINE) - Thanh mảnh, kim loại, thanh lịch */
-.lux-timeline-spine {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 50%;
-    width: 4px;
-    margin-left: -2px;
-    background: linear-gradient(to bottom, transparent, rgba(212, 175, 55, 0.5) 10%, rgba(212, 175, 55, 0.8) 50%, rgba(212, 175, 55, 0.5) 90%, transparent);
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-    border-radius: 4px;
-    z-index: 1;
-}
-
-/* BỐ CỤC HÀNG (ROW) */
-.lux-timeline-row {
+/* =========================================
+   1. BỐ CỤC TỔNG THỂ CỦA HÀNG (ROW)
+========================================= */
+.art-timeline-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 150px; /* Tăng khoảng cách để đường cong có không gian thở */
+    margin-bottom: 120px;
     opacity: 0;
     transform: translateY(50px);
-    transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1); /* Animation mượt hơn */
-    position: relative;
+    transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative; /* Context cho Pole Segment */
 }
-.lux-timeline-row.is-visible { opacity: 1; transform: translateY(0); }
-.lux-timeline-row:last-child { margin-bottom: 0; }
+.art-timeline-row.is-visible { opacity: 1; transform: translateY(0); }
 
-.lux-layout-left { flex-direction: row; }
-.lux-layout-right { flex-direction: row-reverse; }
+.layout-img-left { flex-direction: row; }
+.layout-img-right { flex-direction: row-reverse; }
 
-/* KHUNG HÌNH ẢNH (Mềm mại, lơ lửng) */
-.lux-col-img { width: 42%; display: flex; position: relative; }
-.lux-layout-left .lux-col-img { justify-content: flex-end; padding-right: 50px; }
-.lux-layout-right .lux-col-img { justify-content: flex-start; padding-left: 50px; }
-
-.lux-img-frame, .lux-img-placeholder {
-    width: 280px; height: 280px;
-    border-radius: 20px; /* Bỏ viền tròn xoe, dùng viền bo góc lớn nhìn sang hơn */
-    overflow: visible; /* Để hiển thị Anchor Ring vươn ra ngoài */
-    position: relative;
-    background-color: #fff;
-    padding: 8px; /* Tạo khung viền trắng tinh tế */
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
-    transition: transform 0.5s ease;
-}
-.lux-img-frame img { 
-    width: 100%; height: 100%; 
-    object-fit: cover; 
-    border-radius: 14px; /* Bo góc ảnh lọt lòng viền trắng */
-}
-
-/* ĐIỂM NEO (ANCHOR RING) - Tinh xảo đính trên khung ảnh */
-.lux-anchor-ring {
+/* =========================================
+   2. CỘT ĐOẠN HÌNH THANG ĐAN XEN (INTERLOCKING POLE SEGMENTS)
+========================================= */
+.art-pole-segment {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 24px; height: 24px;
-    background: #fff;
-    border: 5px solid var(--c-main);
-    border-radius: 50%;
-    box-shadow: 0 0 0 4px rgba(255,255,255,0.8), 0 5px 15px rgba(var(--c-main), 0.4);
-    z-index: 10;
+    left: 50%;
+    width: 30px; /* Độ dày của cột */
+    margin-left: -15px; /* Căn giữa hoàn hảo */
+    top: -65px; /* Vươn lên để khớp với đoạn trên */
+    bottom: -65px; /* Vươn xuống để khớp với đoạn dưới */
+    z-index: 2; /* Nằm giữa lớp lá cờ sau (1) và trước (3) */
+    background: linear-gradient(135deg, var(--c-main) 0%, var(--c-dark) 100%);
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.25), 5px 5px 15px rgba(0,0,0,0.05);
+    transition: all 0.5s ease;
 }
-.lux-layout-left .lux-anchor-ring { right: -12px; } /* Đính nửa vời bên phải khung */
-.lux-layout-right .lux-anchor-ring { left: -12px; } /* Đính nửa vời bên trái khung */
 
+/* Các lát cắt hình thang đan xen (Interlocking Trapezes) */
+.layout-img-left .art-pole-segment {
+    /* Cắt xéo: Trên / (Trái thấp phải cao) - Dưới \ (Trái cao phải thấp) */
+    clip-path: polygon(0 30px, 100% 0, 100% 100%, 0 calc(100% - 30px));
+}
+.layout-img-right .art-pole-segment {
+    /* Cắt xéo: Trên \ (Trái cao phải thấp) - Dưới / (Trái thấp phải cao) */
+    clip-path: polygon(0 0, 100% 30px, 100% calc(100% - 30px), 0 100%);
+}
 
-/* KHU VỰC TRUNG TÂM (RUY BĂNG 3D) */
-.lux-col-center {
+/* Xử lý 2 đầu cột cho mượt mà (không vươn nhọn ra ngoài) */
+.art-timeline-row:first-child .art-pole-segment {
+    top: -20px;
+    clip-path: none; /* Cắt thẳng ở đầu */
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+.art-timeline-row:last-child .art-pole-segment {
+    bottom: -20px;
+    clip-path: none; /* Cắt thẳng ở đáy */
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+/* Áp dụng lại clip-path đặc biệt kết hợp bo tròn cho first/last child nếu cần */
+.layout-img-left.art-timeline-row:first-child .art-pole-segment {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 30px));
+}
+.layout-img-right.art-timeline-row:last-child .art-pole-segment {
+    clip-path: polygon(0 0, 100% 30px, 100% 100%, 0 100%);
+}
+
+/* =========================================
+   3. KHUNG HÌNH ẢNH (MATCHING BORDER)
+========================================= */
+.art-col-img { width: 40%; display: flex; }
+.layout-img-left .art-col-img { justify-content: flex-end; padding-right: 60px; }
+.layout-img-right .art-col-img { justify-content: flex-start; padding-left: 60px; }
+
+.art-img-frame, .art-img-placeholder {
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 8px solid var(--c-main);
+    background-color: #fff;
+    box-shadow: 
+        inset 0 0 20px rgba(0,0,0,0.1),
+        0 15px 35px rgba(0,0,0,0.12),
+        0 5px 15px rgba(var(--c-main), 0.3);
+}
+.art-img-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+/* =========================================
+   4. NGHỆ THUẬT LÁ CỜ QUẤN (THE 3D PHYSICS WRAP)
+========================================= */
+.art-col-center {
     position: absolute;
     left: 50%;
     width: 0; height: 0;
     display: flex; justify-content: center; align-items: center;
-    z-index: 5;
 }
 
-/* MẶT TRƯỚC RUY BĂNG (Silk texture) */
-.lux-ribbon-front {
+/* --- MẶT TRƯỚC (NẰM TRÊN CỘT) --- */
+.art-ribbon-front {
     position: absolute;
-    background: linear-gradient(135deg, var(--c-main) 0%, var(--c-dark) 100%);
+    background: var(--c-main);
     color: #fff;
-    padding: 14px 30px;
-    font-weight: 700;
-    font-size: 1.15rem;
+    z-index: 3; /* Đè lên cột (z=2) */
+    padding: 12px 25px;
+    font-weight: bold;
+    font-size: 1.1rem;
     white-space: nowrap;
-    border-radius: 6px; /* Bo góc mềm thay vì cắt nhọn */
-    box-shadow: 
-        inset 0 2px 3px rgba(255,255,255,0.2), /* Highlight cạnh trên */
-        0 10px 20px rgba(0,0,0,0.15), /* Bóng đổ chính */
-        0 4px 6px rgba(0,0,0,0.1);
-    z-index: 5; /* Nằm TRÊN trục (z=1) */
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.25));
 }
 
-/* NẾP GẤP 3D VÒNG RA SAU (Tuyệt chiêu tạo không gian) */
-.lux-ribbon-fold {
+/* NẾP GẤP TẠO 3D (Bóng đổ khuất sau mép cột) */
+.art-ribbon-front::before {
+    content: ''; 
     position: absolute;
-    width: 20px;
-    height: 30px;
-    background: var(--c-dark);
-    filter: brightness(0.6); /* Đổ bóng sâu */
-    z-index: 0; /* Nằm SAU trục (z=1) */
+    top: 100%; /* Rớt xuống từ mép dưới lá cờ trước */
+    width: 15px; /* Chiều rộng nếp gấp (bằng nửa cột) */
+    height: 18px; /* Độ dốc / độ sâu của nếp gấp */
+    background: var(--c-dark); /* Màu tối chìm vào trong */
+    filter: brightness(0.7); /* Tối thêm để tạo chiều sâu chân thực */
 }
 
-/* ĐƯỜNG NỐI CONG MỀM MẠI (Flowing Tail) */
-.lux-curved-tail {
+/* --- MẶT SAU (CHUI SAU CỘT & ĐIỂM CHẤM) --- */
+.art-ribbon-tail {
     position: absolute;
-    width: 80px; 
-    height: 40px; /* Độ cong */
-    border: solid 2px var(--c-main);
-    border-color: var(--c-main) transparent transparent transparent; /* Chỉ lấy viền trên */
-    border-radius: 50%/100% 100% 0 0; /* Tạo đường cong elip */
-    z-index: 0;
-    opacity: 0.6; /* Mờ nhẹ để không tranh chú ý với ruy băng chính */
+    background: var(--c-dark); 
+    height: 35px; /* Nhỏ hơn mặt trước một chút */
+    z-index: 1; /* Chui ra sau cột (z=2) */
+    display: flex; align-items: center;
 }
 
-/* LOGIC VỊ TRÍ CHO LAYOUT LEFT (Ảnh trái, Text phải) */
-.lux-layout-left .lux-ribbon-front {
-    left: -10px; /* Bám vào trục */
-    border-top-left-radius: 0; /* Góc dính trục thì vuông */
-    border-bottom-left-radius: 0;
-    border-top-right-radius: 20px; /* Đuôi ruy băng vuốt cong kiêu sa */
-    border-bottom-right-radius: 20px;
-}
-.lux-layout-left .lux-ribbon-fold {
-    left: -28px; /* Lùi ra sau trục */
-    top: 15px; /* Thụt xuống để tạo nếp gấp xéo */
-    clip-path: polygon(100% 0, 0 0, 100% 100%); /* Cắt xéo nếp gấp */
-}
-.lux-layout-left .lux-curved-tail {
-    right: 15px; /* Bắt đầu từ trục vươn sang trái */
-    top: 5px;
-    transform: rotate(-10deg); /* Nghiêng nhẹ đường cong */
+/* ĐIỂM CHẤM NEO VÀO HÌNH ẢNH */
+.art-anchor-dot {
+    position: absolute;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid var(--c-main);
+    box-shadow: 0 0 12px var(--c-main);
 }
 
-/* LOGIC VỊ TRÍ CHO LAYOUT RIGHT (Ảnh phải, Text trái) */
-.lux-layout-right .lux-ribbon-front {
-    right: -10px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
+/* -- LOGIC QUẤN TRÁI/PHẢI (VẬT LÝ QUẤN CỘT CHUẨN XÁC) -- */
+
+/* HÀNG ẢNH TRÁI (Ảnh bên trái, Text bên phải) */
+.layout-img-left .art-ribbon-front {
+    left: -15px; /* Cạnh trái cờ bám sát mép trái cột */
+    padding-left: 35px; /* Thụt text nhường chỗ cho cột */
+    clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 50%, 100% 100%, 0 100%);
 }
-.lux-layout-right .lux-ribbon-fold {
-    right: -28px;
-    top: 15px;
-    clip-path: polygon(0 0, 100% 0, 0 100%);
+.layout-img-left .art-ribbon-front::before {
+    left: 0; /* Gắn vào mép TRÁI cờ trước */
+    clip-path: polygon(100% 0, 0 0, 100% 100%); /* Cắt xéo từ mép ngoài đâm vào trong sau cột */
 }
-.lux-layout-right .lux-curved-tail {
-    left: 15px; /* Bắt đầu từ trục vươn sang phải */
-    top: 5px;
-    transform: rotate(10deg);
+.layout-img-left .art-ribbon-tail {
+    right: 15px; /* Đuôi chui ra từ mép TRÁI cột, vươn về ảnh bên trái */
+    width: 70px; 
+    top: 18px; /* Khớp với độ sâu nếp gấp */
+}
+.layout-img-left .art-anchor-dot { left: -7px; } 
+
+/* HÀNG ẢNH PHẢI (Ảnh bên phải, Text bên trái) */
+.layout-img-right .art-ribbon-front {
+    right: -15px; /* Cạnh phải cờ bám sát mép phải cột */
+    padding-right: 35px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 15px 50%);
+}
+.layout-img-right .art-ribbon-front::before {
+    right: 0; /* Gắn vào mép PHẢI cờ trước */
+    clip-path: polygon(0 0, 100% 0, 0 100%); /* Cắt xéo góc đổ bóng */
+}
+.layout-img-right .art-ribbon-tail {
+    left: 15px; /* Đuôi chui ra từ mép PHẢI cột, vươn về ảnh bên phải */
+    width: 70px; 
+    top: 18px;
+}
+.layout-img-right .art-anchor-dot { right: -7px; }
+
+/* =========================================
+   5. NỘI DUNG VĂN BẢN
+========================================= */
+.art-col-text { width: 40%; display: flex; align-items: center; }
+.layout-img-left .art-col-text { justify-content: flex-start; padding-left: 60px; text-align: left; }
+.layout-img-right .art-col-text { justify-content: flex-end; padding-right: 60px; text-align: right; }
+
+.art-content-wrapper {
+    width: 100%;
 }
 
-
-/* KHỐI VĂN BẢN (Gọn gàng, sang trọng) */
-.lux-col-text { width: 42%; display: flex; align-items: center; z-index: 2; }
-.lux-layout-left .lux-col-text { justify-content: flex-start; padding-left: 60px; text-align: left; }
-.lux-layout-right .lux-col-text { justify-content: flex-end; padding-right: 60px; text-align: right; }
-
-.lux-text-block {
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(8px);
-    padding: 30px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.8);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-    transition: transform 0.3s ease;
+.art-text-block {
+    background: #fff;
+    padding: 35px 40px;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.04);
 }
-.lux-timeline-row:hover .lux-text-block { transform: translateY(-5px); }
 
-.lux-title {
-    font-size: 1.8rem;
+/* Tiêu đề: Font Serif đậm, màu chính của cờ */
+.art-title {
+    font-size: 2rem;
     margin-bottom: 12px;
-    font-weight: 700;
-    letter-spacing: -0.5px;
+    font-weight: 800;
 }
-.lux-desc {
-    font-size: 1.05rem;
-    color: var(--color-text-medium);
-    line-height: 1.7;
+
+/* Mô tả: Font Sans-serif màu trung tính, dễ đọc */
+.art-desc {
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.8;
     margin: 0;
 }
 
-
 /* =========================================
-   RESPONSIVE MOBILE CHO PHIÊN BẢN LUX
+   RESPONSIVE MOBILE TỐI ƯU HÓA 3D
 ========================================= */
 @media screen and (max-width: 992px) {
-    .lux-timeline-container { padding: 40px 15px; }
-    
-    .lux-timeline-spine {
-        left: 20px; /* Đẩy trục sát lề trái */
-    }
+    .love-story-timeline-art { padding: 60px 15px; }
+    .art-section-title { font-size: 2.2rem; }
 
-    .lux-timeline-row {
+    .art-timeline-row {
         flex-direction: column !important;
-        align-items: flex-start;
-        padding-left: 55px; /* Chừa không gian cho trục */
+        padding-left: 60px; /* Chừa lề cho trục */
         margin-bottom: 80px;
     }
+    
+    /* Ép cột kim loại sang sát lề trái */
+    .art-master-pole-3d {
+        left: 30px;
+        transform: none;
+    }
+    .art-col-center {
+        left: 30px;
+        top: 20px; /* Căn cờ ngang với ảnh sự kiện */
+    }
 
-    .lux-col-img, .lux-col-text {
+    .art-col-img, .art-col-text {
         width: 100%;
         justify-content: flex-start !important;
         padding: 0 !important;
         text-align: left !important;
     }
 
-    .lux-col-center {
-        left: 20px; /* Căn ruy băng theo trục mới */
-        top: 25px; /* Đẩy ruy băng lùi xuống khung ảnh */
-        z-index: 15;
+    /* Trên Mobile, bắt buộc tất cả cờ bay sang phải (như Layout Left) */
+    .art-ribbon-3d-flag {
+        left: -10px !important; right: auto !important;
+        padding-left: 25px !important; padding-right: 30px !important;
+        clip-path: polygon(0 0, 100% 0, calc(100% - 15px) 50%, 100% 100%, 0 100%) !important;
+        filter: drop-shadow(2px 6px 6px rgba(0,0,0,0.15));
     }
-
-    /* Ép tất cả ruy băng về kiểu Layout Left trên Mobile */
-    .lux-ribbon-front {
-        left: -8px !important; right: auto !important;
-        border-radius: 0 20px 20px 0 !important; /* Vuốt đuôi sang phải */
-        padding: 10px 20px !important;
-        font-size: 1rem !important;
-    }
-    .lux-ribbon-fold {
-        left: -20px !important; right: auto !important;
+    .art-ribbon-3d-flag::before {
+        left: 0 !important; right: auto !important;
         clip-path: polygon(100% 0, 0 0, 100% 100%) !important;
     }
-    
-    /* Ẩn đường cong nối trên mobile vì layout dọc đã sát nhau */
-    .lux-curved-tail { display: none; }
+    .art-image-anchor-dot { left: -7px !important; right: auto !important; }
 
-    .lux-img-frame {
-        width: 200px; height: 200px;
-        margin-bottom: 20px;
+    .art-img-wrapper-3d {
+        width: 180px; height: 180px;
+        border-width: 8px;
+        margin-bottom: 25px;
     }
     
-    .lux-anchor-ring { display: none; } /* Bỏ ring trên mobile cho gọn */
-
-    .lux-text-block {
-        padding: 20px;
+    .art-text-block {
+        padding: 25px;
         background: transparent;
-        border: none;
         box-shadow: none;
-        border-left: 3px solid var(--c-main);
+        border-left: 4px solid var(--c-main);
         border-radius: 0;
     }
+    .art-title { font-size: 1.6rem; }
 }
