@@ -1029,3 +1029,196 @@ body {
         height: 48px;
     }
 }
+
+/* ============================================================
+   WEDDING TIMELINE UI - DROPDOWN / ACCORDION STYLE
+============================================================ */
+
+.task-management-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    width: 100%;
+    padding: 20px 0;
+}
+
+/* Category Container */
+.task-categories-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.task-category-card {
+    background: #ffffff;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.task-category-header {
+    background-color: #F9FAFB;
+    padding: 16px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+    transition: background-color 0.2s;
+}
+
+.task-category-card:has(.task-category-body) .task-category-header {
+    border-bottom-color: #E5E7EB;
+}
+
+.task-category-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    flex: 1;
+}
+
+.dropdown-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+    color: #6B7280;
+}
+
+.dropdown-icon svg {
+    transform: rotate(-90deg); /* Mặc định trỏ sang phải */
+}
+
+.dropdown-icon.expanded {
+    transform: rotate(90deg); /* Trỏ xuống dưới khi mở */
+}
+
+.task-category-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.task-category-counter {
+    font-size: 14px;
+    color: #6B7280;
+    font-weight: 500;
+}
+
+/* SubTasks Body */
+.task-category-body {
+    padding: 16px 20px;
+    background-color: #ffffff;
+}
+
+.subtasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.subtask-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background-color: #F3F4F6;
+    border-radius: 6px;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.subtask-item:hover {
+    background-color: #EFF6FF;
+    border-color: #BFDBFE;
+}
+
+.subtask-item.completed {
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.subtask-checkbox {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 2px solid #D1D5DB;
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
+    cursor: pointer;
+    color: white;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.subtask-item.completed .subtask-checkbox {
+    background-color: #10B981;
+    border-color: #10B981;
+}
+
+.subtask-content {
+    flex: 1;
+}
+
+.subtask-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #374151;
+    cursor: text;
+}
+
+.subtask-item.completed .subtask-title {
+    text-decoration: line-through;
+    color: #9CA3AF;
+}
+
+.subtask-delete-btn {
+    opacity: 0;
+    color: #EF4444;
+}
+
+.subtask-item:hover .subtask-delete-btn {
+    opacity: 1;
+}
+
+/* Form Add SubTask */
+.subtask-add-form {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    padding-left: 40px; /* Thụt vào bằng hàng với text subtask */
+}
+
+.subtask-add-input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px dashed #D1D5DB;
+    background: transparent;
+    padding: 8px 0;
+    font-size: 14px;
+    outline: none;
+    color: #111827;
+}
+
+.subtask-add-input:focus {
+    border-bottom-color: rgb(39, 84, 138);
+}
+
+.subtask-add-btn {
+    background: none;
+    border: none;
+    color: rgb(39, 84, 138);
+    font-weight: 600;
+    cursor: pointer;
+    padding: 8px 16px;
+}
+
+.subtask-add-btn:disabled {
+    color: #9CA3AF;
+    cursor: not-allowed;
+}

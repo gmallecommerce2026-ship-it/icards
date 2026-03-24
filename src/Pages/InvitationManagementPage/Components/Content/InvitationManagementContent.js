@@ -1955,17 +1955,29 @@ const InvitationDashboard = ({ invitation, onTabClick }) => {
 };
 
 const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) => {
-    const [tasks, setTasks] = useState(initialTasks);
-    const [newTaskTitle, setNewTaskTitle] = useState('');
-    const [editingTaskId, setEditingTaskId] = useState(null);
-    const [editTitle, setEditTitle] = useState('');
+    // Tự động Migration: Nếu dữ liệu cũ là mảng phẳng, bọc nó vào 1 category mặc định
+    const [tasks, setTasks] = useState(() => {
+        if (initialTasks.length > 0 && !initialTasks[0].subTasks) {
+            return [{
+                id: 'legacy-category',
+                title: 'Công việc chung (Dữ liệu cũ)',
+                isExpanded: true,
+                subTasks: initialTasks
+            }];
+        }
+        return initialTasks;
+    });
+
+    const [newCategoryTitle, setNewCategoryTitle] = useState('');
+    const [newSubTaskTitles, setNewSubTaskTitles] = useState({});
     
-    // Drag & Drop refs
-    const dragItem = useRef();
-    const dragOverItem = useRef();
+    // Trạng thái edit
+    const [editingItem, setEditingItem] = useState(null); // { catId, taskId, title }
 
     useEffect(() => {
-        setTasks(initialTasks);
+        if (initialTasks.length > 0 && initialTasks[0].subTasks) {
+            setTasks(initialTasks);
+        }
     }, [initialTasks]);
 
     const saveTasksToDB = async (updatedTasks) => {
@@ -1977,70 +1989,119 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
         }
     };
 
-    const handleAddTask = (e) => {
+    // --- QUẢN LÝ CATEGORY (TÁC LỚN) ---
+    const handleAddCategory = (e) => {
         e.preventDefault();
-        if (!newTaskTitle.trim()) return;
-        const newTask = { id: Date.now().toString(), title: newTaskTitle, completed: false };
-        
-        // Đã sửa lại: Đẩy task mới vào CUỐI danh sách
-        const updatedTasks = [...tasks, newTask]; 
+        if (!newCategoryTitle.trim()) return;
+        const newCat = { id: Date.now().toString(), title: newCategoryTitle, isExpanded: true, subTasks: [] };
+        const updatedTasks = [...tasks, newCat];
         
         setTasks(updatedTasks);
         saveTasksToDB(updatedTasks);
-        setNewTaskTitle('');
+        setNewCategoryTitle('');
     };
 
-    const handleToggleComplete = (taskId) => {
-        const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, completed: !t.completed } : t);
+    const handleDeleteCategory = (catId) => {
+        const updatedTasks = tasks.filter(c => c.id !== catId);
         setTasks(updatedTasks);
         saveTasksToDB(updatedTasks);
     };
 
-    const handleDeleteTask = (taskId) => {
-        const updatedTasks = tasks.filter(t => t.id !== taskId);
+    const handleToggleExpand = (catId) => {
+        const updatedTasks = tasks.map(c => c.id === catId ? { ...c, isExpanded: !c.isExpanded } : c);
         setTasks(updatedTasks);
         saveTasksToDB(updatedTasks);
     };
 
-    const startEditing = (task) => {
-        setEditingTaskId(task.id);
-        setEditTitle(task.title);
-    };
+    // --- QUẢN LÝ SUB-TASK (TÁC CON) ---
+    const handleAddSubTask = (e, catId) => {
+        e.preventDefault();
+        const title = newSubTaskTitles[catId];
+        if (!title?.trim()) return;
 
-    const handleSaveEdit = (taskId) => {
-        if (!editTitle.trim()) return setEditingTaskId(null);
-        const updatedTasks = tasks.map(t => t.id === taskId ? { ...t, title: editTitle } : t);
+        const updatedTasks = tasks.map(cat => {
+            if (cat.id === catId) {
+                return {
+                    ...cat,
+                    subTasks: [...cat.subTasks, { id: Date.now().toString(), title, completed: false }]
+                };
+            }
+            return cat;
+        });
+
         setTasks(updatedTasks);
         saveTasksToDB(updatedTasks);
-        setEditingTaskId(null);
+        setNewSubTaskTitles(prev => ({ ...prev, [catId]: '' }));
     };
 
-    // --- Drag & Drop Handlers ---
-    const dragStart = (e, position) => {
-        dragItem.current = position;
-        e.target.classList.add('dragging');
+    const handleToggleComplete = (catId, taskId) => {
+        const updatedTasks = tasks.map(cat => {
+            if (cat.id === catId) {
+                return {
+                    ...cat,
+                    subTasks: cat.subTasks.map(st => st.id === taskId ? { ...st, completed: !st.completed } : st)
+                };
+            }
+            return cat;
+        });
+        setTasks(updatedTasks);
+        saveTasksToDB(updatedTasks);
     };
 
-    const dragEnter = (e, position) => {
-        dragOverItem.current = position;
+    const handleDeleteSubTask = (catId, taskId) => {
+        const updatedTasks = tasks.map(cat => {
+            if (cat.id === catId) {
+                return { ...cat, subTasks: cat.subTasks.filter(st => st.id !== taskId) };
+            }
+            return cat;
+        });
+        setTasks(updatedTasks);
+        saveTasksToDB(updatedTasks);
     };
 
-    const dragEnd = (e) => {
-        e.target.classList.remove('dragging');
+    // --- EDITING ---
+    const startEditing = (catId, taskId, currentTitle) => {
+        setEditingItem({ catId, taskId, title: currentTitle });
     };
 
-    // Calculate progress
-    const completedCount = tasks.filter(t => t.completed).length;
-    const progress = tasks.length === 0 ? 0 : Math.round((completedCount / tasks.length) * 100);
+    const handleSaveEdit = () => {
+        if (!editingItem || !editingItem.title.trim()) {
+            setEditingItem(null);
+            return;
+        }
+
+        const updatedTasks = tasks.map(cat => {
+            if (cat.id === editingItem.catId) {
+                if (!editingItem.taskId) { // Edit Category
+                    return { ...cat, title: editingItem.title };
+                } else { // Edit SubTask
+                    return {
+                        ...cat,
+                        subTasks: cat.subTasks.map(st => st.id === editingItem.taskId ? { ...st, title: editingItem.title } : st)
+                    };
+                }
+            }
+            return cat;
+        });
+
+        setTasks(updatedTasks);
+        saveTasksToDB(updatedTasks);
+        setEditingItem(null);
+    };
+
+    // --- TÍNH TOÁN PROGRESS ---
+    const totalTasks = tasks.reduce((sum, cat) => sum + cat.subTasks.length, 0);
+    const completedTasks = tasks.reduce((sum, cat) => sum + cat.subTasks.filter(st => st.completed).length, 0);
+    const progress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
     return (
         <div className="task-management-wrapper">
-            {/* 1. Header & Progress - Style chuẩn design system */}
+            {/* 1. Header & Progress */}
             <div className="task-progress-card">
                 <div className="task-progress-header">
                     <h3 className="task-progress-title">Tiến độ chuẩn bị cưới</h3>
                     <div className="task-progress-badge">
-                        <span>{completedCount}</span> / {tasks.length} hoàn thành
+                        <span>{completedTasks}</span> / {totalTasks} hoàn thành
                     </div>
                 </div>
                 <div className="task-progress-track">
@@ -2048,84 +2109,121 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
                 </div>
             </div>
 
-            {/* 2. Thêm mới Task */}
-            <form onSubmit={handleAddTask} className="task-add-form">
+            {/* 2. Thêm nhóm công việc mới (Category) */}
+            <form onSubmit={handleAddCategory} className="task-add-form">
                 <div className="task-input-wrapper">
                     <input 
                         type="text" 
-                        value={newTaskTitle} 
-                        onChange={(e) => setNewTaskTitle(e.target.value)} 
-                        placeholder="Thêm công việc mới (VD: Đặt cọc nhà hàng, Thử váy cưới...)" 
+                        value={newCategoryTitle} 
+                        onChange={(e) => setNewCategoryTitle(e.target.value)} 
+                        placeholder="Thêm Nhóm công việc lớn (VD: Đặt tiệc, Chụp ảnh cưới...)" 
                         className="task-add-input"
                     />
-                    <button type="submit" className="task-add-submit-btn" disabled={!newTaskTitle.trim()}>
-                        <AddIcon /> <span style={{marginLeft: '6px'}}>Thêm việc</span>
+                    <button type="submit" className="task-add-submit-btn" disabled={!newCategoryTitle.trim()}>
+                        <AddIcon /> <span style={{marginLeft: '6px'}}>Thêm Nhóm</span>
                     </button>
                 </div>
             </form>
 
-            {/* 3. Khung Timeline hiển thị danh sách công việc */}
-            <div className="timeline-container">
+            {/* 3. Danh sách công việc phân cấp */}
+            <div className="task-categories-container">
                 {tasks.length === 0 ? (
                     <div className="timeline-empty-state">
-                        <p>Chưa có công việc nào. Hãy thêm công việc mới để bắt đầu kế hoạch của bạn!</p>
+                        <p>Chưa có kế hoạch nào. Hãy thêm nhóm công việc để bắt đầu!</p>
                     </div>
                 ) : (
-                    tasks.map((task, index) => (
-                        <div 
-                            key={task.id}
-                            draggable
-                            onDragStart={(e) => dragStart(e, index)}
-                            onDragEnter={(e) => dragEnter(e, index)}
-                            onDragEnd={dragEnd}
-                            onDragOver={(e) => e.preventDefault()}
-                            className={`timeline-item ${task.completed ? 'completed' : ''}`}
-                        >
-                            {/* Đường thẳng kết nối (line) */}
-                            <div className="timeline-line"></div>
-
-                            {/* Node (Điểm mốc trên timeline) */}
-                            <div 
-                                className="timeline-node" 
-                                onClick={() => handleToggleComplete(task.id)}
-                            >
-                                {task.completed && <CheckIcon />}
-                            </div>
-
-                            {/* Nội dung Task Card */}
-                            <div className="timeline-card">
-                                <div className="timeline-card-content">
-                                    {editingTaskId === task.id ? (
-                                        <input 
-                                            autoFocus
-                                            value={editTitle}
-                                            onChange={(e) => setEditTitle(e.target.value)}
-                                            onBlur={() => handleSaveEdit(task.id)}
-                                            onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit(task.id)}
-                                            className="timeline-edit-input"
-                                        />
-                                    ) : (
-                                        <span 
-                                            onClick={() => startEditing(task)}
-                                            className="timeline-task-title"
-                                        >
-                                            {task.title}
-                                        </span>
-                                    )}
-                                </div>
-
-                                {/* Actions */}
-                                <div className="timeline-actions">
-                                    <div className="drag-handle" title="Kéo thả để sắp xếp">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    tasks.map(category => {
+                        const isCatEditing = editingItem?.catId === category.id && !editingItem?.taskId;
+                        
+                        return (
+                            <div key={category.id} className="task-category-card">
+                                {/* CATEGORY HEADER */}
+                                <div className="task-category-header">
+                                    <div className="task-category-header-left" onClick={() => handleToggleExpand(category.id)}>
+                                        <div className={`dropdown-icon ${category.isExpanded ? 'expanded' : ''}`}>
+                                            <BackArrowIcon /> 
+                                        </div>
+                                        {isCatEditing ? (
+                                            <input 
+                                                autoFocus
+                                                value={editingItem.title}
+                                                onChange={(e) => setEditingItem({...editingItem, title: e.target.value})}
+                                                onBlur={handleSaveEdit}
+                                                onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
+                                                onClick={e => e.stopPropagation()}
+                                                className="timeline-edit-input"
+                                            />
+                                        ) : (
+                                            <h4 className="task-category-title">{category.title}</h4>
+                                        )}
+                                        <span className="task-category-counter">({category.subTasks.length})</span>
                                     </div>
-                                    <button onClick={() => handleDeleteTask(task.id)} className="timeline-delete-btn table-action-btn" title="Xóa công việc">
-                                        <DeleteIcon width="18" height="18" />
-                                    </button>
+                                    
+                                    <div className="task-category-actions">
+                                        <button onClick={() => startEditing(category.id, null, category.title)} className="table-action-btn">
+                                            <EditIcon width="16" height="16" />
+                                        </button>
+                                        <button onClick={() => handleDeleteCategory(category.id)} className="table-action-btn timeline-delete-btn">
+                                            <DeleteIcon width="16" height="16" />
+                                        </button>
+                                    </div>
                                 </div>
+
+                                {/* CATEGORY BODY (SUB-TASKS) */}
+                                {category.isExpanded && (
+                                    <div className="task-category-body">
+                                        <div className="subtasks-list">
+                                            {category.subTasks.map(task => {
+                                                const isTaskEditing = editingItem?.catId === category.id && editingItem?.taskId === task.id;
+                                                return (
+                                                    <div key={task.id} className={`subtask-item ${task.completed ? 'completed' : ''}`}>
+                                                        <div className="subtask-checkbox" onClick={() => handleToggleComplete(category.id, task.id)}>
+                                                            {task.completed && <CheckIcon />}
+                                                        </div>
+                                                        
+                                                        <div className="subtask-content">
+                                                            {isTaskEditing ? (
+                                                                <input 
+                                                                    autoFocus
+                                                                    value={editingItem.title}
+                                                                    onChange={(e) => setEditingItem({...editingItem, title: e.target.value})}
+                                                                    onBlur={handleSaveEdit}
+                                                                    onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
+                                                                    className="timeline-edit-input"
+                                                                />
+                                                            ) : (
+                                                                <span className="subtask-title" onClick={() => startEditing(category.id, task.id, task.title)}>
+                                                                    {task.title}
+                                                                </span>
+                                                            )}
+                                                        </div>
+
+                                                        <button onClick={() => handleDeleteSubTask(category.id, task.id)} className="table-action-btn subtask-delete-btn">
+                                                            <CancelIcon />
+                                                        </button>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                        
+                                        {/* Thêm Sub-task Form */}
+                                        <form onSubmit={(e) => handleAddSubTask(e, category.id)} className="subtask-add-form">
+                                            <input 
+                                                type="text"
+                                                value={newSubTaskTitles[category.id] || ''}
+                                                onChange={e => setNewSubTaskTitles(prev => ({...prev, [category.id]: e.target.value}))}
+                                                placeholder="Thêm công việc chi tiết..."
+                                                className="subtask-add-input"
+                                            />
+                                            <button type="submit" disabled={!newSubTaskTitles[category.id]?.trim()} className="subtask-add-btn">
+                                                Lưu
+                                            </button>
+                                        </form>
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                    ))
+                        )
+                    })
                 )}
             </div>
         </div>
