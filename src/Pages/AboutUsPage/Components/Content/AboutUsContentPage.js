@@ -233,10 +233,10 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
                                     <div className="art-text-block">
                                         {/* Tiêu đề: Serif đậm, màu đồng bộ với cờ */}
                                         <h3 className="art-title" style={{ color: theme.main }}>
-                                            {event.title}
+                                            {story.title}
                                         </h3>
                                         {/* Mô tả: Sans-serif màu trung tính */}
-                                        <p className="art-desc">{event.description}</p>
+                                        <p className="art-desc">{story.description}</p>
                                     </div>
                                 </div>
                             </div>
