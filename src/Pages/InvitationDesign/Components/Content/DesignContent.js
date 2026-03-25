@@ -5318,11 +5318,15 @@ const WeddingInvitationEditor = () => {
         const cw = page.canvasWidth;
         const ch = page.canvasHeight;
         
+        // CẬP NHẬT MỚI: Reset lại toàn bộ transform data để ảnh fit hoàn hảo
         handleUpdateItem(id, {
             width: cw,
             height: ch,
-            x: 0,
-            y: 0,
+            x: 0,                 // Đưa về mép trái
+            y: 0,                 // Đưa về mép trên
+            rotation: 0,          // Reset góc xoay về 0 độ
+            shape: 'square',      // Đảm bảo không bị cắt tròn khi full canvas
+            imagePosition: { x: 0, y: 0, scale: 1 }, // Reset lại vị trí pan/crop bên trong PannableImageFrame
         }, true);
 
     }, [pages, currentPageId, handleUpdateItem]);

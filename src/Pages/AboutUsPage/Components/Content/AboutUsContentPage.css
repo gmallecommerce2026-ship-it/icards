@@ -2333,11 +2333,11 @@ END: STYLES MỚI
 .art-ribbon-front::before {
     content: ''; 
     position: absolute;
-    top: 100%; /* Rớt xuống từ mép dưới lá cờ trước */
-    width: 15px; /* Chiều rộng nếp gấp (bằng nửa cột) */
-    height: 18px; /* Độ dốc / độ sâu của nếp gấp */
-    background: var(--c-dark); /* Màu tối chìm vào trong */
-    filter: brightness(0.7); /* Tối thêm để tạo chiều sâu chân thực */
+    top: 100%;
+    width: 15px; 
+    height: 18px; 
+    background: var(--c-dark);
+    filter: brightness(0.7); 
 }
 
 /* --- MẶT SAU (CHUI SAU CỘT & ĐIỂM CHẤM) --- */
