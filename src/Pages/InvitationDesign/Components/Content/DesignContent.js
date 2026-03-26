@@ -2761,11 +2761,14 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
     const motionRotate = useMotionValue(item.rotation || 0);
 
     // // Dùng useEffect để đồng bộ motion values khi props thay đổi từ bên ngoài
-    // useEffect(() => {
-    //     motionX.set(item.x);
-    //     motionY.set(item.y);
-    //     motionRotate.set(item.rotation || 0);
-    // }, [item.x, item.y, item.rotation, motionX, motionY, motionRotate]);
+    useEffect(() => {
+        // Chỉ đồng bộ từ ngoài vào trong khi user KHÔNG phải đang dùng chuột kéo/xoay trực tiếp trên Canvas
+        if (!isTransforming) {
+            motionX.set(item.x);
+            motionY.set(item.y);
+            motionRotate.set(item.rotation || 0);
+        }
+    }, [item.x, item.y, item.rotation, isTransforming, motionX, motionY, motionRotate]);
 
 
     // --- BƯỚC 3: Cập nhật handleDragStart ---
