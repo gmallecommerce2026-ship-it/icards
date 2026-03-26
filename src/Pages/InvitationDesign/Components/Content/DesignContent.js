@@ -2503,7 +2503,7 @@ const PannableImageFrame = ({ item, onUpdateItem, onSelectItem }) => {
   const imageStyles = {
     width: '100%',
     height: '100%',
-    objectFit: 'cover',
+    objectFit: 'fill',
     userSelect: 'none',
     pointerEvents: isEditing ? 'auto' : 'none', 
     touchAction: 'none',
@@ -5380,36 +5380,43 @@ const WeddingInvitationEditor = () => {
                     ctx.filter = filterString;
 
                     // 3. Tính toán kích thước "object-fit: cover"
-                    const frameRatio = item.width / item.height;
-                    const imgRatio = img.naturalWidth / img.naturalHeight;
+                    // const frameRatio = item.width / item.height;
+                    // const imgRatio = img.naturalWidth / img.naturalHeight;
                     
-                    let drawWidth, drawHeight;
-                    if (imgRatio > frameRatio) {
-                        // Ảnh rộng hơn khung
-                        drawHeight = item.height;
-                        drawWidth = drawHeight * imgRatio;
-                    } else {
-                        // Ảnh cao hơn khung
-                        drawWidth = item.width;
-                        drawHeight = drawWidth / imgRatio;
-                    }
+                    // let drawWidth, drawHeight;
+                    // if (imgRatio > frameRatio) {
+                    //     // Ảnh rộng hơn khung
+                    //     drawHeight = item.height;
+                    //     drawWidth = drawHeight * imgRatio;
+                    // } else {
+                    //     // Ảnh cao hơn khung
+                    //     drawWidth = item.width;
+                    //     drawHeight = drawWidth / imgRatio;
+                    // }
 
-                    // 4. Lấy vị trí pan/scan
-                    const posX = (item.imagePosition?.x || 0);
-                    const posY = (item.imagePosition?.y || 0);
+                    // // 4. Lấy vị trí pan/scan
+                    // const posX = (item.imagePosition?.x || 0);
+                    // const posY = (item.imagePosition?.y || 0);
                     
-                    // 5. Tính toán vị trí vẽ (drawX, drawY)
-                    // Căn giữa ảnh (đã "cover") sau đó áp dụng vị trí pan/scan
-                    const drawX = item.x - (drawWidth - item.width) / 2 + posX;
-                    const drawY = item.y - (drawHeight - item.height) / 2 + posY;
+                    // // 5. Tính toán vị trí vẽ (drawX, drawY)
+                    // // Căn giữa ảnh (đã "cover") sau đó áp dụng vị trí pan/scan
+                    // const drawX = item.x - (drawWidth - item.width) / 2 + posX;
+                    // const drawY = item.y - (drawHeight - item.height) / 2 + posY;
 
-                    // 6. Vẽ ảnh đã được tính toán
+                    // // 6. Vẽ ảnh đã được tính toán
+                    // ctx.drawImage(
+                    //     img,
+                    //     drawX, 
+                    //     drawY,
+                    //     drawWidth,
+                    //     drawHeight
+                    // );
                     ctx.drawImage(
                         img,
-                        drawX, 
-                        drawY,
-                        drawWidth,
-                        drawHeight
+                        item.x, 
+                        item.y,
+                        item.width,
+                        item.height
                     );
                     
 
