@@ -2749,21 +2749,24 @@ const UserImageManager = ({ userImages, onSelectUserImage, onImageUploaded, isUp
 
 
 
-const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onSelectItem, zoomLevel, snapToGrid, gridSize, allItems, onSetSnapLines, snapToObject, children, canvasRef, id }) => {    const itemRef = useRef(null);
+const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onSelectItem, zoomLevel, snapToGrid, gridSize, allItems, onSetSnapLines, snapToObject, children, canvasRef, id }) => {    
+    const itemRef = useRef(null);
     const isLocked = item.locked;
     const [isTransforming, setIsTransforming] = useState(false);
     
-    // --- BƯỚC 1: Thêm ref để lưu vị trí bắt đầu kéo ---
+    // 1. THÊM REF NÀY: Dùng làm cờ chặn xung đột render
+    const isDraggingRef = useRef(false);
+    
     const dragStartPos = useRef({ x: 0, y: 0 });
 
     const motionX = useMotionValue(item.x);
     const motionY = useMotionValue(item.y);
     const motionRotate = useMotionValue(item.rotation || 0);
 
-    // // Dùng useEffect để đồng bộ motion values khi props thay đổi từ bên ngoài
+    // 2. SỬA LẠI USEEFFECT NÀY
     useEffect(() => {
-        // Chỉ đồng bộ từ ngoài vào trong khi user KHÔNG phải đang dùng chuột kéo/xoay trực tiếp trên Canvas
-        if (!isTransforming) {
+        // CHỈ đồng bộ từ State cha xuống nếu KHÔNG PHẢI đang kéo (drag) hoặc transform
+        if (!isTransforming && !isDraggingRef.current) {
             motionX.set(item.x);
             motionY.set(item.y);
             motionRotate.set(item.rotation || 0);
@@ -2771,15 +2774,15 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
     }, [item.x, item.y, item.rotation, isTransforming, motionX, motionY, motionRotate]);
 
 
-    // --- BƯỚC 3: Cập nhật handleDragStart ---
+    // 3. CẬP NHẬT HANDLE DRAG START
     const handleDragStart = (e, info) => {
         if (isLocked || isTransforming) return;
+        isDraggingRef.current = true; // Bật cờ báo hiệu đang kéo
         dragStartPos.current = { x: item.x, y: item.y };
         onSelectItem(item.id);
     };
 
-
-    // --- BƯỚC 4: Thêm hàm handleDrag từ phiên bản Admin ---
+    // 4. GIỮ NGUYÊN HOẶC CẬP NHẬT HANDLE DRAG
     const handleDrag = (e, info) => {
         if (isLocked || isTransforming) return;
         let newX = dragStartPos.current.x + info.offset.x / zoomLevel;
@@ -2797,7 +2800,7 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
         onSetSnapLines(guides);
     };
     
-    // --- BƯỚC 5: Cập nhật handleDragEnd ---
+    // 5. CẬP NHẬT HANDLE DRAG END
     const handleDragEnd = (e, info) => {
         if (isLocked || isTransforming) return;
         let finalX = dragStartPos.current.x + info.offset.x / zoomLevel;
@@ -2812,8 +2815,21 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
             finalY = Math.round(finalY / gridSize) * gridSize;
         }
 
+        // Chốt cứng vị trí trên UI bằng framer-motion để không bị giật
+        motionX.set(finalX);
+        motionY.set(finalY);
+        
         onSetSnapLines([]);
+        
+        // Bắn action update lên Global state cha
         onUpdateItem(item.id, { x: finalX, y: finalY }, true);
+
+        // QUAN TRỌNG NHẤT: Trì hoãn việc tắt cờ drag
+        // Giữ cờ true thêm 100ms để đợi React cập nhật cây DOM và State cha hoàn tất.
+        // Điều này triệt tiêu hoàn toàn lỗi useEffect kéo data cũ xuống gây giật hình.
+        setTimeout(() => {
+            isDraggingRef.current = false;
+        }, 100);
     };
 
     // createResizeHandler và handleRotateStart giữ nguyên không đổi...
