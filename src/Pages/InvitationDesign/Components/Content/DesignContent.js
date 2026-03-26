@@ -2894,7 +2894,8 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
             const newCenterY = startCenterY + rotatedShiftY;
             const newX = newCenterX - newWidth / 2;
             const newY = newCenterY - newHeight / 2;
-            
+            motionX.set(newX);
+            motionY.set(newY);
             const newProps = {
                 width: newWidth,
                 height: newHeight,
