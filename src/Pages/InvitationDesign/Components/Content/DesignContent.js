@@ -3444,61 +3444,6 @@ const ImagePropertyEditor = ({ item, onUpdate, onScaleToCanvas }) => {
                 </Grid>
             </Grid>
             <Box>
-                <Typography gutterBottom variant="body2" color="text.secondary">
-                    Hình dạng Khung
-                </Typography>
-                <ToggleButtonGroup
-                    value={item.shape || 'square'}
-                    exclusive
-                    onChange={(_e, newShape) => {
-                        if (newShape) onUpdate(item.id, { shape: newShape }, true);
-                    }}
-                    aria-label="shape"
-                    size="medium" 
-                    fullWidth
-                    sx={{
-                        // Style tùy chỉnh để căn giữa icon và text
-                        '& .MuiToggleButton-root': {
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 1,
-                            py: 1.5,
-                            textTransform: 'none',
-                            border: '1px solid rgba(0, 0, 0, 0.12)'
-                        },
-                        '& .Mui-selected': {
-                            backgroundColor: 'rgba(59, 130, 246, 0.1) !important', // Màu nền nhẹ khi active (theo theme xanh của bạn)
-                            color: '#3B82F6 !important', // Màu icon khi active
-                            borderColor: '#3B82F6 !important'
-                        }
-                    }}
-                >
-                    <ToggleButton value="square" aria-label="vuông" sx={{ flex: 1 }}>
-                        {/* Minh họa Khung Vuông bằng CSS */}
-                        <Box sx={{
-                            width: 36,
-                            height: 36,
-                            border: '2px solid currentColor', // Dùng currentColor để ăn theo màu text của nút
-                            borderRadius: '4px', // Bo góc nhẹ cho hiện đại
-                            bgcolor: 'transparent',
-                            transition: 'all 0.2s'
-                        }} />
-                        <Typography variant="caption" sx={{ fontWeight: 500 }}>Hình Vuông</Typography>
-                    </ToggleButton>
-
-                    <ToggleButton value="circle" aria-label="tròn" sx={{ flex: 1 }}>
-                        {/* Minh họa Khung Tròn bằng CSS */}
-                        <Box sx={{
-                            width: 36,
-                            height: 36,
-                            border: '2px solid currentColor',
-                            borderRadius: '50%', // Bo tròn hoàn toàn
-                            bgcolor: 'transparent',
-                            transition: 'all 0.2s'
-                        }} />
-                        <Typography variant="caption" sx={{ fontWeight: 500 }}>Hình Tròn</Typography>
-                    </ToggleButton>
-                </ToggleButtonGroup>
             </Box>
             <Box>
                 <Typography gutterBottom variant="body2" color="text.secondary">Xoay (độ)</Typography>
