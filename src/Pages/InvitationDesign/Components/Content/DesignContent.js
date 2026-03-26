@@ -1558,6 +1558,7 @@ const SimplifiedStoryEditor = ({ fieldKey, settings, onUpdate, customFonts }) =>
                 label="Nội dung"
                 value={item.content}
                 onChange={(e) => handleUpdate({ content: e.target.value })}
+                onFocus={(e) => e.target.select()}
                 fullWidth
                 multiline
                 rows={4}
@@ -1977,6 +1978,7 @@ const SettingsPropertyEditor = ({ selectedKey, settings, setSettings, customFont
                     rows={meta.type === 'textarea' ? 4 : 1}
                     value={value}
                     onChange={(e) => handleUpdate(selectedKey, { content: e.target.value })}
+                    onFocus={(e) => e.target.select()}
                 />;
             case 'select':
                 return <FormControl fullWidth>
@@ -3138,6 +3140,7 @@ const TextEditor = (props) => {
                     onBlur={handleBlur}
                     onKeyDown={handleKeyDown}
                     onClick={(e) => e.stopPropagation()}
+                    onFocus={(e) => e.target.select()}
                     style={{
                         ...textStyle,
                         resize: 'none',
@@ -3281,6 +3284,7 @@ const TextPropertyEditor = ({ item, onUpdate, customFonts }) => {
                 value={item.content}
                 onChange={(e) => onUpdate(item.id, { content: e.target.value.slice(0, MAX_TEXT_LENGTH) }, false)}
                 onBlur={() => onUpdate(item.id, {}, true)}
+                onFocus={(e) => e.target.select()}
                 fullWidth margin="none" size="small" variant="outlined" multiline rows={3}
                 inputProps={{ maxLength: MAX_TEXT_LENGTH }}
             />
