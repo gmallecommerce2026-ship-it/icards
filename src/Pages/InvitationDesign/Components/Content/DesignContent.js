@@ -1497,7 +1497,6 @@ const EventForm = ({ itemData, setItemData, onSave, onCancel, onRemove }) => {
 };
 const SimplifiedStoryEditor = ({ fieldKey, settings, onUpdate, customFonts }) => {
     const theme = useTheme();
-    // Thêm state filter
     const [fontFilter, setFontFilter] = useState('All');
 
     const item = {
@@ -1505,6 +1504,17 @@ const SimplifiedStoryEditor = ({ fieldKey, settings, onUpdate, customFonts }) =>
         content: _.get(settings, fieldKey, ''),
         ..._.get(settings, `${fieldKey}Style`, {})
     };
+
+    // --- 1. BỔ SUNG PROXY STATE TẠI ĐÂY ---
+    const [isFocused, setIsFocused] = useState(false);
+    const [localContent, setLocalContent] = useState(item.content);
+
+    // Sync lại khi data bên ngoài thay đổi (Undo/Redo)
+    useEffect(() => {
+        if (!isFocused) setLocalContent(item.content);
+    }, [item.content, isFocused]);
+    // -------------------------------------
+
     const handleUpdate = (updates) => {
         onUpdate(fieldKey, updates);
     };
@@ -1556,9 +1566,19 @@ const SimplifiedStoryEditor = ({ fieldKey, settings, onUpdate, customFonts }) =>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
                 label="Nội dung"
-                value={item.content}
-                onChange={(e) => handleUpdate({ content: e.target.value })}
-                onFocus={(e) => e.target.select()}
+                // --- 2. THAY ĐỔI CÁCH RENDER TEXTFIELD ---
+                placeholder={item.content} // Data có sẵn nay trở thành placeholder mờ
+                value={isFocused && localContent === item.content ? '' : localContent}
+                onChange={(e) => setLocalContent(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => {
+                    setIsFocused(false);
+                    // Trả lại data cũ nếu user xoá trắng rồi click ra ngoài
+                    const finalValue = localContent.trim() === '' ? item.content : localContent;
+                    setLocalContent(finalValue);
+                    handleUpdate({ content: finalValue });
+                }}
+                // -----------------------------------------
                 fullWidth
                 multiline
                 rows={4}
@@ -3042,8 +3062,21 @@ const TextEditor = (props) => {
     const inputRef = useRef(null);
     const measureRef = useRef(null); 
     const isLocked = item.locked;
-    const isCustomWidth = item.isCustomWidth || false; // Cờ kiểm tra xem user đã kéo tay chưa
-    
+    const isCustomWidth = item.isCustomWidth || false; 
+
+    // --- 1. THÊM LOGIC LƯU TRỮ VÀ CLEAR DATA KHI FOCUS ---
+    const originalContent = useRef(item.content);
+
+    const handleFocus = () => {
+        originalContent.current = item.content; // Lưu lại data phòng khi user xoá trắng
+        onUpdateItem(item.id, { content: '' }, false); // Cố tình xoá value để hiện placeholder
+    };
+
+    const handleBlur = () => {
+        // Khôi phục data cũ nếu lúc thoát ra value đang rỗng
+        const finalContent = item.content.trim() === '' ? originalContent.current : item.content;
+        onUpdateItem(item.id, { isEditing: false, content: finalContent }, true);
+    };
     const textStyle = {
         fontSize: `${item.fontSize || 16}px`,
         fontFamily: item.fontFamily || 'Arial',
@@ -3062,7 +3095,6 @@ const TextEditor = (props) => {
         backgroundColor: 'transparent',
     };
 
-    const handleBlur = () => onUpdateItem(item.id, { isEditing: false }, true);
     
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -3135,12 +3167,15 @@ const TextEditor = (props) => {
             {item.isEditing && !isLocked ? (
                 <textarea
                     ref={inputRef}
+                    // --- 2. CẬP NHẬT PROPS CHO TEXTAREA ---
+                    placeholder={originalContent.current} // Data có sẵn hiện lên dưới dạng mờ
                     value={item.content}
                     onChange={(e) => onUpdateItem(item.id, { content: e.target.value.slice(0, MAX_TEXT_LENGTH) }, false)}
                     onBlur={handleBlur}
+                    onFocus={handleFocus} // Gọi hàm handleFocus thay vì e.target.select()
                     onKeyDown={handleKeyDown}
                     onClick={(e) => e.stopPropagation()}
-                    onFocus={(e) => e.target.select()}
+                    // --------------------------------------
                     style={{
                         ...textStyle,
                         resize: 'none',
