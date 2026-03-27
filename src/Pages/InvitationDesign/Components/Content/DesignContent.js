@@ -2754,7 +2754,7 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
     const isLocked = item.locked;
     const [isTransforming, setIsTransforming] = useState(false);
     
-    // 1. THÊM REF NÀY: Cờ chặn React useEffect ghi đè vị trí khi đang kéo
+    // 1. THÊM REF NÀY: Dùng làm cờ chặn xung đột render
     const isDraggingRef = useRef(false);
     
     const dragStartPos = useRef({ x: 0, y: 0 });
@@ -2763,8 +2763,9 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
     const motionY = useMotionValue(item.y);
     const motionRotate = useMotionValue(item.rotation || 0);
 
-    // 2. SỬA USEEFFECT: Chặn đồng bộ ngược từ trên xuống nếu đang kéo
+    // 2. SỬA LẠI USEEFFECT NÀY
     useEffect(() => {
+        // CHỈ đồng bộ từ State cha xuống nếu KHÔNG PHẢI đang kéo (drag) hoặc transform
         if (!isTransforming && !isDraggingRef.current) {
             motionX.set(item.x);
             motionY.set(item.y);
@@ -2772,22 +2773,18 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
         }
     }, [item.x, item.y, item.rotation, isTransforming, motionX, motionY, motionRotate]);
 
-    // 3. ĐỔI onDragStart THÀNH onPanSessionStart
-    const handlePanStart = (e, info) => {
-        if (isLocked || isTransforming || item.isEditing) return;
-        
-        isDraggingRef.current = true; // Bật cờ khóa re-render
-        
-        // QUAN TRỌNG: Lấy tọa độ realtime từ motion value thay vì item.x để tránh sai số frame đầu
-        dragStartPos.current = { x: motionX.get(), y: motionY.get() }; 
-        
+
+    // 3. CẬP NHẬT HANDLE DRAG START
+    const handleDragStart = (e, info) => {
+        if (isLocked || isTransforming) return;
+        isDraggingRef.current = true; // Bật cờ báo hiệu đang kéo
+        dragStartPos.current = { x: item.x, y: item.y };
         onSelectItem(item.id);
     };
 
-    // 4. ĐỔI onDrag THÀNH onPan
-    const handlePan = (e, info) => {
-        if (isLocked || isTransforming || !isDraggingRef.current) return;
-        
+    // 4. GIỮ NGUYÊN HOẶC CẬP NHẬT HANDLE DRAG
+    const handleDrag = (e, info) => {
+        if (isLocked || isTransforming) return;
         let newX = dragStartPos.current.x + info.offset.x / zoomLevel;
         let newY = dragStartPos.current.y + info.offset.y / zoomLevel;
 
@@ -2803,12 +2800,11 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
         onSetSnapLines(guides);
     };
     
-    // 5. ĐỔI onDragEnd THÀNH onPanEnd
-    const handlePanEnd = (e, info) => {
-        if (isLocked || isTransforming || !isDraggingRef.current) return;
-        
-        let finalX = motionX.get();
-        let finalY = motionY.get();
+    // 5. CẬP NHẬT HANDLE DRAG END
+    const handleDragEnd = (e, info) => {
+        if (isLocked || isTransforming) return;
+        let finalX = dragStartPos.current.x + info.offset.x / zoomLevel;
+        let finalY = dragStartPos.current.y + info.offset.y / zoomLevel;
 
         const snapResult = calculateSnapping({ ...item, x: finalX, y: finalY }, allItems, zoomLevel);
         if (snapResult.guides.length > 0 && snapToObject) {
@@ -2819,17 +2815,21 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
             finalY = Math.round(finalY / gridSize) * gridSize;
         }
 
+        // Chốt cứng vị trí trên UI bằng framer-motion để không bị giật
         motionX.set(finalX);
         motionY.set(finalY);
+        
         onSetSnapLines([]);
         
-        // Lưu trạng thái lên State tổng
+        // Bắn action update lên Global state cha
         onUpdateItem(item.id, { x: finalX, y: finalY }, true);
 
-        // DELAY TẮT CỜ: Đợi React render xong (khoảng 50ms) mới tắt cờ, triệt tiêu hoàn toàn giật hình
+        // QUAN TRỌNG NHẤT: Trì hoãn việc tắt cờ drag
+        // Giữ cờ true thêm 100ms để đợi React cập nhật cây DOM và State cha hoàn tất.
+        // Điều này triệt tiêu hoàn toàn lỗi useEffect kéo data cũ xuống gây giật hình.
         setTimeout(() => {
             isDraggingRef.current = false;
-        }, 50);
+        }, 100);
     };
 
     // createResizeHandler và handleRotateStart giữ nguyên không đổi...
@@ -5294,6 +5294,7 @@ const WeddingInvitationEditor = () => {
             shape: 'square',      // Đảm bảo không bị cắt viền tròn 
             imagePosition: { x: 0, y: 0, scale: 1 }, // Reset lại vị trí pan/crop bên trong PannableImageFrame
         }, true); // true để lưu vào History (Undo/Redo)
+
 
     }, [currentPage, handleUpdateItem]);
 
