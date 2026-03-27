@@ -5274,27 +5274,28 @@ const WeddingInvitationEditor = () => {
     const handleToggleLayerVisibility = (id) => { const i = currentItems.find(it => it.id === id); if (i) handleUpdateItem(id, { visible: !(i.visible ?? true) }, true); };
     const handleToggleLayerLock = (id) => { const i = currentItems.find(it => it.id === id); if (i) handleUpdateItem(id, { locked: !i.locked }, true); };
     const handleScaleImageToFit = useCallback((id) => {
-        const page = pages.find(p => p.id === currentPageId);
-        if (!page || !id) return;
+        // 1. Dùng biến currentPage đã được memoize sẵn thay vì find thủ công trên mảng pages
+        if (!currentPage || !id) return;
 
-        const item = page.items.find(i => i.id === id);
+        const item = currentPage.items.find(i => i.id === id);
         if (!item || item.type !== 'image' || !item.url) return;
 
-        const cw = page.canvasWidth;
-        const ch = page.canvasHeight;
+        // 2. FIX QUAN TRỌNG: Thêm Fallback chống undefined để tránh sập UI trong Framer Motion
+        const safeWidth = currentPage.canvasWidth || DEFAULT_CANVAS_WIDTH || 800;
+        const safeHeight = currentPage.canvasHeight || DEFAULT_CANVAS_HEIGHT || 600;
         
-        // CẬP NHẬT MỚI: Reset lại toàn bộ transform data để ảnh fit hoàn hảo
+        // 3. Gọi hàm update đẩy React State và Framer Motion render lại
         handleUpdateItem(id, {
-            width: cw,
-            height: ch,
-            x: 0,                 // Đưa về mép trái
-            y: 0,                 // Đưa về mép trên
+            width: safeWidth,
+            height: safeHeight,
+            x: 0,                 // Ép sát lề trái
+            y: 0,                 // Ép sát lề trên
             rotation: 0,          // Reset góc xoay về 0 độ
-            shape: 'square',      // Đảm bảo không bị cắt tròn khi full canvas
+            shape: 'square',      // Đảm bảo không bị cắt viền tròn 
             imagePosition: { x: 0, y: 0, scale: 1 }, // Reset lại vị trí pan/crop bên trong PannableImageFrame
-        }, true);
+        }, true); // true để lưu vào History (Undo/Redo)
 
-    }, [pages, currentPageId, handleUpdateItem]);
+    }, [currentPage, handleUpdateItem]);
 
     const handleSidebarItemClick = useCallback((itemData) => {
         // --- THÊM LOGIC ĐỂ CHỌN ẢNH VÀO SETTING ---
