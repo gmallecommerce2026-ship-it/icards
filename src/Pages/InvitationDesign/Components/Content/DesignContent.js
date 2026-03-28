@@ -5403,7 +5403,10 @@ const WeddingInvitationEditor = () => {
     }, [snapLines, currentCanvasWidth, currentCanvasHeight, zoomLevel, currentPage]);
     // useEffect(() => { if (canvasWrapperRef.current) canvasWrapperRef.current.style.cursor = isPanning.current ? 'grabbing' : 'grab'; }, [isPanning.current]);
     const handleToggleLayerVisibility = (id) => { const i = currentItems.find(it => it.id === id); if (i) handleUpdateItem(id, { visible: !(i.visible ?? true) }, true); };
-    const handleToggleLayerLock = (id) => { const i = currentItems.find(it => it.id === id); if (i) handleUpdateItem(id, { locked: !i.locked }, true); };
+    const handleToggleLayerLock = useCallback((id) => { 
+        const i = currentItems.find(it => it.id === id); 
+        if (i) handleUpdateItem(id, { locked: !i.locked }, true); 
+    }, [currentItems, handleUpdateItem]);
     const handleScaleImageToFit = useCallback((id) => {
         // 1. Dùng biến currentPage đã được memoize sẵn thay vì find thủ công trên mảng pages
         if (!currentPage || !id) return;
