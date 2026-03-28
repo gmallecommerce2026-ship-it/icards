@@ -5,7 +5,7 @@ import { Navigate, Route, Routes, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from './Context/AuthContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import 'leaflet/dist/leaflet.css';
 // --- CSS ---
 import './App.css';
 import './tiptap-content.css'

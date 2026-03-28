@@ -15,6 +15,8 @@ import DraggableSidebarItem from "./DraggableSidebarItem"
 import { useDndMonitor } from '@dnd-kit/core';
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import CustomEditor from '../../../Components/CustomEditor.js'; 
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
 import {
     TextFields as TextFieldsIcon,
     Delete as DeleteIcon,
@@ -112,7 +114,15 @@ const triggerDownload = (uri, filename) => {
     link.click();
     document.body.removeChild(link);
 };
-
+const customIcon = new L.Icon({
+    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
 // Helper function for word wrapping on canvas
 const wrapText = (context, text, x, y, maxWidth, lineHeight, textAlign) => {
     const words = text.split(' ');
@@ -1923,16 +1933,37 @@ const BannerDndListEditor = ({ value = [], onUpdate }) => {
         </Box>
     );
 };
-const MapPickerEditor = ({ location, onLocationChange }) => {
-    const { isLoaded, loadError } = useJsApiLoader({ 
-        googleMapsApiKey: process.env.REACT_APP_Maps_API_KEY, 
-        libraries: ['places'] 
+const LocationMarker = ({ position, setPosition, setAddressText, onLocationChange }) => {
+    useMapEvents({
+        click: async (e) => {
+            const { lat, lng } = e.latlng;
+            setPosition({ lat, lng });
+
+            try {
+                // Dùng API Nominatim miễn phí của OpenStreetMap để lấy tên đường
+                const response = await axios.get(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+                    { headers: { 'Accept-Language': 'vi' } } // Ưu tiên tiếng Việt
+                );
+                
+                const address = response.data.display_name || 'Không tìm thấy địa chỉ';
+                setAddressText(address);
+                onLocationChange({ lat, lng, address });
+            } catch (error) {
+                console.error("Lỗi khi lấy địa chỉ:", error);
+                setAddressText("Lỗi khi tải địa chỉ");
+                onLocationChange({ lat, lng, address: '' });
+            }
+        },
     });
-    // Gán giá trị mặc định nếu location chưa có (Ví dụ: Hồ Gươm, Hà Nội)
+
+    return position ? <Marker position={position} icon={customIcon} /> : null;
+};
+const MapPickerEditor = ({ location, onLocationChange }) => {
+    // Tọa độ mặc định: Hồ Gươm, Hà Nội
     const defaultCenter = { lat: 21.028511, lng: 105.804817 };
     const [mapCenter, setMapCenter] = useState(location?.lat ? location : defaultCenter);
     const [addressText, setAddressText] = useState(location?.address || '');
-    const autocompleteRef = useRef(null);
 
     useEffect(() => { 
         if (location?.lat && location?.lng) {
@@ -1943,69 +1974,43 @@ const MapPickerEditor = ({ location, onLocationChange }) => {
         }
     }, [location]);
 
-    const handlePlaceSelect = () => {
-        if (autocompleteRef.current) {
-            const place = autocompleteRef.current.getPlace();
-            if (place && place.geometry) {
-                const newLocation = { 
-                    lat: place.geometry.location.lat(), 
-                    lng: place.geometry.location.lng(), 
-                    address: place.formatted_address 
-                };
-                setMapCenter(newLocation);
-                setAddressText(place.formatted_address);
-                onLocationChange(newLocation);
-            }
-        }
+    // Xử lý khi người dùng tự gõ vào ô text (chưa có search suggest tự động nhưng cho phép nhập tay)
+    const handleAddressChange = (e) => {
+        const text = e.target.value;
+        setAddressText(text);
+        onLocationChange({ ...mapCenter, address: text });
     };
-
-    // THÊM TÍNH NĂNG CLICK CHỌN PIN
-    const handleMapClick = (event) => {
-        const lat = event.latLng.lat();
-        const lng = event.latLng.lng();
-        const newCenter = { lat, lng };
-        
-        setMapCenter(newCenter);
-
-        // Dùng Geocoder để tự động lấy tên đường/địa chỉ từ tọa độ
-        const geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode({ location: newCenter }, (results, status) => {
-            let addr = '';
-            if (status === "OK" && results[0]) {
-                addr = results[0].formatted_address;
-            }
-            setAddressText(addr);
-            onLocationChange({ lat, lng, address: addr });
-        });
-    };
-
-    if (loadError) return <Typography color="error.main">Lỗi tải bản đồ.</Typography>;
-    if (!isLoaded) return <CircularProgress />;
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Autocomplete onLoad={(ref) => (autocompleteRef.current = ref)} onPlaceChanged={handlePlaceSelect}>
-                <TextField 
-                    fullWidth 
-                    variant="outlined" 
-                    placeholder="Tìm kiếm địa điểm..." 
-                    value={addressText}
-                    onChange={(e) => {
-                        setAddressText(e.target.value);
-                        onLocationChange({ ...mapCenter, address: e.target.value });
-                    }}
-                />
-            </Autocomplete>
-            <Box sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
-                <GoogleMap 
-                    mapContainerStyle={{ width: '100%', height: '250px' }} 
-                    center={mapCenter} 
-                    zoom={15}
-                    onClick={handleMapClick} // Bắt sự kiện click
-                    options={{ disableDefaultUI: true, zoomControl: true }}
+            <TextField 
+                fullWidth 
+                variant="outlined" 
+                placeholder="Nhập địa chỉ hoặc click trên bản đồ để chọn..." 
+                value={addressText}
+                onChange={handleAddressChange}
+            />
+            
+            <Box sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider', height: '250px' }}>
+                {/* Thuộc tính key giúp map render lại nếu tọa độ mặc định thay đổi lớn */}
+                <MapContainer 
+                    center={[mapCenter.lat, mapCenter.lng]} 
+                    zoom={15} 
+                    style={{ height: '100%', width: '100%' }}
+                    scrollWheelZoom={true}
                 >
-                    {mapCenter && <Marker position={mapCenter} animation={window.google.maps.Animation.DROP} />}
-                </GoogleMap>
+                    {/* Layer bản đồ miễn phí của OpenStreetMap */}
+                    <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <LocationMarker 
+                        position={mapCenter} 
+                        setPosition={setMapCenter} 
+                        setAddressText={setAddressText}
+                        onLocationChange={onLocationChange}
+                    />
+                </MapContainer>
             </Box>
         </Box>
     );
