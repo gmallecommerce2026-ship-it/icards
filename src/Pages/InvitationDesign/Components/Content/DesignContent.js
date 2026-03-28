@@ -72,6 +72,7 @@ import {
     Grid3x3 as GridOnIcon, 
     GridOff as GridOffIcon
 } from '@mui/icons-material';
+import axios from 'axios';
 import { useDroppable } from '@dnd-kit/core';
 import JSZip from 'jszip';
 import jsPDF from 'jspdf';
