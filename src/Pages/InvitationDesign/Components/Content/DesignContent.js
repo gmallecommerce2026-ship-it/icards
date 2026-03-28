@@ -5338,7 +5338,7 @@ const WeddingInvitationEditor = () => {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [handleUndo, handleRedo, handleCopy, handlePaste, handleDeleteItem, selectedItemId, currentItems]); // Thêm currentItems vào deps
+    }, [handleUndo, handleRedo, handleCopy, handlePaste, handleDeleteItem, selectedItemId, currentItems, handleToggleLayerLock]); // Thêm currentItems vào deps
     useEffect(() => {
         const bgCanvas = document.getElementById(`background-canvas-${currentPage?.id}`);
         if (!bgCanvas || !currentPage) return;
