@@ -5301,7 +5301,10 @@ const WeddingInvitationEditor = () => {
         }), true);
     }, [currentPageId, setPages]);
 
-
+    const handleToggleLayerLock = useCallback((id) => { 
+        const i = currentItems.find(it => it.id === id); 
+        if (i) handleUpdateItem(id, { locked: !i.locked }, true); 
+    }, [currentItems, handleUpdateItem]);
     const handleCopy = useCallback(() => { if (!selectedItemId || !currentPage) return; const item = currentPage.items.find(i => i.id === selectedItemId); if (item) setClipboard(item); }, [selectedItemId, currentPage]);
     const handlePaste = useCallback(() => { if (!clipboard || !currentPage) return; const newItem = { ...clipboard, id: uuidv4(), x: clipboard.x + 20, y: clipboard.y + 20, zIndex: getNextZIndex(), isEditing: false, locked: false }; setPages(pages.map(p => p.id === currentPageId ? { ...p, items: [...p.items, newItem] } : p), true); setSelectedItemId(newItem.id); }, [clipboard, currentPage, currentPageId, getNextZIndex, pages, setPages]);
     useEffect(() => {
@@ -5403,10 +5406,7 @@ const WeddingInvitationEditor = () => {
     }, [snapLines, currentCanvasWidth, currentCanvasHeight, zoomLevel, currentPage]);
     // useEffect(() => { if (canvasWrapperRef.current) canvasWrapperRef.current.style.cursor = isPanning.current ? 'grabbing' : 'grab'; }, [isPanning.current]);
     const handleToggleLayerVisibility = (id) => { const i = currentItems.find(it => it.id === id); if (i) handleUpdateItem(id, { visible: !(i.visible ?? true) }, true); };
-    const handleToggleLayerLock = useCallback((id) => { 
-        const i = currentItems.find(it => it.id === id); 
-        if (i) handleUpdateItem(id, { locked: !i.locked }, true); 
-    }, [currentItems, handleUpdateItem]);
+    
     const handleScaleImageToFit = useCallback((id) => {
         // 1. Dùng biến currentPage đã được memoize sẵn thay vì find thủ công trên mảng pages
         if (!currentPage || !id) return;
