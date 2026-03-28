@@ -245,6 +245,7 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
 
 const EventSchedule = React.memo(({ events, title, titleStyle }) => {
     const [openMenuId, setOpenMenuId] = useState(null);
+    const [mapEvent, setMapEvent] = useState(null); // State quản lý popup bản đồ
     const menuRef = useRef(null);
 
     useEffect(() => {
@@ -287,7 +288,18 @@ const EventSchedule = React.memo(({ events, title, titleStyle }) => {
                                 <p className="event-card-time">{time} | {date}</p>
                                 <p className="event-card-address">{event.address}</p>
                                 <div className="event-card-actions">
-                                    {event.mapUrl && <a href={event.mapUrl} target="_blank" rel="noopener noreferrer" className="event-btn map-btn"><ExternalLink size={14} /> Xem bản đồ</a>}
+                                    
+                                    {/* LOGIC NÚT XEM BẢN ĐỒ MỚI */}
+                                    {event.location?.lat ? (
+                                        <button onClick={() => setMapEvent(event)} className="event-btn map-btn">
+                                            <ExternalLink size={14} /> Xem bản đồ
+                                        </button>
+                                    ) : event.mapUrl ? (
+                                        <a href={event.mapUrl} target="_blank" rel="noopener noreferrer" className="event-btn map-btn">
+                                            <ExternalLink size={14} /> Xem bản đồ
+                                        </a>
+                                    ) : null}
+
                                     <div className="calendar-menu-container">
                                         <button onClick={() => setOpenMenuId(openMenuId === event.id ? null : event.id)} className="event-btn calendar-btn">
                                             <Calendar size={14} /> Thêm vào lịch
@@ -307,6 +319,59 @@ const EventSchedule = React.memo(({ events, title, titleStyle }) => {
                     );
                 })}
             </div>
+
+            {/* POPUP (MODAL) HIỂN THỊ BẢN ĐỒ KHI CLICK */}
+            {mapEvent && (
+                <div 
+                    className="modern-lightbox" 
+                    onClick={() => setMapEvent(null)} 
+                    style={{ zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                    <button className="modern-lightbox-close" onClick={() => setMapEvent(null)}>
+                        <X size={32} />
+                    </button>
+                    
+                    <div 
+                        className="modern-lightbox-content" 
+                        onClick={e => e.stopPropagation()} 
+                        style={{ 
+                            width: '90%', maxWidth: '800px', height: '75vh', 
+                            backgroundColor: '#fff', borderRadius: '16px', 
+                            padding: '24px', display: 'flex', flexDirection: 'column',
+                            boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
+                            position: 'relative'
+                        }}
+                    >
+                        <h3 style={{ marginTop: 0, marginBottom: '8px', color: 'var(--color-primary)', fontSize: '1.4rem' }}>
+                            {mapEvent.title}
+                        </h3>
+                        <p style={{ marginTop: 0, marginBottom: '20px', color: '#666', fontSize: '1rem', lineHeight: 1.5 }}>
+                            {mapEvent.address}
+                        </p>
+                        
+                        {/* Dùng iframe của Google Maps Embed API (Miễn phí, không cần key) */}
+                        <iframe 
+                            width="100%" 
+                            height="100%" 
+                            frameBorder="0" 
+                            scrolling="no" 
+                            src={`https://maps.google.com/maps?q=${mapEvent.location.lat},${mapEvent.location.lng}&z=16&output=embed`}
+                            style={{ borderRadius: '12px', flexGrow: 1, border: '1px solid #eaeaea' }}
+                            title="Bản đồ địa điểm"
+                        ></iframe>
+                        
+                        <a 
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${mapEvent.location.lat},${mapEvent.location.lng}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="modern-btn-primary" 
+                            style={{ marginTop: '20px', textAlign: 'center', display: 'block', textDecoration: 'none', padding: '12px' }}
+                        >
+                            Chỉ đường bằng Google Maps
+                        </a>
+                    </div>
+                </div>
+            )}
         </section>
     );
 });
