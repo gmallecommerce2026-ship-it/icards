@@ -3111,14 +3111,6 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
             {children}
             {isSelected && !isLocked && (
                 <>
-                    <div style={{
-                        position: 'absolute', top: -12, right: -12, 
-                        background: '#EF4444', color: 'white', 
-                        borderRadius: '50%', padding: '4px', display: 'flex', 
-                        zIndex: 20000, boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                    }}>
-                        <LockIcon style={{ fontSize: '14px' }} />
-                    </div>
                     <div style={{ ...MinimalHandleStyle, top: `-${HANDLE_OFFSET}px`, left: `-${HANDLE_OFFSET}px`, cursor: 'nwse-resize' }} onPointerDown={createResizeHandler('top-left')} />
                     <div style={{ ...MinimalHandleStyle, top: `-${HANDLE_OFFSET}px`, right: `-${HANDLE_OFFSET}px`, cursor: 'nesw-resize' }} onPointerDown={createResizeHandler('top-right')} />
                     <div style={{ ...MinimalHandleStyle, bottom: `-${HANDLE_OFFSET}px`, left: `-${HANDLE_OFFSET}px`, cursor: 'nesw-resize' }} onPointerDown={createResizeHandler('bottom-left')} />
