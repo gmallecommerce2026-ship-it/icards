@@ -1468,8 +1468,27 @@ const EventForm = ({ itemData, setItemData, onSave, onCancel, onRemove }) => {
                         <TextField label="Giờ" type="time" value={itemData.time || ''} onChange={(e) => setItemData(prev => ({ ...prev, time: e.target.value }))} fullWidth InputLabelProps={{ shrink: true }} />
                     </Grid>
                 </Grid>
-                <TextField label="Địa chỉ" value={itemData.address || ''} onChange={(e) => setItemData(prev => ({ ...prev, address: e.target.value }))} fullWidth multiline rows={2} />
-                <TextField label="Link Google Maps" value={itemData.mapUrl || ''} onChange={(e) => setItemData(prev => ({ ...prev, mapUrl: e.target.value }))} fullWidth placeholder="Dán link Google Maps vào đây" />
+                <Box>
+                    <Typography variant="subtitle2" gutterBottom color="text.secondary">
+                        Địa điểm tổ chức (Tìm kiếm hoặc thả Pin trên bản đồ)
+                    </Typography>
+                    <MapPickerEditor 
+                        location={{ 
+                            lat: itemData.location?.lat, 
+                            lng: itemData.location?.lng, 
+                            address: itemData.address || '' 
+                        }}
+                        onLocationChange={(newLoc) => {
+                            setItemData(prev => ({ 
+                                ...prev, 
+                                address: newLoc.address,
+                                location: { lat: newLoc.lat, lng: newLoc.lng },
+                                // Tự động render mapUrl cho tương thích ngược / nút bấm bên ngoài
+                                mapUrl: `https://www.google.com/maps/search/?api=1&query=${newLoc.lat},${newLoc.lng}`
+                            }))
+                        }}
+                    />
+                </Box>
                 <Box>
                     <Typography variant="subtitle2" gutterBottom>Dress Code</Typography>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
@@ -1905,30 +1924,87 @@ const BannerDndListEditor = ({ value = [], onUpdate }) => {
     );
 };
 const MapPickerEditor = ({ location, onLocationChange }) => {
-    const { isLoaded, loadError } = useJsApiLoader({ googleMapsApiKey: process.env.REACT_APP_Maps_API_KEY, libraries: ['places'] });
-    const [mapCenter, setMapCenter] = useState(location);
+    const { isLoaded, loadError } = useJsApiLoader({ 
+        googleMapsApiKey: process.env.REACT_APP_Maps_API_KEY, 
+        libraries: ['places'] 
+    });
+    // Gán giá trị mặc định nếu location chưa có (Ví dụ: Hồ Gươm, Hà Nội)
+    const defaultCenter = { lat: 21.028511, lng: 105.804817 };
+    const [mapCenter, setMapCenter] = useState(location?.lat ? location : defaultCenter);
+    const [addressText, setAddressText] = useState(location?.address || '');
     const autocompleteRef = useRef(null);
-    useEffect(() => { setMapCenter(location); }, [location]);
+
+    useEffect(() => { 
+        if (location?.lat && location?.lng) {
+            setMapCenter({ lat: location.lat, lng: location.lng });
+        }
+        if (location?.address) {
+            setAddressText(location.address);
+        }
+    }, [location]);
+
     const handlePlaceSelect = () => {
         if (autocompleteRef.current) {
             const place = autocompleteRef.current.getPlace();
             if (place && place.geometry) {
-                const newLocation = { lat: place.geometry.location.lat(), lng: place.geometry.location.lng(), address: place.formatted_address };
+                const newLocation = { 
+                    lat: place.geometry.location.lat(), 
+                    lng: place.geometry.location.lng(), 
+                    address: place.formatted_address 
+                };
                 setMapCenter(newLocation);
+                setAddressText(place.formatted_address);
                 onLocationChange(newLocation);
             }
         }
     };
+
+    // THÊM TÍNH NĂNG CLICK CHỌN PIN
+    const handleMapClick = (event) => {
+        const lat = event.latLng.lat();
+        const lng = event.latLng.lng();
+        const newCenter = { lat, lng };
+        
+        setMapCenter(newCenter);
+
+        // Dùng Geocoder để tự động lấy tên đường/địa chỉ từ tọa độ
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ location: newCenter }, (results, status) => {
+            let addr = '';
+            if (status === "OK" && results[0]) {
+                addr = results[0].formatted_address;
+            }
+            setAddressText(addr);
+            onLocationChange({ lat, lng, address: addr });
+        });
+    };
+
     if (loadError) return <Typography color="error.main">Lỗi tải bản đồ.</Typography>;
     if (!isLoaded) return <CircularProgress />;
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Autocomplete onLoad={(ref) => (autocompleteRef.current = ref)} onPlaceChanged={handlePlaceSelect}>
-                <TextField fullWidth variant="outlined" placeholder="Nhập địa điểm..." defaultValue={location.address} />
+                <TextField 
+                    fullWidth 
+                    variant="outlined" 
+                    placeholder="Tìm kiếm địa điểm..." 
+                    value={addressText}
+                    onChange={(e) => {
+                        setAddressText(e.target.value);
+                        onLocationChange({ ...mapCenter, address: e.target.value });
+                    }}
+                />
             </Autocomplete>
             <Box sx={{ borderRadius: 2, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
-                <GoogleMap mapContainerStyle={{ width: '100%', height: '250px' }} center={mapCenter} zoom={15}>
-                    {mapCenter && <Marker position={mapCenter} />}
+                <GoogleMap 
+                    mapContainerStyle={{ width: '100%', height: '250px' }} 
+                    center={mapCenter} 
+                    zoom={15}
+                    onClick={handleMapClick} // Bắt sự kiện click
+                    options={{ disableDefaultUI: true, zoomControl: true }}
+                >
+                    {mapCenter && <Marker position={mapCenter} animation={window.google.maps.Animation.DROP} />}
                 </GoogleMap>
             </Box>
         </Box>
@@ -2052,7 +2128,16 @@ const SettingsPropertyEditor = ({ selectedKey, settings, setSettings, customFont
                     items={value || []}
                     onUpdate={handleUpdate}
                     FormComponent={EventForm}
-                    defaultNewItem={{ title: 'Sự kiện mới', date: new Date().toISOString().split('T')[0], time: '12:00', address: '', mapUrl: '', imageUrl: '', dressCode: [] }}
+                    defaultNewItem={{ 
+                        title: 'Sự kiện mới', 
+                        date: new Date().toISOString().split('T')[0], 
+                        time: '12:00', 
+                        address: '', 
+                        mapUrl: '', 
+                        location: { lat: 21.028511, lng: 105.804817 }, // Mặc định Hà Nội
+                        imageUrl: '', 
+                        dressCode: [] 
+                    }}
                     renderListItem={(item) => <ListItemText primary={item.title} secondary={`${item.date} - ${item.time}`} />}
                     initialItemToEdit={itemToEdit?.type === 'events' ? itemToEdit : null}
                     onCloseEditor={() => setItemToEdit(null)}
