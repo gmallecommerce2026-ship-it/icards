@@ -3099,7 +3099,10 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
                 zIndex: isSelected ? item.zIndex + 1000 : item.zIndex,
                 width: item.width,
                 height: item.height,
-                border: (isSelected || isTransforming) ? `2.5px solid ${BORDER_COLOR}` : `2.5px solid transparent`,
+                // CẬP NHẬT: Nếu bị khóa, đổi viền thành màu đỏ (hoặc xám tùy theme)
+                border: (isSelected || isTransforming) 
+                    ? `2.5px solid ${isLocked ? '#EF4444' : BORDER_COLOR}` // #EF4444 là màu đỏ báo hiệu Locked
+                    : `2.5px solid transparent`,
                 transformOrigin: 'center center',
                 opacity: item.opacity,
                 cursor: isLocked ? 'not-allowed' : 'grab',
@@ -3108,6 +3111,14 @@ const DraggableItemComponent = React.memo(({ item, onUpdateItem, isSelected, onS
             {children}
             {isSelected && !isLocked && (
                 <>
+                    <div style={{
+                        position: 'absolute', top: -12, right: -12, 
+                        background: '#EF4444', color: 'white', 
+                        borderRadius: '50%', padding: '4px', display: 'flex', 
+                        zIndex: 20000, boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    }}>
+                        <LockIcon style={{ fontSize: '14px' }} />
+                    </div>
                     <div style={{ ...MinimalHandleStyle, top: `-${HANDLE_OFFSET}px`, left: `-${HANDLE_OFFSET}px`, cursor: 'nwse-resize' }} onPointerDown={createResizeHandler('top-left')} />
                     <div style={{ ...MinimalHandleStyle, top: `-${HANDLE_OFFSET}px`, right: `-${HANDLE_OFFSET}px`, cursor: 'nesw-resize' }} onPointerDown={createResizeHandler('top-right')} />
                     <div style={{ ...MinimalHandleStyle, bottom: `-${HANDLE_OFFSET}px`, left: `-${HANDLE_OFFSET}px`, cursor: 'nesw-resize' }} onPointerDown={createResizeHandler('bottom-left')} />
@@ -5297,15 +5308,37 @@ const WeddingInvitationEditor = () => {
         const handleKeyDown = (e) => {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
             const meta = e.ctrlKey || e.metaKey;
+            
             if (meta && e.key === 'z') { e.preventDefault(); handleUndo(); }
             if (meta && (e.key === 'y' || (e.shiftKey && e.key === 'Z'))) { e.preventDefault(); handleRedo(); }
             if (meta && e.key === 'c') { e.preventDefault(); handleCopy(); }
             if (meta && e.key === 'v') { e.preventDefault(); handlePaste(); }
-            if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); if (selectedItemId) handleDeleteItem(selectedItemId); }
+            
+            // --- THÊM MỚI: Phím tắt Khóa/Mở khóa ---
+            if (meta && e.key.toLowerCase() === 'l') { 
+                e.preventDefault(); 
+                if (selectedItemId) {
+                    handleToggleLayerLock(selectedItemId);
+                    // (Tuỳ chọn) toast.info("Đã thay đổi trạng thái khóa");
+                }
+            }
+
+            // --- CẬP NHẬT: Không cho phép xóa nếu đang bị khóa ---
+            if (e.key === 'Delete' || e.key === 'Backspace') { 
+                e.preventDefault(); 
+                if (selectedItemId) {
+                    const itemToDel = currentItems.find(i => i.id === selectedItemId);
+                    if (itemToDel && !itemToDel.locked) {
+                        handleDeleteItem(selectedItemId); 
+                    } else if (itemToDel?.locked) {
+                        toast.warn("Không thể xóa đối tượng đang bị khóa!");
+                    }
+                } 
+            }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [handleUndo, handleRedo, handleCopy, handlePaste, handleDeleteItem, selectedItemId]);
+    }, [handleUndo, handleRedo, handleCopy, handlePaste, handleDeleteItem, selectedItemId, currentItems]); // Thêm currentItems vào deps
     useEffect(() => {
         const bgCanvas = document.getElementById(`background-canvas-${currentPage?.id}`);
         if (!bgCanvas || !currentPage) return;
@@ -6049,14 +6082,32 @@ const WeddingInvitationEditor = () => {
                                         <Tooltip title="Sao chép (Ctrl+C)"><IconButton size="small" onClick={handleCopy} disabled={!activeItem}><ContentCopyIcon /></IconButton></Tooltip>
                                         <Tooltip title="Dán (Ctrl+V)"><IconButton size="small" onClick={handlePaste} disabled={!clipboard}><ContentPasteIcon /></IconButton></Tooltip>
                                     </Box>
-                                    {activeItem && !activeItem.locked && (
+                                    {activeItem && (
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                            <Tooltip title="Độ mờ"><OpacityIcon fontSize="small" sx={{ color: 'text.secondary' }} /></Tooltip>
-                                            <Slider value={activeItem.opacity} onChange={(_e, val) => handleUpdateItem(selectedItemId, { opacity: val }, false)} onChangeCommitted={() => handleUpdateItem(selectedItemId, {}, true)} min={0} max={1} step={0.01} sx={{ width: 100 }} size="small" />
+                                            {/* Nút Khóa / Mở khóa luôn hiển thị */}
+                                            <Tooltip title={activeItem.locked ? "Mở khóa (Ctrl+L)" : "Khóa vị trí & kích thước (Ctrl+L)"}>
+                                                <IconButton 
+                                                    size="small" 
+                                                    onClick={() => handleToggleLayerLock(selectedItemId)} 
+                                                    color={activeItem.locked ? "primary" : "default"}
+                                                >
+                                                    {activeItem.locked ? <LockIcon /> : <LockOpenIcon />}
+                                                </IconButton>
+                                            </Tooltip>
+                                            
                                             <Divider orientation="vertical" flexItem />
-                                            <Tooltip title="Đưa lên trên"><IconButton size="small" onClick={() => handleBringToFront(selectedItemId)}><FlipToFrontIcon /></IconButton></Tooltip>
-                                            <Tooltip title="Đưa xuống dưới"><IconButton size="small" onClick={() => handleSendToBack(selectedItemId)}><FlipToBackIcon /></IconButton></Tooltip>
-                                            <Tooltip title="Xóa đối tượng"><IconButton size="small" color="error" onClick={() => handleDeleteItem(selectedItemId)}><DeleteIcon /></IconButton></Tooltip>
+
+                                            {/* Các nút sửa đổi chỉ hiện khi KHÔNG khóa */}
+                                            {!activeItem.locked && (
+                                                <>
+                                                    <Tooltip title="Độ mờ"><OpacityIcon fontSize="small" sx={{ color: 'text.secondary' }} /></Tooltip>
+                                                    <Slider value={activeItem.opacity} onChange={(_e, val) => handleUpdateItem(selectedItemId, { opacity: val }, false)} onChangeCommitted={() => handleUpdateItem(selectedItemId, {}, true)} min={0} max={1} step={0.01} sx={{ width: 100 }} size="small" />
+                                                    <Divider orientation="vertical" flexItem />
+                                                    <Tooltip title="Đưa lên trên"><IconButton size="small" onClick={() => handleBringToFront(selectedItemId)}><FlipToFrontIcon /></IconButton></Tooltip>
+                                                    <Tooltip title="Đưa xuống dưới"><IconButton size="small" onClick={() => handleSendToBack(selectedItemId)}><FlipToBackIcon /></IconButton></Tooltip>
+                                                    <Tooltip title="Xóa đối tượng"><IconButton size="small" color="error" onClick={() => handleDeleteItem(selectedItemId)}><DeleteIcon /></IconButton></Tooltip>
+                                                </>
+                                            )}
                                         </Box>
                                     )}
                                 </Paper>
