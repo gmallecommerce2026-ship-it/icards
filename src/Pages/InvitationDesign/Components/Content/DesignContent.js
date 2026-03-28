@@ -77,7 +77,6 @@ import JSZip from 'jszip';
 import jsPDF from 'jspdf';
 import { toast } from 'react-toastify';
 import { showSuccessToast, showErrorToast, handlePromiseToast } from '../../../../Utils/toastHelper';
-import { GoogleMap, useJsApiLoader, Marker, Autocomplete } from '@react-google-maps/api';
 import _ from 'lodash';
 import {
     DndContext,
