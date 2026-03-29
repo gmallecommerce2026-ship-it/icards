@@ -1248,7 +1248,7 @@ const WishesSection = React.memo(({ resourceId, settings }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.senderName || !formData.content) {
-            showErrorToast("Vui lòng nhập tên và lời chúc!");
+            // showErrorToast("Vui lòng nhập tên và lời chúc!");
             return;
         }
         setIsSubmitting(true);
@@ -1259,7 +1259,7 @@ const WishesSection = React.memo(({ resourceId, settings }) => {
             setFormData({ senderName: '', content: '' });
             // Tùy logic BE, nếu auto-approve có thể push thẳng vào mảng setWishes(prev => [res.data.data, ...prev])
         } catch (err) {
-            showErrorToast("Có lỗi xảy ra, vui lòng thử lại.");
+            // showErrorToast("Có lỗi xảy ra, vui lòng thử lại.");
         } finally {
             setIsSubmitting(false);
         }
