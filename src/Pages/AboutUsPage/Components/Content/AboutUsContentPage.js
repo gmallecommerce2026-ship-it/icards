@@ -1230,12 +1230,11 @@ const WishesSection = React.memo(({ resourceId, settings }) => {
     const [formData, setFormData] = useState({ senderName: '', content: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Fetch lời chúc đã được duyệt
     useEffect(() => {
         if (!resourceId) return;
         const fetchWishes = async () => {
             try {
-                // Giả định API GET public wishes (chỉ lấy status = 'approved')
+                // Endpoint lấy các lời chúc đã được duyệt
                 const res = await api.get(`/invitations/public/${resourceId}/wishes`);
                 setWishes(res.data.data || []);
             } catch (err) {
@@ -1248,18 +1247,16 @@ const WishesSection = React.memo(({ resourceId, settings }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.senderName || !formData.content) {
-            // showErrorToast("Vui lòng nhập tên và lời chúc!");
+            showSuccessToast("Vui lòng nhập tên và lời chúc!"); // Có thể dùng showErrorToast nếu đã export
             return;
         }
         setIsSubmitting(true);
         try {
-            // Giả định API POST wish
-            const res = await api.post(`/invitations/public/${resourceId}/wishes`, formData);
+            await api.post(`/invitations/public/${resourceId}/wishes`, formData);
             showSuccessToast("Gửi lời chúc thành công! Lời chúc sẽ được hiển thị sau khi duyệt.");
             setFormData({ senderName: '', content: '' });
-            // Tùy logic BE, nếu auto-approve có thể push thẳng vào mảng setWishes(prev => [res.data.data, ...prev])
         } catch (err) {
-            // showErrorToast("Có lỗi xảy ra, vui lòng thử lại.");
+            console.error("Có lỗi xảy ra, vui lòng thử lại.", err);
         } finally {
             setIsSubmitting(false);
         }
@@ -1273,7 +1270,6 @@ const WishesSection = React.memo(({ resourceId, settings }) => {
             />
             
             <div className="modern-wishes-wrapper" style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '40px' }}>
-                {/* Form gửi lời chúc */}
                 <form onSubmit={handleSubmit} className="modern-rsvp-form" style={{ padding: '24px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
                     <div className="modern-form-group">
                         <label className="form-label">Tên của bạn *</label>
@@ -1301,7 +1297,6 @@ const WishesSection = React.memo(({ resourceId, settings }) => {
                     </button>
                 </form>
 
-                {/* Danh sách lời chúc */}
                 {wishes.length > 0 && (
                     <div className="wishes-list" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {wishes.map((wish) => (

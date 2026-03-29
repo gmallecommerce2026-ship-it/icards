@@ -1424,7 +1424,6 @@ const WishManagementPanel = ({ invitationId }) => {
     const fetchWishes = useCallback(async () => {
         if (!invitationId) return;
         try {
-            // Giả định API GET /invitations/:id/wishes
             const response = await api.get(`/invitations/${invitationId}/wishes`);
             setWishes(response.data.data || []);
         } catch (error) {
@@ -1438,7 +1437,6 @@ const WishManagementPanel = ({ invitationId }) => {
 
     const handleToggleStatus = (wish) => {
         const newStatus = wish.status === 'approved' ? 'hidden' : 'approved';
-        // Giả định API PUT /invitations/:id/wishes/:wishId
         const promise = api.put(`/invitations/${invitationId}/wishes/${wish._id}`, { status: newStatus });
         
         handlePromiseToast(promise, {
@@ -1452,7 +1450,6 @@ const WishManagementPanel = ({ invitationId }) => {
 
     const handleDeleteWish = (wishId) => {
         if (!window.confirm("Bạn có chắc chắn muốn xóa lời chúc này?")) return;
-        // Giả định API DELETE /invitations/:id/wishes/:wishId
         const promise = api.delete(`/invitations/${invitationId}/wishes/${wishId}`);
         
         handlePromiseToast(promise, {
@@ -1485,9 +1482,9 @@ const WishManagementPanel = ({ invitationId }) => {
                     <div style={{ padding: '30px', textAlign: 'center', color: '#666' }}>Chưa có lời chúc nào.</div>
                 ) : (
                     wishes.map((wish, index) => (
-                        <div key={wish._id} style={{ display: "flex", width: '100%', backgroundColor: index % 2 === 0 ? 'white' : 'rgba(239,239,239,1)', borderBottom: '1px solid #eee' }}>
+                        <div key={wish._id} style={{ display: "flex", width: '100%', backgroundColor: index % 2 === 0 ? 'white' : 'rgba(239,239,239,1)', borderBottom: '1px solid #eee', alignItems: 'center' }}>
                             <div className="table-body-cell" style={{width: "60px"}}>{index + 1}</div>
-                            <div className="table-body-cell" style={{flex: 1.5, alignItems: 'flex-start', paddingLeft: '20px'}}>
+                            <div className="table-body-cell" style={{flex: 1.5, alignItems: 'flex-start', paddingLeft: '20px', flexDirection: 'column'}}>
                                 <div style={{ fontWeight: 'bold', color: 'rgba(39,84,138,1)' }}>{wish.senderName}</div>
                                 <div style={{ fontSize: '12px', color: '#666' }}>{new Date(wish.createdAt).toLocaleDateString('vi-VN')}</div>
                             </div>
