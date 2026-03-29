@@ -4207,7 +4207,7 @@ const WeddingInvitationEditor = () => {
         if (!currentPage || currentItems.length === 0) return BASE_Z_INDEX;
         return Math.max(...currentItems.map(item => item.zIndex), BASE_Z_INDEX) + 1;
     }, [currentItems, currentPage]);
-    const addTextToCanvas = useCallback((content, targetPageId) => {
+    const addTextToCanvas = useCallback((content, targetPageId, isGuestName = false) => {
         const pageForAdding = pages.find(p => p.id === targetPageId);
         if (!pageForAdding) return;
         
