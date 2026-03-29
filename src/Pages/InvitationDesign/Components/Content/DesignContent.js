@@ -70,7 +70,8 @@ import {
     PlayCircleFilledWhite as PlayIcon,
     Brush,
     Grid3x3 as GridOnIcon, 
-    GridOff as GridOffIcon
+    GridOff as GridOffIcon,
+    Contacts as ContactsIcon
 } from '@mui/icons-material';
 import axios from 'axios';
 import { useDroppable } from '@dnd-kit/core';
@@ -3220,7 +3221,7 @@ const TextEditor = (props) => {
                     padding: '10px 5px', 
                 }}
             >
-                {item.content ? item.content + '\u200B' : "Văn bản"}
+                {item.content ? (item.isGuestName ? '[Tên Khách Mời]\u200B' : item.content + '\u200B') : "Văn bản"}
             </div>
 
             {item.isEditing && !isLocked ? (
@@ -3255,7 +3256,7 @@ const TextEditor = (props) => {
                     onDoubleClick={(e) => { if (!isLocked) { e.stopPropagation(); onUpdateItem(item.id, { isEditing: true }, true); } }}
                     onClick={(e) => { if (!item.isEditing) { e.stopPropagation(); onSelectItem(item.id); } }}
                 >
-                    {item.content || "Văn bản"}
+                    {item.isGuestName ? "[Tên Khách Mời]" : (item.content || "Văn bản")}
                 </Box>
             )}
         </DraggableItemComponent>
@@ -4228,7 +4229,8 @@ const WeddingInvitationEditor = () => {
             fontSize: 24, 
             type: 'text', 
             zIndex: getNextZIndex(),
-            isCustomWidth: false // <-- THÊM DÒNG NÀY ĐỂ BẬT AUTO-FIT MẶC ĐỊNH
+            isCustomWidth: false, // <-- THÊM DÒNG NÀY ĐỂ BẬT AUTO-FIT MẶC ĐỊNH
+            isGuestName: isGuestName
         };
 
         setPages(currentPages => currentPages.map(page => page.id === targetPageId ? { ...page, items: [...page.items, newTextItem] } : page), true);
@@ -5446,7 +5448,8 @@ const WeddingInvitationEditor = () => {
         if (itemData.type === 'image' && itemData.url) {
             addImageToCanvas(itemData.url, currentPageId);
         } else if (itemData.type === 'text' && itemData.content) {
-            addTextToCanvas(itemData.content, currentPageId);
+            // Truyền thêm itemData.isGuestName
+            addTextToCanvas(itemData.content, currentPageId, itemData.isGuestName); 
         }
     }, [currentPageId, addImageToCanvas, addTextToCanvas, selectedSettingField, handleUpdateSetting]);
     const generateCanvasFromPage = useCallback(async (page) => {
@@ -6035,6 +6038,12 @@ const WeddingInvitationEditor = () => {
                                                 <AddCircleOutlineIcon />
                                                 <ListItemText primary="Tạo mới" primaryTypographyProps={{ variant: 'caption' }} />
                                             </ListItemButton>
+                                            <DraggableSidebarItem data={{ id: 'sidebar-guest-name-item', type: 'text', content: '[Tên Khách Mời]', isGuestName: true }}>
+                                                <ListItemButton sx={{ flexDirection: 'column', px: 1, mb: 1, cursor: 'grab' }} component="div" onClick={() => handleSidebarItemClick({ type: 'text', content: '[Tên Khách Mời]', isGuestName: true })}>
+                                                    <ContactsIcon />
+                                                    <ListItemText primary="Tên Khách" primaryTypographyProps={{ variant: 'caption', textAlign: 'center' }} />
+                                                </ListItemButton>
+                                            </DraggableSidebarItem>
                                             <DraggableSidebarItem data={{ id: 'sidebar-text-item', type: 'text', content: 'Nội dung mới' }}>
                                                 <ListItemButton sx={{ flexDirection: 'column', px: 1, mb: 1, cursor: 'grab' }} component="div" onClick={() => handleSidebarItemClick({ type: 'text', content: 'Nội dung mới' })}>
                                                     <TextFieldsIcon />
