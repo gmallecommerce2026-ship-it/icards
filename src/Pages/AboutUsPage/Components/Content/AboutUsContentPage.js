@@ -1225,7 +1225,107 @@ const RsvpSection = ({ resourceId, guestDetails }) => {
     );
 };
 
+const WishesSection = React.memo(({ resourceId, settings }) => {
+    const [wishes, setWishes] = useState([]);
+    const [formData, setFormData] = useState({ senderName: '', content: '' });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Fetch lời chúc đã được duyệt
+    useEffect(() => {
+        if (!resourceId) return;
+        const fetchWishes = async () => {
+            try {
+                // Giả định API GET public wishes (chỉ lấy status = 'approved')
+                const res = await api.get(`/invitations/public/${resourceId}/wishes`);
+                setWishes(res.data.data || []);
+            } catch (err) {
+                console.error("Lỗi tải lời chúc:", err);
+            }
+        };
+        fetchWishes();
+    }, [resourceId]);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!formData.senderName || !formData.content) {
+            showErrorToast("Vui lòng nhập tên và lời chúc!");
+            return;
+        }
+        setIsSubmitting(true);
+        try {
+            // Giả định API POST wish
+            const res = await api.post(`/invitations/public/${resourceId}/wishes`, formData);
+            showSuccessToast("Gửi lời chúc thành công! Lời chúc sẽ được hiển thị sau khi duyệt.");
+            setFormData({ senderName: '', content: '' });
+            // Tùy logic BE, nếu auto-approve có thể push thẳng vào mảng setWishes(prev => [res.data.data, ...prev])
+        } catch (err) {
+            showErrorToast("Có lỗi xảy ra, vui lòng thử lại.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    return (
+        <section className="section-container fade-in-up">
+            <SectionHeader 
+                title={settings.wishesTitle || "Sổ Lưu Bút"} 
+                subtitle={settings.wishesSubtitle || "Hãy để lại những lời chúc tốt đẹp nhất dành cho chúng tôi nhé!"}
+            />
+            
+            <div className="modern-wishes-wrapper" style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '40px' }}>
+                {/* Form gửi lời chúc */}
+                <form onSubmit={handleSubmit} className="modern-rsvp-form" style={{ padding: '24px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+                    <div className="modern-form-group">
+                        <label className="form-label">Tên của bạn *</label>
+                        <input 
+                            type="text" 
+                            className="modern-form-input" 
+                            placeholder="Nhập tên của bạn..." 
+                            value={formData.senderName}
+                            onChange={(e) => setFormData({...formData, senderName: e.target.value})}
+                        />
+                    </div>
+                    <div className="modern-form-group">
+                        <label className="form-label">Lời chúc *</label>
+                        <textarea 
+                            className="modern-form-input" 
+                            placeholder="Nhập lời chúc..." 
+                            rows="4"
+                            value={formData.content}
+                            onChange={(e) => setFormData({...formData, content: e.target.value})}
+                            style={{ resize: 'vertical', paddingTop: '12px' }}
+                        />
+                    </div>
+                    <button type="submit" className="modern-btn-primary submit-btn" disabled={isSubmitting}>
+                        {isSubmitting ? 'Đang gửi...' : 'Gửi Lời Chúc'}
+                    </button>
+                </form>
+
+                {/* Danh sách lời chúc */}
+                {wishes.length > 0 && (
+                    <div className="wishes-list" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {wishes.map((wish) => (
+                            <div key={wish._id} className="wish-card" style={{ padding: '20px', backgroundColor: '#fdfbfb', borderRadius: '12px', border: '1px solid #f0eaeb' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px' }}>
+                                        {wish.senderName.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <h4 style={{ margin: 0, color: 'var(--color-text-dark)', fontSize: '16px' }}>{wish.senderName}</h4>
+                                        <span style={{ fontSize: '12px', color: '#999' }}>{new Date(wish.createdAt).toLocaleDateString('vi-VN')}</span>
+                                    </div>
+                                </div>
+                                <p style={{ margin: 0, color: 'var(--color-text-medium)', fontStyle: 'italic', lineHeight: '1.6' }}>
+                                    "{wish.content}"
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </section>
+    );
+});
 // ===================================================================
 // ++ COMPONENT CHÍNH CỦA TRANG ++
 // ===================================================================
@@ -1518,7 +1618,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
     const contactGroomStyle = createStyleObject(settings.contactGroomStyle);
     const contactBrideStyle = createStyleObject(settings.contactBrideStyle);
 
-    const defaultBlockOrder = ['EVENT_DESCRIPTION', 'COUPLE_INFO', 'PARTICIPANTS', 'EVENT_SCHEDULE', 'COUNTDOWN', 'LOVE_STORY', 'GALLERY', 'VIDEO', 'CONTACT_INFO', 'QR_CODES', 'RSVP'];
+    const defaultBlockOrder = ['EVENT_DESCRIPTION', 'COUPLE_INFO', 'PARTICIPANTS', 'EVENT_SCHEDULE', 'COUNTDOWN', 'LOVE_STORY', 'GALLERY', 'VIDEO', 'WISHES', 'CONTACT_INFO', 'QR_CODES', 'RSVP'];
     
     const blocksToRender = Array.isArray(settings.blocksOrder) && settings.blocksOrder.length > 0 
     ? settings.blocksOrder 
@@ -1535,6 +1635,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
         LOVE_STORY: <LoveStoryTimeline stories={settings.loveStory} title={settings.loveStoryTitle} titleStyle={settings.loveStoryTitleStyle} />,
         GALLERY: <Gallery images={settings.galleryImages} onImageClick={handleImageClick} title={settings.galleryTitle} titleStyle={settings.galleryTitleStyle} />,
         VIDEO: <EventVideo videoUrl={settings.videoUrl} title={settings.videoTitle} titleStyle={settings.videoTitleStyle} />,
+        WISHES: <WishesSection settings={settings} resourceId={resourceId} />,
         CONTACT_INFO: (
             <section className="section-container">
                 <SectionHeader title={settings.contactTitle || "Thông Tin Liên Hệ"} titleStyle={settings.contactTitleStyle} />
@@ -1716,6 +1817,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                                 case 'LOVE_STORY': return Array.isArray(settings.loveStory) && settings.loveStory.length > 0;
                                 case 'GALLERY': return Array.isArray(settings.galleryImages) && settings.galleryImages.length > 0;
                                 case 'VIDEO': return !!settings.videoUrl;
+                                case 'WISHES': return true;
                                 case 'CONTACT_INFO': return settings.invitationType === 'Thiệp cưới' && (settings.contactGroom || settings.contactBride);
                                 case 'QR_CODES': return Array.isArray(settings.qrCodes) && settings.qrCodes.length > 0;
                                 case 'RSVP': return settings.rsvpTitle && settings.rsvpTitle.length > 0; 

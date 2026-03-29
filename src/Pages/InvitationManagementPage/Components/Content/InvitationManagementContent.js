@@ -1417,12 +1417,103 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
 };
 
 
-const WishManagementPanel = () => (
-    <div className="management-content-placeholder">
-        <h3>Quản lý lời chúc</h3>
-        <p>Tính năng sẽ được cập nhật trong thời gian tới.</p>
-    </div>
-);
+const WishManagementPanel = ({ invitationId }) => {
+    const [wishes, setWishes] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchWishes = useCallback(async () => {
+        if (!invitationId) return;
+        try {
+            // Giả định API GET /invitations/:id/wishes
+            const response = await api.get(`/invitations/${invitationId}/wishes`);
+            setWishes(response.data.data || []);
+        } catch (error) {
+            showErrorToast("Không thể tải danh sách lời chúc.");
+        } finally {
+            setLoading(false);
+        }
+    }, [invitationId]);
+
+    useEffect(() => { fetchWishes(); }, [fetchWishes]);
+
+    const handleToggleStatus = (wish) => {
+        const newStatus = wish.status === 'approved' ? 'hidden' : 'approved';
+        // Giả định API PUT /invitations/:id/wishes/:wishId
+        const promise = api.put(`/invitations/${invitationId}/wishes/${wish._id}`, { status: newStatus });
+        
+        handlePromiseToast(promise, {
+            pending: 'Đang cập nhật trạng thái...',
+            success: 'Cập nhật thành công!',
+            error: 'Cập nhật thất bại!'
+        }).then(() => {
+            setWishes(prev => prev.map(w => w._id === wish._id ? { ...w, status: newStatus } : w));
+        });
+    };
+
+    const handleDeleteWish = (wishId) => {
+        if (!window.confirm("Bạn có chắc chắn muốn xóa lời chúc này?")) return;
+        // Giả định API DELETE /invitations/:id/wishes/:wishId
+        const promise = api.delete(`/invitations/${invitationId}/wishes/${wishId}`);
+        
+        handlePromiseToast(promise, {
+            pending: 'Đang xóa lời chúc...',
+            success: 'Đã xóa thành công!',
+            error: 'Xóa thất bại!'
+        }).then(() => {
+            setWishes(prev => prev.filter(w => w._id !== wishId));
+        });
+    };
+
+    if (loading) return <p>Đang tải dữ liệu lời chúc...</p>;
+
+    return (
+        <div style={{ display: "flex", flexDirection: "column", gap: "20px", paddingTop: '20px', width: '100%' }}>
+            <div style={{ backgroundColor: "rgba(204,215,229,1)", width: '100%', display: "flex", alignItems: "center", padding: "20px", boxSizing: 'border-box' }}>
+                <div style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "20px", color: "rgba(39,84,138,1)", textTransform: "uppercase", fontWeight: "700" }}>Quản lý lời chúc ({wishes.length})</div>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", width: "100%", boxShadow: "0px 0px 8px 0px rgba(0,0,0,0.1)" }}>
+                <div style={{ display: "flex", width: '100%', backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>
+                    <div className="table-header-cell" style={{width: "60px"}}>#</div>
+                    <div className="table-header-cell" style={{flex: 1.5, paddingLeft: '20px', justifyContent: 'flex-start'}}>Người gửi</div>
+                    <div className="table-header-cell" style={{flex: 3, paddingLeft: '20px', justifyContent: 'flex-start'}}>Nội dung lời chúc</div>
+                    <div className="table-header-cell" style={{flex: 1, justifyContent: 'center'}}>Trạng thái</div>
+                    <div className="table-header-cell" style={{flex: 1, justifyContent: 'center'}}>Hành động</div>
+                </div>
+                
+                {wishes.length === 0 ? (
+                    <div style={{ padding: '30px', textAlign: 'center', color: '#666' }}>Chưa có lời chúc nào.</div>
+                ) : (
+                    wishes.map((wish, index) => (
+                        <div key={wish._id} style={{ display: "flex", width: '100%', backgroundColor: index % 2 === 0 ? 'white' : 'rgba(239,239,239,1)', borderBottom: '1px solid #eee' }}>
+                            <div className="table-body-cell" style={{width: "60px"}}>{index + 1}</div>
+                            <div className="table-body-cell" style={{flex: 1.5, alignItems: 'flex-start', paddingLeft: '20px'}}>
+                                <div style={{ fontWeight: 'bold', color: 'rgba(39,84,138,1)' }}>{wish.senderName}</div>
+                                <div style={{ fontSize: '12px', color: '#666' }}>{new Date(wish.createdAt).toLocaleDateString('vi-VN')}</div>
+                            </div>
+                            <div className="table-body-cell" style={{flex: 3, alignItems: 'flex-start', paddingLeft: '20px', paddingRight: '20px', whiteSpace: 'normal', lineHeight: '1.5'}}>
+                                "{wish.content}"
+                            </div>
+                            <div className="table-body-cell" style={{flex: 1, justifyContent: 'center'}}>
+                                <span style={{ padding: '4px 12px', borderRadius: '20px', fontSize: '12px', backgroundColor: wish.status === 'approved' ? '#d1fae5' : '#fee2e2', color: wish.status === 'approved' ? '#065f46' : '#991b1b' }}>
+                                    {wish.status === 'approved' ? 'Đang hiển thị' : 'Đang ẩn'}
+                                </span>
+                            </div>
+                            <div className="table-body-cell" style={{flex: 1, justifyContent: 'center', gap: '10px', flexDirection: 'row'}}>
+                                <button className="table-action-btn" onClick={() => handleToggleStatus(wish)} title="Ẩn/Hiện">
+                                    {wish.status === 'approved' ? <CancelIcon /> : <CheckIcon />}
+                                </button>
+                                <button className="table-action-btn" onClick={() => handleDeleteWish(wish._id)} title="Xóa">
+                                    <DeleteIcon />
+                                </button>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    );
+};
 
 const EventManagementPanel = ({ invitation, onDataChange }) => {
     const [reminders, setReminders] = useState([]);
@@ -1497,6 +1588,8 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
         displayStyle: 'Kiểu 1',
         qrCodeImageUrls: [],
         videoUrl: '',
+        wishesTitle: '',
+        wishesSubtitle: '',
         // Xóa emailReminders ở state cục bộ này đi vì đã chuyển sang tab khác
     });
     const [isSaving, setIsSaving] = useState(false);
@@ -1509,6 +1602,8 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
                 salutationStyle: invitation.settings.salutationStyle || 'Thân gửi',
                 useGlobalSalutation: invitation.settings.useGlobalSalutation || false,
                 displayStyle: invitation.settings.displayStyle || 'Kiểu 1',
+                wishesTitle: invitation.settings.wishesTitle || 'Sổ Lưu Bút',
+                wishesSubtitle: invitation.settings.wishesSubtitle || 'Hãy để lại những lời chúc tốt đẹp nhất dành cho chúng tôi nhé!',
             });
         }
     }, [invitation]);
@@ -1621,6 +1716,29 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
                                     Sử dụng cài đặt này cho tất cả khách mời (ghi đè cài đặt của nhóm)
                                 </label>
                             </div>
+                        </SettingsField>
+                    </div>
+                </div>
+                <div style={{ marginTop: '40px' }}>
+                    <h3 className="settings-section-title">Cài đặt Khu vực Lời chúc</h3>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                        <SettingsField label="Tiêu đề khu vực lời chúc" required>
+                            <input 
+                                name="wishesTitle" 
+                                value={settings.wishesTitle} 
+                                onChange={handleChange} 
+                                className="settings-input"
+                                style={{ borderColor: "rgb(128,128,128)", borderWidth: "0.5px", borderStyle: "solid", width: "100%", height: "40px", padding: "0 20px" }}
+                            />
+                        </SettingsField>
+                        <SettingsField label="Mô tả phụ (Subtitle)">
+                            <textarea 
+                                name="wishesSubtitle" 
+                                value={settings.wishesSubtitle} 
+                                onChange={handleChange} 
+                                className="settings-input"
+                                style={{ borderColor: "rgb(128,128,128)", borderWidth: "0.5px", borderStyle: "solid", width: "100%", height: "80px", padding: "10px 20px", fontFamily: "inherit" }}
+                            />
                         </SettingsField>
                     </div>
                 </div>
@@ -2426,7 +2544,7 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
             case 'guests':
                 return <GuestManagementPanel invitationId={invitation._id} guests={invitation.guests || []} onDataChange={onDataChange} invitation={invitation} onTabChange={onTabChange} />;
             case 'wishes':
-                return <WishManagementPanel />;
+                return <WishManagementPanel invitationId={invitation._id} />;
             // case 'master-guests': // <-- RENDER PANEL MỚI
             //     return <MasterGuestPanel user={invitation.user} onAddGuestsToInvitation={handleAddGuestsFromMaster} />;
             case 'tasks':
