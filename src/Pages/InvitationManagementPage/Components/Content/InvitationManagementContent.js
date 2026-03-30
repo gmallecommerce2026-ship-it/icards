@@ -1425,7 +1425,7 @@ const WishManagementPanel = ({ invitationId }) => {
         if (!invitationId) return;
         try {
             // SỬA Ở ĐÂY: Đổi endpoint gọi trực tiếp vào resource wishes
-            const response = await api.get(`/wish/${invitationId}`);
+            const response = await api.get(`/wishes/${invitationId}`);
             setWishes(response.data.data || []);
         } catch (error) {
             showErrorToast("Không thể tải danh sách lời chúc.");
