@@ -1424,11 +1424,12 @@ const WishManagementPanel = ({ invitationId }) => {
     const fetchWishes = useCallback(async () => {
         if (!invitationId) return;
         try {
-            // SỬA Ở ĐÂY: Đổi endpoint gọi trực tiếp vào resource wishes
-            const response = await api.get(`/wishes/${invitationId}`);
+            // ĐÃ SỬA: Trỏ vào đúng endpoint dành cho Admin để lấy tất cả lời chúc
+            const response = await api.get(`/wishes/admin/${invitationId}`);
             setWishes(response.data.data || []);
         } catch (error) {
             showErrorToast("Không thể tải danh sách lời chúc.");
+            console.error("Lỗi fetch wishes:", error); // Nên thêm log để debug dễ hơn
         } finally {
             setLoading(false);
         }
