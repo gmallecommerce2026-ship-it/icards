@@ -1613,7 +1613,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
     const contactGroomStyle = createStyleObject(settings.contactGroomStyle);
     const contactBrideStyle = createStyleObject(settings.contactBrideStyle);
 
-    const defaultBlockOrder = ['EVENT_DESCRIPTION', 'COUPLE_INFO', 'PARTICIPANTS', 'EVENT_SCHEDULE', 'COUNTDOWN', 'LOVE_STORY', 'GALLERY', 'VIDEO', 'WISHES', 'CONTACT_INFO', 'QR_CODES', 'RSVP'];
+    const defaultBlockOrder = ['EVENT_DESCRIPTION', 'COUPLE_INFO', 'PARTICIPANTS', 'EVENT_SCHEDULE', 'COUNTDOWN', 'LOVE_STORY', 'GALLERY', 'VIDEO', 'WISHES', 'CONTACT_INFO', 'QR_CODES', 'RSVP', 'CUSTOM_HTML'];
     
     const blocksToRender = Array.isArray(settings.blocksOrder) && settings.blocksOrder.length > 0 
     ? settings.blocksOrder 
@@ -1805,7 +1805,6 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                             switch(key) {
                                 case 'EVENT_DESCRIPTION': return !!settings.eventDescription;
                                 case 'COUPLE_INFO': return settings.invitationType === 'Thiệp cưới';
-                                // Sửa lỗi: Thêm Array.isArray để đảm bảo đây là mảng
                                 case 'PARTICIPANTS': return Array.isArray(settings.participants) && settings.participants.length > 0;
                                 case 'EVENT_SCHEDULE': return Array.isArray(settings.events) && settings.events.length > 0;
                                 case 'COUNTDOWN': return !!settings.eventDate;
@@ -1813,9 +1812,16 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                                 case 'GALLERY': return Array.isArray(settings.galleryImages) && settings.galleryImages.length > 0;
                                 case 'VIDEO': return !!settings.videoUrl;
                                 case 'WISHES': return true;
-                                case 'CONTACT_INFO': return settings.invitationType === 'Thiệp cưới' && (settings.contactGroom || settings.contactBride);
+                                
+                                // SỬA: Bỏ điều kiện bắt buộc phải là 'Thiệp cưới', chỉ cần có data SĐT là hiển thị
+                                case 'CONTACT_INFO': return !!(settings.contactGroom || settings.contactBride);
+                                
                                 case 'QR_CODES': return Array.isArray(settings.qrCodes) && settings.qrCodes.length > 0;
                                 case 'RSVP': return settings.rsvpTitle && settings.rsvpTitle.length > 0; 
+                                
+                                // THÊM MỚI: Bổ sung case cho CUSTOM_HTML (trước đó bị thiếu nên nó luôn return false)
+                                case 'CUSTOM_HTML': return !!settings.customHtmlContent;
+                                
                                 default: return false;
                             }
                         };

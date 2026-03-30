@@ -4570,11 +4570,10 @@ const WeddingInvitationEditor = () => {
             ];
             let applicableBlockTypes = defaultOrder;
             if (eventSettings.invitationType && eventSettings.invitationType !== 'Thiệp cưới') {
-                applicableBlockTypes = [
-                    'EVENT_DESCRIPTION',
-                    'GALLERY',
-                    'VIDEO',
-                ];
+                // Với các sự kiện không phải đám cưới, giữ lại tất cả các khối TRỪ thông tin cô dâu/chú rể và chuyện tình yêu
+                applicableBlockTypes = defaultOrder.filter(type => 
+                    !['COUPLE_INFO', 'LOVE_STORY', 'PARTICIPANTS'].includes(type)
+                );
             }
             if (order && order.length > 0) {
                 blocks = order
