@@ -1424,7 +1424,7 @@ const WishManagementPanel = ({ invitationId }) => {
     const fetchWishes = useCallback(async () => {
         if (!invitationId) return;
         try {
-            const response = await api.get(`/invitations/${invitationId}/wishes`);
+            const response = await api.get(`/${invitationId}/wishes`);
             setWishes(response.data.data || []);
         } catch (error) {
             showErrorToast("Không thể tải danh sách lời chúc.");
