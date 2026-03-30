@@ -3,7 +3,7 @@ import axios from 'axios';
 // 1. Cấu hình Instance cơ bản
 const api = axios.create({
   // baseURL: 'http://localhost:5000/api', // Dùng khi dev local
-  baseURL: 'https://api-icards.duckdns.org/api',
+  baseURL: 'https://api-icards.loca.lt/api',
   headers: {
     'Content-Type': 'application/json'
   },
