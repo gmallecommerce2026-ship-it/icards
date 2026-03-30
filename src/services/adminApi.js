@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const adminApi = axios.create({
   // URL này dành riêng cho backend của trang quản trị
-  baseURL: 'https://helpless-liger-92.loca.lt/api/v1', 
+  baseURL: 'https://api-icards-dashboard.loca.lt/api/v1', 
   headers: {
     'Content-Type': 'application/json'
   },
