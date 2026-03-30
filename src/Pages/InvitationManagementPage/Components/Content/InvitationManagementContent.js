@@ -1424,7 +1424,8 @@ const WishManagementPanel = ({ invitationId }) => {
     const fetchWishes = useCallback(async () => {
         if (!invitationId) return;
         try {
-            const response = await api.get(`/${invitationId}/wishes`);
+            // SỬA Ở ĐÂY: Đổi endpoint gọi trực tiếp vào resource wishes
+            const response = await api.get(`/wish/${invitationId}`);
             setWishes(response.data.data || []);
         } catch (error) {
             showErrorToast("Không thể tải danh sách lời chúc.");
@@ -1437,7 +1438,9 @@ const WishManagementPanel = ({ invitationId }) => {
 
     const handleToggleStatus = (wish) => {
         const newStatus = wish.status === 'approved' ? 'hidden' : 'approved';
-        const promise = api.put(`/invitations/${invitationId}/wishes/${wish._id}`, { status: newStatus });
+        
+        // SỬA Ở ĐÂY: Gọi trực tiếp vào ID của lời chúc thay vì lồng qua invitationId
+        const promise = api.put(`/wishes/${wish._id}`, { status: newStatus });
         
         handlePromiseToast(promise, {
             pending: 'Đang cập nhật trạng thái...',
@@ -1450,7 +1453,9 @@ const WishManagementPanel = ({ invitationId }) => {
 
     const handleDeleteWish = (wishId) => {
         if (!window.confirm("Bạn có chắc chắn muốn xóa lời chúc này?")) return;
-        const promise = api.delete(`/invitations/${invitationId}/wishes/${wishId}`);
+        
+        // SỬA Ở ĐÂY: Gọi trực tiếp vào ID của lời chúc thay vì lồng qua invitationId
+        const promise = api.delete(`/wishes/${wishId}`);
         
         handlePromiseToast(promise, {
             pending: 'Đang xóa lời chúc...',
