@@ -5,6 +5,7 @@ const api = axios.create({
   // baseURL: 'http://localhost:5000/api', // Dùng khi dev local
   baseURL: 'https://api-icards-vps.loca.lt/api',
   headers: {
+    'Bypass-Tunnel-Reminder': 'true',
     'Content-Type': 'application/json'
   },
   withCredentials: true, // Quan trọng để gửi Cookie/Session
