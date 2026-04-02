@@ -71,6 +71,7 @@ import {
     Brush,
     Grid3x3 as GridOnIcon, 
     GridOff as GridOffIcon,
+    Comment as CommentIcon,
     Contacts as ContactsIcon
 } from '@mui/icons-material';
 import axios from 'axios';
@@ -171,6 +172,27 @@ const DndCursorManager = () => {
 
     return null; // Component này không render gì cả
 };
+const WishesPreview = ({ settings, onSelectField, selectedFieldKey }) => (
+    <Box className="section-container">
+        <SectionHeader
+            title={settings.wishesTitle || "Sổ Lưu Bút"}
+            subtitle={settings.wishesSubtitle || "Hãy để lại những lời chúc tốt đẹp nhất dành cho chúng tôi nhé!"}
+            onSelectField={onSelectField}
+            selectedFieldKey={selectedFieldKey}
+            titleKey="wishesTitle"
+            subtitleKey="wishesSubtitle"
+            titleStyle={settings.wishesTitleStyle}
+            subtitleStyle={settings.wishesSubtitleStyle}
+        />
+        <EditableWrapper fieldKey="wishes" onSelectField={onSelectField} selectedFieldKey={selectedFieldKey} sx={{ p: 0, border: 'none', '&:hover': { backgroundColor: 'transparent' } }}>
+            <Box sx={{ maxWidth: '800px', margin: '0 auto', p: 3, bgcolor: '#fdfbfb', borderRadius: 2, border: '1px dashed #ccc' }}>
+                <Typography color="text.secondary" align="center" sx={{ fontStyle: 'italic' }}>
+                    [Khu vực Form nhập và danh sách lời chúc sẽ được hiển thị ở đây trên trang thực tế]
+                </Typography>
+            </Box>
+        </EditableWrapper>
+    </Box>
+);
 const FloatingSelectionBar = ({ count, onClear, onDelete, isDeleting }) => {
     if (count === 0) return null;
     
@@ -386,6 +408,7 @@ const AVAILABLE_BLOCKS = {
     LOVE_STORY: { key: 'loveStory', label: 'Chuyện tình yêu', description: 'Dòng thời gian (Timeline) kể lại các cột mốc đáng nhớ.', icon: <FilterVintageIcon />, isList: true, titleKey: 'loveStoryTitle' },
     GALLERY: { key: 'galleryImages', label: 'Bộ sưu tập ảnh', description: 'Lưới hình ảnh (Grid) trưng bày những khoảnh khắc đẹp nhất.', icon: <PhotoLibraryIcon />, isList: true, titleKey: 'galleryTitle' },
     VIDEO: { key: 'videoUrl', label: 'Video sự kiện', description: 'Nhúng video trực tiếp từ YouTube để khách mời cùng xem.', icon: <ImageIcon />, titleKey: 'videoTitle' },
+    WISHES: { key: 'wishes', label: 'Sổ Lưu Bút', description: 'Nơi khách mời gửi gắm những lời chúc tốt đẹp nhất.', icon: <CommentIcon />, titleKey: 'wishesTitle', subtitleKey: 'wishesSubtitle' }, // <--- THÊM DÒNG NÀY
     CONTACT_INFO: { key: 'contactInfo', label: 'Thông tin liên hệ', description: 'Số điện thoại hỗ trợ của đại diện nhà trai và nhà gái.', icon: <PhoneIcon />, relatedFields: ['contactGroom', 'contactBride'], titleKey: 'contactTitle' },
     QR_CODES: { key: 'qrCodes', label: 'Mã QR mừng cưới', description: 'Mã QR tài khoản ngân hàng để khách mời tiện gửi quà mừng.', icon: <DataObjectIcon />, isList: true, titleKey: 'qrCodeTitle' },
     RSVP: { key: 'rsvp', label: 'Xác Nhận Tham Dự (RSVP)', description: 'Biểu mẫu giúp khách mời phản hồi khả năng tham dự.', icon: <CheckBoxIcon />, titleKey: 'rsvpTitle', subtitleKey: 'rsvpSubtitle' },
@@ -1027,6 +1050,7 @@ const blockComponentMap = {
     LOVE_STORY: LoveStoryPreview,
     GALLERY: GalleryPreview,
     VIDEO: VideoPreview,
+    WISHES: WishesPreview,
     CONTACT_INFO: ContactInfoPreview,
     QR_CODES: QrCodesPreview,
     COUNTDOWN: CountdownPreview,
@@ -1699,6 +1723,7 @@ const SETTINGS_META = {
     loveStoryTitle: { label: 'Tiêu đề Chuyện tình yêu', type: 'story-text' },
     galleryTitle: { label: 'Tiêu đề Bộ sưu tập ảnh', type: 'story-text' },
     videoTitle: { label: 'Tiêu đề Video', type: 'story-text' },
+    wishesTitle: { label: 'Tiêu đề Sổ Lưu Bút', type: 'story-text' },
     contactTitle: { label: 'Tiêu đề Liên hệ', type: 'story-text' },
     qrCodeTitle: { label: 'Tiêu đề Mã QR', type: 'story-text' },
     rsvpTitle: { label: 'Tiêu đề RSVP', type: 'story-text' },
@@ -4328,6 +4353,7 @@ const WeddingInvitationEditor = () => {
         loveStoryTitle: 'Chuyện Tình Yêu',
         galleryTitle: 'Bộ Sưu Tập Ảnh',
         videoTitle: 'Video Sự Kiện',
+        wishesTitle: 'Sổ Lưu Bút',
         contactTitle: 'Thông Tin Liên Hệ',
         qrCodeTitle: 'Mã QR Mừng Cưới',
         rsvpTitle: 'Xác Nhận Tham Dự',
@@ -4566,7 +4592,7 @@ const WeddingInvitationEditor = () => {
             const defaultOrder = [
                 'BANNER_CAROUSEL', 'EVENT_DESCRIPTION', 'COUPLE_INFO',
                 'PARTICIPANTS', 'EVENT_SCHEDULE', 'COUNTDOWN',
-                'LOVE_STORY', 'GALLERY', 'VIDEO', 'CONTACT_INFO', 'QR_CODES', 'RSVP', 'CUSTOM_HTML'
+                'LOVE_STORY', 'GALLERY', 'VIDEO', 'WISHES', 'CONTACT_INFO', 'QR_CODES', 'RSVP', 'CUSTOM_HTML'
             ];
             let applicableBlockTypes = defaultOrder;
             if (eventSettings.invitationType && eventSettings.invitationType !== 'Thiệp cưới') {
