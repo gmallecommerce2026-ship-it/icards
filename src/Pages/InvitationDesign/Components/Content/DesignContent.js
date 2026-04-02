@@ -706,6 +706,37 @@ const EventSchedulePreview = ({ settings, onEditItem, onSelectField, selectedFie
         </Box>
     </Box>
 );
+const SafePreviewImage = ({ fileOrUrl, alt, className, onClick }) => {
+    const [previewUrl, setPreviewUrl] = useState(null);
+
+    useEffect(() => {
+        if (!fileOrUrl) {
+            setPreviewUrl(null);
+            return;
+        }
+
+        if (fileOrUrl instanceof File) {
+            const objectUrl = URL.createObjectURL(fileOrUrl);
+            setPreviewUrl(objectUrl);
+            // Cleanup function: Xóa URL cũ khỏi bộ nhớ khi unmount hoặc đổi ảnh
+            return () => URL.revokeObjectURL(objectUrl);
+        } else {
+            setPreviewUrl(fileOrUrl);
+        }
+    }, [fileOrUrl]);
+
+    if (!previewUrl) return null;
+
+    return (
+        <img 
+            src={previewUrl} 
+            alt={alt} 
+            className={className} 
+            onClick={onClick}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        />
+    );
+};
 const LoveStoryPreview = ({ settings, onEditItem, onSelectField, selectedFieldKey }) => (
     <Box className="section-container">
         <SectionHeader
@@ -715,36 +746,82 @@ const LoveStoryPreview = ({ settings, onEditItem, onSelectField, selectedFieldKe
             titleKey="loveStoryTitle"
             titleStyle={settings.loveStoryTitleStyle}
         />
-        <Box className="love-story-timeline">
+        <Box className="love-story-timeline" sx={{ position: 'relative' }}>
+            {/* Đường line ở giữa của Timeline */}
+            {(settings.loveStory && settings.loveStory.length > 0) && (
+                <Box sx={{ 
+                    position: 'absolute', top: 0, bottom: 0, left: '50%', 
+                    width: '2px', bgcolor: 'primary.light', transform: 'translateX(-50%)', zIndex: 0 
+                }} className="timeline-center-line" />
+            )}
+
             {(settings.loveStory && settings.loveStory.length > 0) ? settings.loveStory.map((story, index) => (
-                <Box key={story.id} className={`story-item ${index % 2 === 0 ? 'left' : 'right'}`} onClick={() => onEditItem({ type: 'loveStory', data: story })}>
-                    <Box className="story-content clickable-card">
-                        
-                        {/* === BẮT ĐẦU SỬA: Bọc ảnh trong story-image-wrapper === */}
+                <Box 
+                    key={story.id} 
+                    className={`story-item ${index % 2 === 0 ? 'left' : 'right'}`} 
+                    onClick={() => onEditItem({ type: 'loveStory', data: story })}
+                    sx={{ position: 'relative', zIndex: 1, mb: 4 }}
+                >
+                    <Box 
+                        className="story-content clickable-card"
+                        sx={{ 
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
+                            '&:hover': { transform: 'translateY(-4px)', boxShadow: 4, borderColor: 'primary.main' }
+                        }}
+                    >
+                        {/* Ảnh cột mốc an toàn */}
                         {story.imageUrl && (
-                            <Box className="story-image-wrapper">
-                                <img 
-                                    src={story.imageUrl instanceof File ? URL.createObjectURL(story.imageUrl) : story.imageUrl} 
+                            <Box className="story-image-wrapper" sx={{ mb: 2, borderRadius: 2, overflow: 'hidden' }}>
+                                <SafePreviewImage 
+                                    fileOrUrl={story.imageUrl} 
                                     alt={story.title || "Cột mốc"} 
                                     className="story-image" 
                                     onClick={(e) => e.stopPropagation()} 
                                 />
                             </Box>
                         )}
-                        {/* === KẾT THÚC SỬA === */}
 
-                        <Typography variant="h3" className="story-title">{story.title}</Typography>
-                        <Typography className="story-date">{story.date}</Typography>
-                        <Typography className="story-description">{story.description}</Typography>
+                        {/* ĐỒNG BỘ STYLES TỪ SETTINGS */}
+                        <Typography 
+                            variant="h3" 
+                            className="story-title"
+                            sx={{ ...settings.loveStoryItemTitleStyle, minHeight: '30px' }}
+                        >
+                            {story.title || "Tiêu đề sự kiện"}
+                        </Typography>
+                        
+                        <Typography 
+                            className="story-date"
+                            sx={{ ...settings.loveStoryItemDateStyle, display: 'block', mb: 1, minHeight: '20px' }}
+                        >
+                            {story.date || "Ngày tháng"}
+                        </Typography>
+                        
+                        <Typography 
+                            className="story-description"
+                            sx={{ ...settings.loveStoryItemDescStyle, whiteSpace: 'pre-line', minHeight: '24px' }}
+                        >
+                            {story.description || "Thêm mô tả cho kỷ niệm đáng nhớ của bạn..."}
+                        </Typography>
                     </Box>
                 </Box>
-            )) : <Typography sx={{ textAlign: 'center', color: 'text.secondary' }}>Chưa có câu chuyện nào. Nhấp vào nút bên dưới để thêm.</Typography>}
+            )) : (
+                <Box sx={{ textAlign: 'center', py: 6, width: '100%', position: 'relative', zIndex: 1 }}>
+                    <FilterVintageIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
+                    <Typography sx={{ color: 'text.secondary' }}>
+                        Chưa có câu chuyện nào. Nhấp vào nút bên dưới để thêm cột mốc.
+                    </Typography>
+                </Box>
+            )}
         </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+        
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
             <Button
-                variant="outlined"
+                variant="contained"
+                color="primary"
                 startIcon={<AddCircleOutlineIcon />}
                 onClick={() => onEditItem({ type: 'loveStory', data: { id: uuidv4(), title: '', date: '', description: '', imageUrl: null }, isNew: true })}
+                sx={{ borderRadius: 8, px: 4, py: 1, boxShadow: 2 }}
             >
                 Thêm cột mốc
             </Button>
