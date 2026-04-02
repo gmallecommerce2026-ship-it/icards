@@ -1235,7 +1235,7 @@ const WishesSection = React.memo(({ resourceId, settings }) => {
         const fetchWishes = async () => {
             try {
                 // Endpoint lấy các lời chúc đã được duyệt
-                const res = await api.get(`/invitations/public/${resourceId}/wishes`);
+                const res = await api.get(`/wishes/public/${resourceId}`);
                 setWishes(res.data.data || []);
             } catch (err) {
                 console.error("Lỗi tải lời chúc:", err);
@@ -1252,7 +1252,7 @@ const WishesSection = React.memo(({ resourceId, settings }) => {
         }
         setIsSubmitting(true);
         try {
-            await api.post(`/invitations/public/${resourceId}/wishes`, formData);
+            await api.post(`/wishes/public/${resourceId}`, formData);
             showSuccessToast("Gửi lời chúc thành công! Lời chúc sẽ được hiển thị sau khi duyệt.");
             setFormData({ senderName: '', content: '' });
         } catch (err) {
