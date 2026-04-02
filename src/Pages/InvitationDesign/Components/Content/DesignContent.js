@@ -1723,7 +1723,9 @@ const SETTINGS_META = {
     loveStoryTitle: { label: 'Tiêu đề Chuyện tình yêu', type: 'story-text' },
     galleryTitle: { label: 'Tiêu đề Bộ sưu tập ảnh', type: 'story-text' },
     videoTitle: { label: 'Tiêu đề Video', type: 'story-text' },
+    wishes: { label: 'Cài đặt Sổ Lưu Bút', type: 'text', description: 'Form nhập và danh sách lời chúc sẽ tự động hiển thị trên trang thực tế.' },
     wishesTitle: { label: 'Tiêu đề Sổ Lưu Bút', type: 'story-text' },
+    wishesSubtitle: { label: 'Tiêu đề phụ Sổ Lưu Bút', type: 'story-text' },
     contactTitle: { label: 'Tiêu đề Liên hệ', type: 'story-text' },
     qrCodeTitle: { label: 'Tiêu đề Mã QR', type: 'story-text' },
     rsvpTitle: { label: 'Tiêu đề RSVP', type: 'story-text' },
@@ -2044,6 +2046,7 @@ const MapPickerEditor = ({ location, onLocationChange }) => {
 const SettingsPropertyEditor = ({ selectedKey, settings, setSettings, customFonts, itemToEdit, setItemToEdit }) => {
     if (!selectedKey) return null;
     const meta = SETTINGS_META[selectedKey];
+    if (!meta) return <Typography color="text.secondary" sx={{fontStyle: 'italic'}}>Thuộc tính này hiện không cần cài đặt thêm.</Typography>;
     const value = _.get(settings, selectedKey, '');
     const handleUpdate = (fieldIdOrValue, updates) => {
         if (['image-grid', 'image-dnd-list', 'qr-code-editor', 'event-list', 'participants-editor', 'love-story-editor'].includes(meta.type)) {
