@@ -5,6 +5,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../../../services/api';
 import SEO from '../../../../Features/SEO';
 import { gsap } from 'gsap';
+import { ChevronRight, Hash } from 'lucide-react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import '../../../../tiptap-content.css';
 import './BlogDetailsPageContent.css';
@@ -16,10 +17,13 @@ const BlogDetailsPageContent = () => {
     const [latestPosts, setLatestPosts] = useState([]); // ++ MỚI: State cho bài mới nhất
     const [loading, setLoading] = useState(true);
     const [scrollWidth, setScrollWidth] = useState(0);
+    const [categories, setCategories] = useState([]);
+    const [topics, setTopics] = useState([]);
     const { slug } = useParams();
     const navigate = useNavigate();
     const contentRef = useRef(null);
-
+    let textBlockCount = 0;
+    let productIndex = 0;
     // --- 1. Effect: Scroll Progress Bar (Giữ nguyên) ---
     useEffect(() => {
         const handleScroll = () => {
@@ -62,7 +66,25 @@ const BlogDetailsPageContent = () => {
         };
         if (slug) fetchBlogDetails();
     }, [slug]);
+    useEffect(() => {
+        const fetchSidebarData = async () => {
+            try {
+                const [catsRes, topicsRes] = await Promise.all([
+                    api.get('/public/page-categories'),
+                    api.get('/public/topics')
+                ]);
 
+                if (catsRes.data?.data) setCategories(catsRes.data.data);
+                
+                if (topicsRes?.data?.data && Array.isArray(topicsRes.data.data)) {
+                    setTopics(topicsRes.data.data.map(t => t.name));
+                }
+            } catch (error) {
+                console.error("Lỗi tải dữ liệu sidebar:", error);
+            }
+        };
+        fetchSidebarData();
+    }, []);
     if (loading) return <div className="loading-wrapper">Đang tải nội dung...</div>;
     if (!blog) return <div className="loading-wrapper">Bài viết không tồn tại.</div>;
 
@@ -107,36 +129,63 @@ const BlogDetailsPageContent = () => {
                         )}
 
                         <div className="blog-content-body blog-animate ck-content">
-                            {Array.isArray(blog.content) ? (
-                                // Nếu content là mảng các block (cấu trúc mới)
-                                blog.content.map((block, index) => {
-                                    if (block.type === 'text') {
-                                        return (
-                                            <div 
-                                                key={block._id || index} 
-                                                dangerouslySetInnerHTML={{ __html: block.content }} 
-                                            />
-                                        );
-                                    }
-                                    if (block.type === 'image') {
-                                        return (
-                                            <img 
-                                                key={block._id || index} 
-                                                src={block.content} 
-                                                alt={block.alt || "blog-image"} 
-                                                style={{ maxWidth: '100%', borderRadius: '8px', margin: '1rem 0' }}
-                                            />
-                                        );
-                                    }
-                                    return null;
-                                })
-                            ) : (
-                                // Nếu content là một chuỗi string HTML (cấu trúc cũ/fallback)
-                                typeof blog.content === 'string' ? (
-                                    <div dangerouslySetInnerHTML={{ __html: blog.content }} />
-                                ) : null
-                            )}
+    {Array.isArray(blog.content) ? (
+        blog.content.map((block, index) => {
+            let injectedProduct = null;
+
+            // Nếu là block text, tăng biến đếm
+            if (block.type === 'text') {
+                textBlockCount++;
+                
+                // Cứ sau mỗi 2 block text, chèn 1 sản phẩm (nếu còn sản phẩm trong mảng)
+                if (textBlockCount % 2 === 0 && productIndex < relatedProducts.length) {
+                    const prod = relatedProducts[productIndex];
+                    injectedProduct = (
+                        <div className="inline-product-banner" key={`inline-prod-${prod._id}`}>
+                            <Link to={`/product/${prod._id}`} className="inline-product-link">
+                                <img 
+                                    src={prod.imgSrc || (prod.images && prod.images[0]) || "https://placehold.co/150"} 
+                                    alt={prod.title} 
+                                    className="inline-product-img" 
+                                />
+                                <div className="inline-product-details">
+                                    <span className="inline-product-badge">Gợi ý cho bạn</span>
+                                    <h4 className="inline-product-title">{prod.title}</h4>
+                                    <div className="inline-product-price">{prod.price?.toLocaleString('vi-VN')}đ</div>
+                                    <span className="inline-product-btn">Xem chi tiết</span>
+                                </div>
+                            </Link>
                         </div>
+                    );
+                    productIndex++; // Chuyển sang sản phẩm tiếp theo cho lần chèn sau
+                }
+            }
+
+            return (
+                <React.Fragment key={block._id || index}>
+                    {/* Render nội dung bài viết */}
+                    {block.type === 'text' && (
+                        <div dangerouslySetInnerHTML={{ __html: block.content }} />
+                    )}
+                    {block.type === 'image' && (
+                        <img 
+                            src={block.content} 
+                            alt={block.alt || "blog-image"} 
+                            style={{ maxWidth: '100%', borderRadius: '8px', margin: '1.5rem 0' }}
+                        />
+                    )}
+                    
+                    {/* Render sản phẩm xen kẽ (nếu có ở vị trí này) */}
+                    {injectedProduct}
+                </React.Fragment>
+            );
+        })
+    ) : (
+        typeof blog.content === 'string' ? (
+            <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+        ) : null
+    )}
+</div>
                     </article>
 
                     {/* --- CỘT PHẢI: SIDEBAR --- */}
@@ -201,7 +250,55 @@ const BlogDetailsPageContent = () => {
                                     </ul>
                                 </div>
                             )}
+                            {categories.length > 0 && (
+                                <div className="widget-box blog-animate">
+                                    <div className="widget-title">Danh mục</div>
+                                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                        {categories.map((cat) => (
+                                            <li key={cat._id} style={{ marginBottom: '0.5rem', borderBottom: '1px dashed #e5e7eb', paddingBottom: '0.5rem' }}>
+                                                {/* Chú ý: Cần xử lý navigate về trang danh sách blog và truyền state category */}
+                                                <div 
+                                                    onClick={() => navigate('/blogs', { state: { categoryId: cat._id } })}
+                                                    style={{ 
+                                                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                                        cursor: 'pointer', color: '#374151', fontSize: '0.9rem', transition: 'color 0.2s'
+                                                    }}
+                                                    onMouseOver={(e) => e.currentTarget.style.color = '#2563eb'}
+                                                    onMouseOut={(e) => e.currentTarget.style.color = '#374151'}
+                                                >
+                                                    <span>{cat.name}</span>
+                                                    <ChevronRight size={14} color="#9ca3af" />
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
 
+                            {/* [+] MỚI - Widget 4: Chủ đề (Tags/Topics) */}
+                            {topics.length > 0 && (
+                                <div className="widget-box blog-animate">
+                                    <div className="widget-title">Chủ đề nổi bật</div>
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '10px' }}>
+                                        {topics.map((topic, idx) => (
+                                            <span 
+                                                key={idx} 
+                                                onClick={() => navigate('/blogs', { state: { search: topic } })}
+                                                style={{
+                                                    background: '#f3f4f6', color: '#374151', padding: '6px 12px',
+                                                    borderRadius: '999px', fontSize: '0.8rem', cursor: 'pointer',
+                                                    display: 'inline-flex', alignItems: 'center', gap: '4px',
+                                                    border: '1px solid #e5e7eb', transition: 'all 0.2s'
+                                                }}
+                                                onMouseOver={(e) => { e.currentTarget.style.borderColor = '#2563eb'; e.currentTarget.style.color = '#2563eb'; }}
+                                                onMouseOut={(e) => { e.currentTarget.style.borderColor = '#e5e7eb'; e.currentTarget.style.color = '#374151'; }}
+                                            >
+                                                <Hash size={12} /> {topic}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </aside>
                 </div>

@@ -2491,7 +2491,7 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
         { id: 'dashboard', title: 'Tổng quan' },
         { id: 'guests', title: 'Quản lý khách mời' },
         { id: 'wishes', title: 'Quản lý lời chúc' },
-        { id: 'master-guests', title: 'Danh bạ khách mời' },
+        // { id: 'master-guests', title: 'Danh bạ khách mời' },
         { id: 'event-management', title: 'Quản lí sự kiện' },
         { id: 'tasks', title: 'Kế hoạch cưới' },
         { id: 'budget', title: 'Ngân sách' },

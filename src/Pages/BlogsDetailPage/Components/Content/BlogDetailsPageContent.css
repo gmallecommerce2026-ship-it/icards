@@ -234,3 +234,106 @@ body {
     font-family: 'Inter', sans-serif;
     color: #6b7280;
 }
+
+/* --- Inline Product Banner --- */
+.inline-product-banner {
+    margin: 2.5rem 0;
+    padding: 1rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.inline-product-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    border-color: #cbd5e1;
+}
+
+.inline-product-link {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+}
+
+.inline-product-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 0 !important; /* Ghi đè margin mặc định của ảnh trong bài viết */
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.inline-product-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.inline-product-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #2563eb;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.inline-product-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 0 0 0.5rem 0 !important; /* Ghi đè margin của thẻ heading */
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.inline-product-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 0.75rem;
+}
+
+.inline-product-btn {
+    align-self: flex-start;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fff;
+    background: #2563eb;
+    padding: 6px 16px;
+    border-radius: 999px;
+    transition: background 0.2s;
+}
+
+.inline-product-banner:hover .inline-product-btn {
+    background: #1d4ed8;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 640px) {
+    .inline-product-link {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .inline-product-img {
+        width: 100%;
+        height: 200px;
+    }
+
+    .inline-product-btn {
+        align-self: center;
+        width: 100%;
+        text-align: center;
+    }
+}
