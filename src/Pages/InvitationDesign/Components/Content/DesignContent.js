@@ -16,6 +16,7 @@ import { useDndMonitor } from '@dnd-kit/core';
 import { styled, useTheme, alpha } from '@mui/material/styles';
 import CustomEditor from '../../../Components/CustomEditor.js'; 
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import '../../../AboutUsPage/Components/Content/AboutUsContentPage.css';
 import L from 'leaflet';
 import {
     TextFields as TextFieldsIcon,
@@ -737,8 +738,15 @@ const SafePreviewImage = ({ fileOrUrl, alt, className, onClick }) => {
         />
     );
 };
+const artThemes = [
+    { main: '#D4A373', dark: '#B58252' }, // Vàng Cát / Gold
+    { main: '#84A59D', dark: '#63827B' }, // Xanh Sage (Lục bình)
+    { main: '#F28482', dark: '#D16260' }, // Đỏ San Hô
+    { main: '#9D8CA1', dark: '#7A6B7E' }, // Tím Dusty Rose
+    { main: '#6B8EAD', dark: '#4D6E8C' }  // Xanh Slate (Đá phiến)
+];
 const LoveStoryPreview = ({ settings, onEditItem, onSelectField, selectedFieldKey }) => (
-    <Box className="section-container">
+    <Box className="section-container art-lovestory-section">
         <SectionHeader
             title={settings.loveStoryTitle || "Chuyện Tình Yêu"}
             onSelectField={onSelectField}
@@ -746,66 +754,97 @@ const LoveStoryPreview = ({ settings, onEditItem, onSelectField, selectedFieldKe
             titleKey="loveStoryTitle"
             titleStyle={settings.loveStoryTitleStyle}
         />
-        <Box className="love-story-timeline" sx={{ position: 'relative' }}>
-            {/* Đường line ở giữa của Timeline */}
-            {(settings.loveStory && settings.loveStory.length > 0) && (
-                <Box sx={{ 
-                    position: 'absolute', top: 0, bottom: 0, left: '50%', 
-                    width: '2px', bgcolor: 'primary.light', transform: 'translateX(-50%)', zIndex: 0 
-                }} className="timeline-center-line" />
-            )}
+        
+        <Box className="art-timeline-container" sx={{ position: 'relative', px: { xs: 1, md: 0 } }}>
+            {(settings.loveStory && settings.loveStory.length > 0) ? settings.loveStory.map((story, index) => {
+                const theme = artThemes[index % artThemes.length];
+                const isImgLeft = index % 2 === 0;
 
-            {(settings.loveStory && settings.loveStory.length > 0) ? settings.loveStory.map((story, index) => (
-                <Box 
-                    key={story.id} 
-                    className={`story-item ${index % 2 === 0 ? 'left' : 'right'}`} 
-                    onClick={() => onEditItem({ type: 'loveStory', data: story })}
-                    sx={{ position: 'relative', zIndex: 1, mb: 4 }}
-                >
+                return (
                     <Box 
-                        className="story-content clickable-card"
+                        key={story.id} 
+                        className={`art-timeline-row ${isImgLeft ? 'layout-img-left' : 'layout-img-right'}`}
+                        onClick={() => onEditItem({ type: 'loveStory', data: story })}
                         sx={{ 
-                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
-                            '&:hover': { transform: 'translateY(-4px)', boxShadow: 4, borderColor: 'primary.main' }
+                            '--c-main': theme.main, 
+                            '--c-dark': theme.dark,
+                            cursor: 'pointer', // UX cho Editor: Báo hiệu có thể click để sửa
+                            transition: 'all 0.3s ease',
+                            '&:hover': { 
+                                transform: 'translateY(-4px)', 
+                                '& .art-img-frame': {
+                                    boxShadow: `0 0 0 3px ${theme.main}40` // Highlight màu khi hover
+                                }
+                            }
                         }}
                     >
-                        {/* Ảnh cột mốc an toàn */}
-                        {story.imageUrl && (
-                            <Box className="story-image-wrapper" sx={{ mb: 2, borderRadius: 2, overflow: 'hidden' }}>
-                                <SafePreviewImage 
-                                    fileOrUrl={story.imageUrl} 
-                                    alt={story.title || "Cột mốc"} 
-                                    className="story-image" 
-                                    onClick={(e) => e.stopPropagation()} 
-                                />
-                            </Box>
-                        )}
+                        {/* KHỐI TRỤC ĐOẠN: Thanh hình thang đan xen mang màu sắc riêng */}
+                        <div className="art-pole-segment"></div>
 
-                        {/* ĐỒNG BỘ STYLES TỪ SETTINGS */}
-                        <Typography 
-                            variant="h3" 
-                            className="story-title"
-                            sx={{ ...settings.loveStoryItemTitleStyle, minHeight: '30px' }}
-                        >
-                            {story.title || "Tiêu đề sự kiện"}
-                        </Typography>
-                        
-                        <Typography 
-                            className="story-date"
-                            sx={{ ...settings.loveStoryItemDateStyle, display: 'block', mb: 1, minHeight: '20px' }}
-                        >
-                            {story.date || "Ngày tháng"}
-                        </Typography>
-                        
-                        <Typography 
-                            className="story-description"
-                            sx={{ ...settings.loveStoryItemDescStyle, whiteSpace: 'pre-line', minHeight: '24px' }}
-                        >
-                            {story.description || "Thêm mô tả cho kỷ niệm đáng nhớ của bạn..."}
-                        </Typography>
+                        {/* KHỐI HÌNH ẢNH */}
+                        <div className="art-col-img">
+                            {story.imageUrl ? (
+                                <div className="art-img-frame">
+                                    {/* Sử dụng SafePreviewImage thay vì thẻ img thường để hỗ trợ File Object trong Editor */}
+                                    <SafePreviewImage 
+                                        fileOrUrl={story.imageUrl} 
+                                        alt={story.title || "Cột mốc"} 
+                                        className="story-image" 
+                                    />
+                                </div>
+                            ) : (
+                                <div className="art-img-placeholder" style={{ backgroundColor: '#f0f0f0', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <FilterVintageIcon sx={{ color: '#ccc' }}/>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* KHỐI TRUNG TÂM: LÁ CỜ QUẤN QUANH CỘT ĐOẠN */}
+                        <div className="art-col-center">
+                            {/* Đuôi cờ */}
+                            <div className="art-ribbon-tail">
+                                <div className="art-anchor-dot"></div> 
+                            </div>
+                            
+                            {/* Mặt trước cờ */}
+                            <div className="art-ribbon-front">
+                                <span className="art-ribbon-text">{story.date || "Ngày tháng"}</span>
+                            </div>
+                        </div>
+
+                        {/* KHỐI VĂN BẢN */}
+                        <div className="art-col-text">
+                            <div className="art-content-wrapper">
+                                <div className="art-text-block">
+                                    {/* Tiêu đề: Lấy style từ settings, ghi đè màu theo theme */}
+                                    <Typography 
+                                        component="h3"
+                                        className="art-title" 
+                                        sx={{ 
+                                            ...settings.loveStoryItemTitleStyle, 
+                                            color: theme.main,
+                                            minHeight: '24px'
+                                        }}
+                                    >
+                                        {story.title || "Tiêu đề sự kiện"}
+                                    </Typography>
+                                    {/* Mô tả */}
+                                    <Typography 
+                                        className="art-desc"
+                                        sx={{ 
+                                            ...settings.loveStoryItemDescStyle, 
+                                            whiteSpace: 'pre-line',
+                                            minHeight: '24px'
+                                        }}
+                                    >
+                                        {story.description || "Nhấp vào đây để chỉnh sửa mô tả cho kỷ niệm đáng nhớ của bạn..."}
+                                    </Typography>
+                                </div>
+                            </div>
+                        </div>
                     </Box>
-                </Box>
-            )) : (
+                );
+            }) : (
                 <Box sx={{ textAlign: 'center', py: 6, width: '100%', position: 'relative', zIndex: 1 }}>
                     <FilterVintageIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2 }} />
                     <Typography sx={{ color: 'text.secondary' }}>
@@ -815,7 +854,7 @@ const LoveStoryPreview = ({ settings, onEditItem, onSelectField, selectedFieldKe
             )}
         </Box>
         
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
             <Button
                 variant="contained"
                 color="primary"

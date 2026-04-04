@@ -1571,6 +1571,7 @@ const EventManagementPanel = ({ invitation, onDataChange }) => {
                     <ReminderSettings 
                         reminders={reminders} 
                         onUpdate={handleReminderUpdate} 
+                        eventDate={invitation?.settings?.eventDate}
                     />
                 </div>
             </div>
@@ -1754,7 +1755,7 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
     );
 };
 
-const ReminderSettings = ({ reminders, onUpdate }) => {
+const ReminderSettings = ({ reminders, onUpdate, eventDate }) => {
     const [newDays, setNewDays] = useState('');
 
     const handleAddReminder = () => {
@@ -1783,6 +1784,13 @@ const ReminderSettings = ({ reminders, onUpdate }) => {
         onUpdate(reminders.map(r => r.id === id ? { ...r, isEnabled: !r.isEnabled } : r));
     };
 
+    const getSendDateDisplay = (daysBefore) => {
+        if (!eventDate) return "Vui lòng cài đặt Ngày sự kiện trước.";
+        const date = new Date(eventDate);
+        date.setDate(date.getDate() - daysBefore);
+        return date.toLocaleDateString('vi-VN');
+    };
+
     return (
         <div style={{ border: '1px solid #ccc', padding: '15px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '15px', backgroundColor: '#f9f9f9' }}>
             <h4 style={{ margin: 0, color: '#27548a' }}>Thiết lập Email Nhắc nhở</h4>
@@ -1807,7 +1815,15 @@ const ReminderSettings = ({ reminders, onUpdate }) => {
             
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {reminders.map(reminder => (
-                    <li key={reminder.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', borderBottom: '1px solid #eee' }}>
+                    <li key={reminder.id}>
+                        <div style={{ flex: 1 }}>
+                            <strong style={{ color: reminder.isEnabled ? '#10B981' : '#EF4444' }}>
+                                Nhắc trước {reminder.daysBefore} ngày
+                            </strong>
+                            <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '4px' }}>
+                                Dự kiến gửi vào: <b>{getSendDateDisplay(reminder.daysBefore)}</b>
+                            </div>
+                        </div>
                         <div style={{ flex: 1 }}>
                             <strong style={{ color: reminder.isEnabled ? '#10B981' : '#EF4444' }}>
                                 {reminder.daysBefore} ngày trước
