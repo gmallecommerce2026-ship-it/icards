@@ -2513,9 +2513,10 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
         { id: 'dashboard', title: 'Tổng quan' },
         { id: 'guests', title: 'Quản lý khách mời' },
         { id: 'wishes', title: 'Quản lý lời chúc' },
-        // { id: 'master-guests', title: 'Danh bạ khách mời' },
+        { id: 'master-guests', title: 'Danh bạ khách mời' },
         { id: 'event-management', title: 'Quản lí sự kiện' },
         { id: 'tasks', title: 'Kế hoạch cưới' },
+        { id: 'budget', title: 'Ngân sách' },
         { id: 'invitation-settings', title: 'Cài đặt thiệp mời' },
         { id: 'delete', title: 'Xóa thiệp mời' },
     ];
@@ -2569,6 +2570,8 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
             //     return <MasterGuestPanel user={invitation.user} onAddGuestsToInvitation={handleAddGuestsFromMaster} />;
             case 'tasks':
                 return <TaskManagementPanel invitationId={invitation._id} initialTasks={invitation.tasks || []} onDataChange={onDataChange} />;
+            case 'budget':
+                return <BudgetManagementPanel invitationId={invitation._id} initialBudget={invitation.budget || []} onDataChange={onDataChange} />;
             case 'event-management': // <- BỔ SUNG SWITCH CASE
                 return <EventManagementPanel invitation={invitation} onDataChange={onDataChange} />;
             case 'invitation-settings':
@@ -2641,7 +2644,235 @@ const InvitationListView = ({ invitations, onManageClick }) => {
         </div>
     );
 }
+// ==============================================================================
+// COMPONENT: BUDGET MANAGEMENT PANEL (QUẢN LÝ NGÂN SÁCH)
+// ==============================================================================
+const BudgetManagementPanel = ({ invitationId, initialBudget = [], onDataChange }) => {
+    const [budgetData, setBudgetData] = useState(initialBudget);
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [newItemNames, setNewItemNames] = useState({});
+    
+    // State cho việc edit item
+    const [editingItem, setEditingItem] = useState(null); // { catId, itemId }
+    const [editForm, setEditForm] = useState({ name: '', estimatedCost: 0, actualCost: 0 });
 
+    const formatVND = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value || 0);
+
+    const saveBudgetToDB = async (updatedData) => {
+        try {
+            // Giả định bạn có API endpoint tương tự như tasks
+            const response = await api.put(`/invitations/${invitationId}/budget`, { budget: updatedData });
+            onDataChange(response.data.data, 'update-budget');
+        } catch (error) {
+            showErrorToast('Không thể lưu dữ liệu ngân sách.');
+        }
+    };
+
+    // Tính toán tổng quan sử dụng useMemo để tối ưu performance
+    const summary = useMemo(() => {
+        let totalEstimated = 0;
+        let totalActual = 0;
+        budgetData.forEach(cat => {
+            (cat.items || []).forEach(item => {
+                totalEstimated += Number(item.estimatedCost) || 0;
+                totalActual += Number(item.actualCost) || 0;
+            });
+        });
+        return { totalEstimated, totalActual, diff: totalEstimated - totalActual };
+    }, [budgetData]);
+
+    // Thêm Nhóm chi phí
+    const handleAddCategory = (e) => {
+        e.preventDefault();
+        if (!newCategoryName.trim()) return;
+        const newCat = { id: Date.now().toString(), title: newCategoryName, items: [] };
+        const updatedData = [...budgetData, newCat];
+        setBudgetData(updatedData);
+        saveBudgetToDB(updatedData);
+        setNewCategoryName('');
+    };
+
+    const handleDeleteCategory = (catId) => {
+        if (!window.confirm("Bạn có chắc muốn xóa nhóm chi phí này và toàn bộ các mục bên trong?")) return;
+        const updatedData = budgetData.filter(c => c.id !== catId);
+        setBudgetData(updatedData);
+        saveBudgetToDB(updatedData);
+    };
+
+    // Thêm hạng mục con
+    const handleAddItem = (e, catId) => {
+        e.preventDefault();
+        const name = newItemNames[catId];
+        if (!name?.trim()) return;
+
+        const updatedData = budgetData.map(cat => {
+            if (cat.id === catId) {
+                return {
+                    ...cat,
+                    items: [...(cat.items || []), { id: Date.now().toString(), name, estimatedCost: 0, actualCost: 0 }]
+                };
+            }
+            return cat;
+        });
+        setBudgetData(updatedData);
+        saveBudgetToDB(updatedData);
+        setNewItemNames(prev => ({ ...prev, [catId]: '' }));
+    };
+
+    const handleDeleteItem = (catId, itemId) => {
+        const updatedData = budgetData.map(cat => {
+            if (cat.id === catId) {
+                return { ...cat, items: (cat.items || []).filter(i => i.id !== itemId) };
+            }
+            return cat;
+        });
+        setBudgetData(updatedData);
+        saveBudgetToDB(updatedData);
+    };
+
+    const startEditing = (catId, item) => {
+        setEditingItem({ catId, itemId: item.id });
+        setEditForm({ name: item.name, estimatedCost: item.estimatedCost, actualCost: item.actualCost });
+    };
+
+    const saveEditItem = () => {
+        if (!editingItem) return;
+        const updatedData = budgetData.map(cat => {
+            if (cat.id === editingItem.catId) {
+                return {
+                    ...cat,
+                    items: (cat.items || []).map(i => i.id === editingItem.itemId ? { ...i, ...editForm } : i)
+                };
+            }
+            return cat;
+        });
+        setBudgetData(updatedData);
+        saveBudgetToDB(updatedData);
+        setEditingItem(null);
+    };
+
+    return (
+        <div className="task-management-wrapper">
+            {/* 1. Tổng quan ngân sách */}
+            <div className="budget-summary-grid">
+                <div className="budget-summary-card">
+                    <div className="budget-label">Tổng ngân sách dự kiến</div>
+                    <div className="budget-value text-blue">{formatVND(summary.totalEstimated)}</div>
+                </div>
+                <div className="budget-summary-card">
+                    <div className="budget-label">Chi phí thực tế</div>
+                    <div className="budget-value text-green">{formatVND(summary.totalActual)}</div>
+                </div>
+                <div className="budget-summary-card">
+                    <div className="budget-label">{summary.diff >= 0 ? 'Còn dư' : 'Vượt ngân sách'}</div>
+                    <div className={`budget-value ${summary.diff >= 0 ? 'text-green' : 'text-red'}`}>
+                        {formatVND(Math.abs(summary.diff))}
+                    </div>
+                </div>
+            </div>
+
+            {/* 2. Thêm nhóm mới */}
+            <form onSubmit={handleAddCategory} className="task-add-form">
+                <div className="task-input-wrapper">
+                    <input 
+                        type="text" 
+                        value={newCategoryName} 
+                        onChange={(e) => setNewCategoryName(e.target.value)} 
+                        placeholder="Thêm Nhóm chi phí (VD: Trang phục, Tiệc cưới, Quay chụp...)" 
+                        className="task-add-input"
+                    />
+                    <button type="submit" className="task-add-submit-btn" disabled={!newCategoryName.trim()}>
+                        <AddIcon /> <span style={{marginLeft: '6px'}}>Thêm Nhóm</span>
+                    </button>
+                </div>
+            </form>
+
+            {/* 3. Danh sách ngân sách chi tiết */}
+            <div className="task-categories-container">
+                {budgetData.length === 0 ? (
+                    <div className="timeline-empty-state">
+                        <p>Chưa có kế hoạch ngân sách nào. Hãy thêm nhóm chi phí để bắt đầu!</p>
+                    </div>
+                ) : (
+                    budgetData.map(category => (
+                        <div key={category.id} className="task-category-card">
+                            <div className="task-category-header">
+                                <h4 className="task-category-title" style={{ flex: 1, color: '#27548a' }}>{category.title}</h4>
+                                <div style={{fontWeight: 600, color: '#4B5563', marginRight: '20px'}}>
+                                    Tổng: {formatVND((category.items || []).reduce((s, i) => s + (Number(i.estimatedCost) || 0), 0))}
+                                </div>
+                                <button onClick={() => handleDeleteCategory(category.id)} className="table-action-btn timeline-delete-btn">
+                                    <DeleteIcon width="18" height="18" />
+                                </button>
+                            </div>
+
+                            <div className="task-category-body" style={{padding: 0}}>
+                                {/* Table Header */}
+                                <div className="budget-table-header">
+                                    <div style={{flex: 2}}>Hạng mục</div>
+                                    <div style={{flex: 1.5, textAlign: 'right'}}>Chi phí dự kiến</div>
+                                    <div style={{flex: 1.5, textAlign: 'right'}}>Chi phí thực tế</div>
+                                    <div style={{flex: 1, textAlign: 'center'}}>Thao tác</div>
+                                </div>
+
+                                {/* Table Body */}
+                                {(category.items || []).map(item => {
+                                    const isEditing = editingItem?.itemId === item.id;
+                                    return (
+                                        <div key={item.id} className="budget-table-row">
+                                            {isEditing ? (
+                                                <>
+                                                    <div style={{flex: 2, paddingRight: '10px'}}>
+                                                        <input className="settings-input" style={{height: '36px'}} value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
+                                                    </div>
+                                                    <div style={{flex: 1.5, paddingRight: '10px'}}>
+                                                        <input type="number" className="settings-input" style={{height: '36px', textAlign: 'right'}} value={editForm.estimatedCost} onChange={e => setEditForm({...editForm, estimatedCost: e.target.value})} />
+                                                    </div>
+                                                    <div style={{flex: 1.5, paddingRight: '10px'}}>
+                                                        <input type="number" className="settings-input" style={{height: '36px', textAlign: 'right'}} value={editForm.actualCost} onChange={e => setEditForm({...editForm, actualCost: e.target.value})} />
+                                                    </div>
+                                                    <div style={{flex: 1, display: 'flex', justifyContent: 'center', gap: '8px'}}>
+                                                        <button onClick={saveEditItem} className="table-action-btn" style={{color: '#10B981'}}><SaveIcon /></button>
+                                                        <button onClick={() => setEditingItem(null)} className="table-action-btn"><CancelIcon /></button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div style={{flex: 2, fontWeight: 500}}>{item.name}</div>
+                                                    <div style={{flex: 1.5, textAlign: 'right', color: '#6B7280'}}>{formatVND(item.estimatedCost)}</div>
+                                                    <div style={{flex: 1.5, textAlign: 'right', fontWeight: 600}}>{formatVND(item.actualCost)}</div>
+                                                    <div style={{flex: 1, display: 'flex', justifyContent: 'center', gap: '8px'}}>
+                                                        <button onClick={() => startEditing(category.id, item)} className="table-action-btn"><EditIcon width="16" height="16" /></button>
+                                                        <button onClick={() => handleDeleteItem(category.id, item.id)} className="table-action-btn" style={{color: '#EF4444'}}><CancelIcon /></button>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    )
+                                })}
+
+                                {/* Add new item row */}
+                                <form onSubmit={(e) => handleAddItem(e, category.id)} className="budget-add-item-row">
+                                    <input 
+                                        type="text" 
+                                        placeholder="+ Thêm chi tiết hạng mục..." 
+                                        value={newItemNames[category.id] || ''}
+                                        onChange={e => setNewItemNames(prev => ({...prev, [category.id]: e.target.value}))}
+                                        className="subtask-add-input"
+                                        style={{flex: 1}}
+                                    />
+                                    <button type="submit" disabled={!newItemNames[category.id]?.trim()} className="subtask-add-btn">
+                                        Lưu
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    );
+};
 const InvitationManagement = () => {
     const { invitationId } = useParams();
     const navigate = useNavigate();
@@ -2703,6 +2934,10 @@ const InvitationManagement = () => {
 
                 case 'update-tasks': // <--- THÊM CASE NÀY ĐỂ XỬ LÝ UPDATE LOCAL STATE CHO TASK
                     newInvitation.tasks = data;
+                    return newInvitation;
+
+                case 'update-budget':
+                    newInvitation.budget = data;
                     return newInvitation;
 
                 case 'add-guest':
