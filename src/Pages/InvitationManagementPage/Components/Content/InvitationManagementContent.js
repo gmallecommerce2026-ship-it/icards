@@ -7,7 +7,48 @@ import _ from 'lodash';
 import './InvitationManagementContent.css';
 import { FiMail } from 'react-icons/fi';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'; // <--- Thêm Import
+import { create } from 'zustand';
+const useTaskStore = create((set, get) => ({
+    tasks: [],
+    isLoading: false,
 
+    // Hàm gọi GET API
+    fetchTasks: async (invitationId) => {
+        set({ isLoading: true });
+        try {
+            const response = await api.get(`/invitations/${invitationId}/tasks`);
+            let fetchedTasks = response.data.data || [];
+            
+            // Tự động Migration dữ liệu cũ (nếu có)
+            if (fetchedTasks.length > 0 && !fetchedTasks[0].subTasks) {
+                fetchedTasks = [{
+                    id: 'legacy-category',
+                    title: 'Công việc chung (Dữ liệu cũ)',
+                    isExpanded: true,
+                    subTasks: fetchedTasks
+                }];
+            }
+            set({ tasks: fetchedTasks, isLoading: false });
+        } catch (error) {
+            console.error("Lỗi fetch tasks:", error);
+            set({ isLoading: false });
+        }
+    },
+
+    // Hàm xử lý Update & Gọi PUT API ngầm (Optimistic UI)
+    updateTasks: async (invitationId, newTasks) => {
+        // Cập nhật State UI ngay lập tức để người dùng không thấy độ trễ
+        set({ tasks: newTasks });
+
+        // Gọi API lưu xuống Database
+        try {
+            await api.put(`/invitations/${invitationId}/tasks`, { tasks: newTasks });
+        } catch (error) {
+            // Bạn phải import showErrorToast từ Utils nếu chưa có
+            console.error('Không thể lưu kế hoạch cưới.', error);
+        }
+    }
+}));
 const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
     const [masterGuests, setMasterGuests] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -2097,126 +2138,82 @@ const InvitationDashboard = ({ invitation, onTabClick }) => {
     );
 };
 
-const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) => {
-    // Tự động Migration: Nếu dữ liệu cũ là mảng phẳng, bọc nó vào 1 category mặc định
-    const [tasks, setTasks] = useState(() => {
-        if (initialTasks.length > 0 && !initialTasks[0].subTasks) {
-            return [{
-                id: 'legacy-category',
-                title: 'Công việc chung (Dữ liệu cũ)',
-                isExpanded: true,
-                subTasks: initialTasks
-            }];
-        }
-        return initialTasks;
-    });
+const TaskManagementPanel = ({ invitationId }) => {
+    // KẾT NỐI VỚI GLOBAL STATE
+    const { tasks, isLoading, fetchTasks, updateTasks } = useTaskStore();
 
     const [newCategoryTitle, setNewCategoryTitle] = useState('');
     const [newSubTaskTitles, setNewSubTaskTitles] = useState({});
-    
-    // Trạng thái edit
-    const [editingItem, setEditingItem] = useState(null); // { catId, taskId, title }
+    const [editingItem, setEditingItem] = useState(null);
 
+    // Tự động Fetch (GET API) khi người dùng bấm vào Tab Kế hoạch cưới
     useEffect(() => {
-        if (initialTasks.length > 0 && initialTasks[0].subTasks) {
-            setTasks(initialTasks);
+        if (invitationId) {
+            fetchTasks(invitationId);
         }
-    }, [initialTasks]);
+    }, [invitationId, fetchTasks]);
 
-    const saveTasksToDB = async (updatedTasks) => {
-        try {
-            const response = await api.put(`/invitations/${invitationId}/tasks`, { tasks: updatedTasks });
-            onDataChange(response.data.data, 'update-tasks');
-        } catch (error) {
-            showErrorToast('Không thể lưu kế hoạch cưới.');
-        }
+    // Hàm Helper để cập nhật
+    const handleUpdateAndSave = (updatedTasks) => {
+        updateTasks(invitationId, updatedTasks);
     };
 
     const onDragEnd = (result) => {
         const { source, destination, type } = result;
-
         if (!destination) return;
-
-        if (source.droppableId === destination.droppableId && source.index === destination.index) {
-            return;
-        }
+        if (source.droppableId === destination.droppableId && source.index === destination.index) return;
 
         let updatedTasks = Array.from(tasks);
 
-        // 1. Kéo thả Category (Loại lớn)
         if (type === 'CATEGORY') {
             const [reorderedCategory] = updatedTasks.splice(source.index, 1);
             updatedTasks.splice(destination.index, 0, reorderedCategory);
         }
 
-        // 2. Kéo thả Sub-task (Tác con)
         if (type === 'SUBTASK') {
             const sourceParentId = source.droppableId;
             const destParentId = destination.droppableId;
-
             const sourceCategoryIndex = updatedTasks.findIndex(c => c.id === sourceParentId);
             const destCategoryIndex = updatedTasks.findIndex(c => c.id === destParentId);
-
             const sourceCategory = updatedTasks[sourceCategoryIndex];
             const destCategory = updatedTasks[destCategoryIndex];
-
             const newSourceSubTasks = Array.from(sourceCategory.subTasks || []);
             const [movedSubTask] = newSourceSubTasks.splice(source.index, 1);
 
-            // Nếu kéo thả trong cùng một Category
             if (sourceParentId === destParentId) {
                 newSourceSubTasks.splice(destination.index, 0, movedSubTask);
-                
-                updatedTasks[sourceCategoryIndex] = {
-                    ...sourceCategory,
-                    subTasks: newSourceSubTasks
-                };
+                updatedTasks[sourceCategoryIndex] = { ...sourceCategory, subTasks: newSourceSubTasks };
             } else {
-                // Nếu kéo từ Category này sang Category khác
                 const newDestSubTasks = Array.from(destCategory.subTasks || []);
                 newDestSubTasks.splice(destination.index, 0, movedSubTask);
-
-                updatedTasks[sourceCategoryIndex] = {
-                    ...sourceCategory,
-                    subTasks: newSourceSubTasks
-                };
-
-                updatedTasks[destCategoryIndex] = {
-                    ...destCategory,
-                    subTasks: newDestSubTasks
-                };
+                updatedTasks[sourceCategoryIndex] = { ...sourceCategory, subTasks: newSourceSubTasks };
+                updatedTasks[destCategoryIndex] = { ...destCategory, subTasks: newDestSubTasks };
             }
         }
 
-        setTasks(updatedTasks);
-        saveTasksToDB(updatedTasks);
+        handleUpdateAndSave(updatedTasks); // <-- Gọi Global State
     };
 
-    // --- QUẢN LÝ CATEGORY (TÁC LỚN) ---
     const handleAddCategory = (e) => {
         e.preventDefault();
         if (!newCategoryTitle.trim()) return;
         const newCat = { id: Date.now().toString(), title: newCategoryTitle, isExpanded: true, subTasks: [] };
         const updatedTasks = [...tasks, newCat];
         
-        setTasks(updatedTasks);
-        saveTasksToDB(updatedTasks);
+        handleUpdateAndSave(updatedTasks); // <-- Gọi Global State
         setNewCategoryTitle('');
     };
 
     const handleDeleteCategory = (catId) => {
         const updatedTasks = tasks.filter(c => c.id !== catId);
-        setTasks(updatedTasks);
-        saveTasksToDB(updatedTasks);
+        handleUpdateAndSave(updatedTasks);
     };
 
     const handleToggleExpand = (catId) => {
         const updatedTasks = tasks.map(c => c.id === catId ? { ...c, isExpanded: !c.isExpanded } : c);
-        setTasks(updatedTasks);
-        saveTasksToDB(updatedTasks);
+        handleUpdateAndSave(updatedTasks);
     };
 
-    // --- QUẢN LÝ SUB-TASK (TÁC CON) ---
     const handleAddSubTask = (e, catId) => {
         e.preventDefault();
         const title = newSubTaskTitles[catId];
@@ -2224,31 +2221,23 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
 
         const updatedTasks = tasks.map(cat => {
             if (cat.id === catId) {
-                return {
-                    ...cat,
-                    subTasks: [...(cat.subTasks || []), { id: Date.now().toString(), title, completed: false }]
-                };
+                return { ...cat, subTasks: [...(cat.subTasks || []), { id: Date.now().toString(), title, completed: false }] };
             }
             return cat;
         });
 
-        setTasks(updatedTasks);
-        saveTasksToDB(updatedTasks);
+        handleUpdateAndSave(updatedTasks);
         setNewSubTaskTitles(prev => ({ ...prev, [catId]: '' }));
     };
 
     const handleToggleComplete = (catId, taskId) => {
         const updatedTasks = tasks.map(cat => {
             if (cat.id === catId) {
-                return {
-                    ...cat,
-                    subTasks: (cat.subTasks || []).map(st => st.id === taskId ? { ...st, completed: !st.completed } : st)
-                };
+                return { ...cat, subTasks: (cat.subTasks || []).map(st => st.id === taskId ? { ...st, completed: !st.completed } : st) };
             }
             return cat;
         });
-        setTasks(updatedTasks);
-        saveTasksToDB(updatedTasks);
+        handleUpdateAndSave(updatedTasks);
     };
 
     const handleDeleteSubTask = (catId, taskId) => {
@@ -2258,45 +2247,34 @@ const TaskManagementPanel = ({ invitationId, initialTasks = [], onDataChange }) 
             }
             return cat;
         });
-        setTasks(updatedTasks);
-        saveTasksToDB(updatedTasks);
+        handleUpdateAndSave(updatedTasks);
     };
 
-    // --- EDITING ---
-    const startEditing = (catId, taskId, currentTitle) => {
-        setEditingItem({ catId, taskId, title: currentTitle });
-    };
+    const startEditing = (catId, taskId, currentTitle) => setEditingItem({ catId, taskId, title: currentTitle });
 
     const handleSaveEdit = () => {
         if (!editingItem || !editingItem.title.trim()) {
             setEditingItem(null);
             return;
         }
-
         const updatedTasks = tasks.map(cat => {
             if (cat.id === editingItem.catId) {
-                if (!editingItem.taskId) { // Edit Category
-                    return { ...cat, title: editingItem.title };
-                } else { // Edit SubTask
-                    return {
-                        ...cat,
-                        subTasks: (cat.subTasks || []).map(st => st.id === editingItem.taskId ? { ...st, title: editingItem.title } : st)
-                    };
-                }
+                if (!editingItem.taskId) return { ...cat, title: editingItem.title };
+                else return { ...cat, subTasks: (cat.subTasks || []).map(st => st.id === editingItem.taskId ? { ...st, title: editingItem.title } : st) };
             }
             return cat;
         });
-
-        setTasks(updatedTasks);
-        saveTasksToDB(updatedTasks);
+        handleUpdateAndSave(updatedTasks);
         setEditingItem(null);
     };
 
-    // --- TÍNH TOÁN PROGRESS ---
     const totalTasks = tasks.reduce((sum, cat) => sum + (cat.subTasks?.length || 0), 0);
     const completedTasks = tasks.reduce((sum, cat) => sum + (cat.subTasks?.filter(st => st.completed)?.length || 0), 0);
     const progress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
+    if (isLoading && tasks.length === 0) return <div style={{padding: '40px', textAlign: 'center'}}>Đang tải kế hoạch...</div>;
+
+    // --- (PHẦN RENDER UI BÊN DƯỚI GIỮ NGUYÊN HOÀN TOÀN NHƯ CŨ, TỪ <div className="task-management-wrapper">...) ---
     return (
         <div className="task-management-wrapper">
             {/* 1. Header & Progress */}
@@ -2569,7 +2547,7 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
             // case 'master-guests': // <-- RENDER PANEL MỚI
             //     return <MasterGuestPanel user={invitation.user} onAddGuestsToInvitation={handleAddGuestsFromMaster} />;
             case 'tasks':
-                return <TaskManagementPanel invitationId={invitation._id} initialTasks={invitation.tasks || []} onDataChange={onDataChange} />;
+                return <TaskManagementPanel invitationId={invitation._id} />;
             case 'budget':
                 return <BudgetManagementPanel invitationId={invitation._id} initialBudget={invitation.budget || []} onDataChange={onDataChange} />;
             case 'event-management': // <- BỔ SUNG SWITCH CASE
