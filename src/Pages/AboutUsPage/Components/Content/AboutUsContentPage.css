@@ -2987,3 +2987,94 @@ END: STYLES MỚI
         border-radius: 20px 20px 0 0;
     }
 }
+
+/* ==============================================
+   NEW MAPS SECTION STYLES
+============================================== */
+.about-us-container .maps-grid {
+    display: grid;
+    /* Tự động chia 2 cột nếu có nhiều sự kiện, 1 cột nếu màn hình nhỏ */
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--spacing-2xl);
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.about-us-container .map-card {
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border-light);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.about-us-container .map-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+}
+
+.about-us-container .map-card-header {
+    text-align: center;
+}
+
+.about-us-container .map-event-title {
+    font-family: var(--font-display);
+    color: var(--color-primary);
+    font-size: 1.5rem;
+    margin: 0 0 5px 0;
+}
+
+.about-us-container .map-event-address {
+    font-size: 0.9rem;
+    color: var(--color-text-medium);
+    margin: 0;
+    font-style: italic;
+}
+
+.about-us-container .modern-map-wrapper {
+    width: 100%;
+    height: 300px; /* Chiều cao cố định để Map hiển thị đẹp */
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+    background: var(--color-background-subtle);
+}
+
+.about-us-container .modern-map-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.3s;
+}
+
+.about-us-container .modern-map-wrapper iframe:hover {
+    opacity: 0.9;
+}
+
+.about-us-container .map-direct-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-size: 0.95rem;
+    border-radius: var(--radius-lg);
+    margin-top: auto; /* Đẩy nút xuống đáy nếu có chênh lệch chiều cao */
+    text-decoration: none;
+}
+
+/* Responsive Mobile */
+@media (max-width: 768px) {
+    .about-us-container .maps-grid {
+        grid-template-columns: 1fr;
+    }
+    .about-us-container .modern-map-wrapper {
+        height: 250px;
+    }
+    .about-us-container .map-event-title {
+        font-size: 1.3rem;
+    }
+}
