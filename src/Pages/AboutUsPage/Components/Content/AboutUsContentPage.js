@@ -1262,7 +1262,7 @@ const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
                 <div className="sticky-wishes-header" onClick={() => setIsExpanded(!isExpanded)}>
                     <div className="header-left">
                         <MessageCircle size={22} className="pulse-icon" />
-                        <span className="header-title">{settings.wishesTitle || "Sổ Lưu Bút"} 123</span>
+                        <span className="header-title">{settings.wishesTitle || "Sổ Lưu Bút"}</span>
                         {wishes.length > 0 && <span className="wishes-badge">{wishes.length}</span>}
                     </div>
                     <div className="header-right">
