@@ -1225,16 +1225,20 @@ const RsvpSection = ({ resourceId, guestDetails }) => {
     );
 };
 
-const WishesSection = React.memo(({ resourceId, settings }) => {
+// Thay thế toàn bộ component WishesSection cũ bằng code này
+const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
     const [wishes, setWishes] = useState([]);
-    const [formData, setFormData] = useState({ senderName: '', content: '' });
+    const [content, setContent] = useState(''); // Chỉ cần lưu nội dung lời chúc
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false); // State quản lý đóng/mở Drawer
+
+    // Tự động lấy tên từ URL/guestDetails, nếu không có fallback về "Khách mời"
+    const guestName = guestDetails?.name || "Khách mời";
 
     useEffect(() => {
         if (!resourceId) return;
         const fetchWishes = async () => {
             try {
-                // Endpoint lấy các lời chúc đã được duyệt
                 const res = await api.get(`/wishes/public/${resourceId}`);
                 setWishes(res.data.data || []);
             } catch (err) {
@@ -1246,15 +1250,20 @@ const WishesSection = React.memo(({ resourceId, settings }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.senderName || !formData.content) {
-            showSuccessToast("Vui lòng nhập tên và lời chúc!"); // Có thể dùng showErrorToast nếu đã export
+        if (!content.trim()) {
+            showSuccessToast("Vui lòng nhập lời chúc!");
             return;
         }
         setIsSubmitting(true);
         try {
-            await api.post(`/wishes/public/${resourceId}`, formData);
+            // Gửi thẳng guestName được tự động gán
+            await api.post(`/wishes/public/${resourceId}`, {
+                senderName: guestName,
+                content: content
+            });
             showSuccessToast("Gửi lời chúc thành công! Lời chúc sẽ được hiển thị sau khi duyệt.");
-            setFormData({ senderName: '', content: '' });
+            setContent('');
+            setIsExpanded(false); // Gửi xong thì đóng Drawer lại cho gọn
         } catch (err) {
             console.error("Có lỗi xảy ra, vui lòng thử lại.", err);
         } finally {
@@ -1262,63 +1271,89 @@ const WishesSection = React.memo(({ resourceId, settings }) => {
         }
     };
 
-    return (
-        <section className="section-container fade-in-up">
-            <SectionHeader 
-                title={settings.wishesTitle || "Sổ Lưu Bút"} 
-                subtitle={settings.wishesSubtitle || "Hãy để lại những lời chúc tốt đẹp nhất dành cho chúng tôi nhé!"}
-            />
-            
-            <div className="modern-wishes-wrapper" style={{ maxWidth: '800px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '40px' }}>
-                <form onSubmit={handleSubmit} className="modern-rsvp-form" style={{ padding: '24px', backgroundColor: '#fff', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
-                    <div className="modern-form-group">
-                        <label className="form-label">Tên của bạn *</label>
-                        <input 
-                            type="text" 
-                            className="modern-form-input" 
-                            placeholder="Nhập tên của bạn..." 
-                            value={formData.senderName}
-                            onChange={(e) => setFormData({...formData, senderName: e.target.value})}
-                        />
-                    </div>
-                    <div className="modern-form-group">
-                        <label className="form-label">Lời chúc *</label>
-                        <textarea 
-                            className="modern-form-input" 
-                            placeholder="Nhập lời chúc..." 
-                            rows="4"
-                            value={formData.content}
-                            onChange={(e) => setFormData({...formData, content: e.target.value})}
-                            style={{ resize: 'vertical', paddingTop: '12px' }}
-                        />
-                    </div>
-                    <button type="submit" className="modern-btn-primary submit-btn" disabled={isSubmitting}>
-                        {isSubmitting ? 'Đang gửi...' : 'Gửi Lời Chúc'}
-                    </button>
-                </form>
+    // Ngăn chặn cuộn trang body khi Drawer đang mở
+    useEffect(() => {
+        if (isExpanded) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+        return () => { document.body.style.overflow = 'auto'; };
+    }, [isExpanded]);
 
-                {wishes.length > 0 && (
-                    <div className="wishes-list" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                        {wishes.map((wish) => (
-                            <div key={wish._id} className="wish-card" style={{ padding: '20px', backgroundColor: '#fdfbfb', borderRadius: '12px', border: '1px solid #f0eaeb' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '18px' }}>
-                                        {wish.senderName.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div>
-                                        <h4 style={{ margin: 0, color: 'var(--color-text-dark)', fontSize: '16px' }}>{wish.senderName}</h4>
-                                        <span style={{ fontSize: '12px', color: '#999' }}>{new Date(wish.createdAt).toLocaleDateString('vi-VN')}</span>
-                                    </div>
-                                </div>
-                                <p style={{ margin: 0, color: 'var(--color-text-medium)', fontStyle: 'italic', lineHeight: '1.6' }}>
-                                    "{wish.content}"
-                                </p>
-                            </div>
-                        ))}
+    return (
+        <>
+            {/* Overlay làm tối nền khi mở Drawer */}
+            <div 
+                className={`sticky-wishes-overlay ${isExpanded ? 'visible' : ''}`} 
+                onClick={() => setIsExpanded(false)}
+            ></div>
+
+            {/* Sticky Bottom Nav */}
+            <div className={`modern-sticky-wishes ${isExpanded ? 'expanded' : ''}`}>
+                
+                {/* Header (Thanh Bar luôn hiển thị ở bottom) */}
+                <div className="sticky-wishes-header" onClick={() => setIsExpanded(!isExpanded)}>
+                    <div className="header-left">
+                        <MessageCircle size={22} className="pulse-icon" />
+                        <span className="header-title">{settings.wishesTitle || "Sổ Lưu Bút"}</span>
+                        {wishes.length > 0 && <span className="wishes-badge">{wishes.length}</span>}
                     </div>
-                )}
+                    <div className="header-right">
+                        <span className="header-hint">{isExpanded ? 'Đóng' : 'Gửi lời chúc'}</span>
+                        <ChevronUp size={24} className="toggle-icon" />
+                    </div>
+                </div>
+
+                {/* Body (Phần nội dung trượt lên) */}
+                <div className="sticky-wishes-body">
+                    {/* Khu vực Form tự động nhận diện user */}
+                    <div className="wishes-form-container">
+                        <p className="wishes-greeting">
+                            Xin chào <strong>{guestName}</strong>, hãy để lại những lời chúc tốt đẹp nhất dành cho chúng tôi nhé!
+                        </p>
+                        <form onSubmit={handleSubmit} className="modern-rsvp-form">
+                            <div className="modern-form-group">
+                                <textarea 
+                                    className="modern-form-input custom-scrollbar" 
+                                    placeholder="Nhập lời chúc của bạn tại đây..." 
+                                    rows="3"
+                                    value={content}
+                                    onChange={(e) => setContent(e.target.value)}
+                                    style={{ resize: 'none' }}
+                                />
+                            </div>
+                            <button type="submit" className="modern-btn-primary submit-btn" disabled={isSubmitting}>
+                                {isSubmitting ? 'Đang gửi...' : 'Gửi Lời Chúc'} <Heart size={16} style={{marginLeft: 4}}/>
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Danh sách lời chúc hiển thị bên dưới Form */}
+                    {wishes.length > 0 && (
+                        <div className="wishes-list-container custom-scrollbar">
+                            <h4 className="wishes-list-title">Lời chúc từ mọi người</h4>
+                            <div className="wishes-list">
+                                {wishes.map((wish) => (
+                                    <div key={wish._id} className="wish-card">
+                                        <div className="wish-card-header">
+                                            <div className="wish-avatar">
+                                                {wish.senderName.charAt(0).toUpperCase()}
+                                            </div>
+                                            <div className="wish-meta">
+                                                <h4>{wish.senderName}</h4>
+                                                <span>{new Date(wish.createdAt).toLocaleDateString('vi-VN')}</span>
+                                            </div>
+                                        </div>
+                                        <p className="wish-content">"{wish.content}"</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
-        </section>
+        </>
     );
 });
 // ===================================================================
@@ -1630,7 +1665,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
         LOVE_STORY: <LoveStoryTimeline stories={settings.loveStory} title={settings.loveStoryTitle} titleStyle={settings.loveStoryTitleStyle} />,
         GALLERY: <Gallery images={settings.galleryImages} onImageClick={handleImageClick} title={settings.galleryTitle} titleStyle={settings.galleryTitleStyle} />,
         VIDEO: <EventVideo videoUrl={settings.videoUrl} title={settings.videoTitle} titleStyle={settings.videoTitleStyle} />,
-        WISHES: <WishesSection settings={settings} resourceId={resourceId} />,
+        WISHES: <WishesSection settings={settings} resourceId={resourceId} guestDetails={guestDetails} />,
         CONTACT_INFO: (
             <section className="section-container">
                 <SectionHeader title={settings.contactTitle || "Thông Tin Liên Hệ"} titleStyle={settings.contactTitleStyle} />

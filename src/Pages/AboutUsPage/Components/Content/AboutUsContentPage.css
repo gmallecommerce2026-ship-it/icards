@@ -2486,3 +2486,226 @@ END: STYLES MỚI
     }
     .art-title { font-size: 1.6rem; }
 }
+
+/* ===================================================================
+   STICKY WISHES NAV (BOTTOM SHEET UI)
+=================================================================== */
+/* Đẩy padding bottom của trang lên để nội dung không bị thanh nav che mất */
+.about-us-container .modern-container {
+    padding-bottom: 100px; 
+}
+
+/* Đẩy các nút Share lên cao hơn một chút để tránh bị đè */
+.about-us-container .modern-share-buttons {
+    bottom: calc(var(--spacing-2xl) + 60px);
+    z-index: 999;
+}
+
+.sticky-wishes-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.sticky-wishes-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modern-sticky-wishes {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 800px;
+    background: var(--color-white);
+    border-radius: 24px 24px 0 0;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.1);
+    z-index: 2001;
+    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    display: flex;
+    flex-direction: column;
+    /* Chiều cao mặc định khi gập lại (Chỉ hiện header) */
+    height: calc(70px + env(safe-area-inset-bottom));
+}
+
+.modern-sticky-wishes.expanded {
+    /* Chiều cao khi mở rộng Bottom Sheet */
+    height: 80vh; 
+    max-height: 700px;
+}
+
+/* --- Header / Nút Toggle --- */
+.sticky-wishes-header {
+    height: 70px;
+    padding: 0 var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+    user-select: none;
+}
+
+.modern-sticky-wishes.expanded .sticky-wishes-header {
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.header-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.wishes-badge {
+    background: var(--color-accent);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.header-hint {
+    font-size: 0.9rem;
+    color: var(--color-text-medium);
+    font-weight: 500;
+}
+
+.toggle-icon {
+    color: var(--color-text-medium);
+    transition: transform 0.4s ease;
+}
+
+.modern-sticky-wishes.expanded .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.pulse-icon {
+    color: var(--color-accent);
+    animation: heartbeat 2s infinite;
+}
+
+/* --- Body / Nội dung --- */
+.sticky-wishes-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom));
+}
+
+.modern-sticky-wishes.expanded .sticky-wishes-body {
+    opacity: 1;
+    visibility: visible;
+}
+
+.wishes-greeting {
+    font-size: 1.05rem;
+    color: var(--color-text-medium);
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+}
+
+.wishes-greeting strong {
+    color: var(--color-primary);
+}
+
+.wishes-form-container {
+    background: var(--color-background-subtle);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border-light);
+    margin-bottom: var(--spacing-xl);
+}
+
+.wishes-list-title {
+    font-family: var(--font-display);
+    color: var(--color-primary);
+    font-size: 1.3rem;
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+}
+
+/* Design lại Card Lời chúc cho hợp với form nhỏ */
+.wish-card {
+    padding: 16px;
+    background: var(--color-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border-light);
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.wish-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.wish-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+    color: var(--color-white);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 16px;
+}
+
+.wish-meta h4 {
+    margin: 0; font-size: 1rem; color: var(--color-text-dark);
+}
+
+.wish-meta span {
+    font-size: 0.75rem; color: var(--color-text-light);
+}
+
+.wish-content {
+    margin: 0;
+    color: var(--color-text-medium);
+    font-style: italic;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* Scrollbar tùy chỉnh cho đẹp */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+    .modern-sticky-wishes {
+        max-width: 100%;
+        border-radius: 20px 20px 0 0;
+    }
+    .sticky-wishes-header {
+        padding: 0 var(--spacing-lg);
+    }
+    .sticky-wishes-body {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+}
