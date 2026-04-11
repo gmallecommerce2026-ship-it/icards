@@ -1250,10 +1250,7 @@ const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
     return (
         <>
             {/* Overlay làm tối nền khi mở Drawer */}
-            <div 
-                className={`sticky-wishes-overlay ${isExpanded ? 'visible' : ''}`} 
-                onClick={() => setIsExpanded(false)}
-            ></div>
+            <div className={`sticky-wishes-overlay ${isExpanded ? 'visible' : ''}`} onClick={() => setIsExpanded(false)}></div>
 
             {/* Sticky Bottom Nav */}
             <div className={`modern-sticky-wishes ${isExpanded ? 'expanded' : ''}`}>

@@ -2750,3 +2750,121 @@ END: STYLES MỚI
     margin-top: auto; /* Cực kỳ quan trọng để đẩy các nút xuống đáy card */
     padding-top: var(--spacing-sm);
 }
+
+/* ===================================================================
+   STICKY WISHES NAV (GLASSMORPHISM UI)
+=================================================================== */
+
+/* Lớp phủ khi mở rộng sổ lưu bút */
+.sticky-wishes-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9998; /* Nằm ngay dưới sticky nav */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+}
+
+.sticky-wishes-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Thanh điều hướng cố định - Nền kính mờ */
+.modern-sticky-wishes {
+    position: fixed; /* Ép cứng vị trí trên màn hình */
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 800px;
+    
+    /* Hiệu ứng Glassmorphism (Kính mờ trong suốt) */
+    background: rgba(255, 255, 255, 0.35); /* Độ trong suốt của nền */
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    
+    /* Viền sáng nhẹ để tạo khối kính */
+    border-radius: 24px 24px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.6);
+    border-left: 1px solid rgba(255, 255, 255, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.3);
+    
+    /* Bóng đổ tạo chiều sâu, nổi bật khỏi nền trang */
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08);
+    
+    z-index: 9999; /* Đảm bảo KHÔNG BAO GIỜ bị che khuất bởi các thành phần khác */
+    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1), background 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    
+    height: calc(70px + env(safe-area-inset-bottom));
+}
+
+/* Khi mở rộng, nền kính có thể đậm hơn một chút để dễ đọc chữ */
+.modern-sticky-wishes.expanded {
+    height: 80vh; 
+    max-height: 700px;
+    background: rgba(255, 255, 255, 0.75); /* Giảm độ trong suốt khi đang đọc/viết */
+}
+
+/* --- Header --- */
+.sticky-wishes-header {
+    height: 70px;
+    padding: 0 var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s;
+    user-select: none;
+}
+
+.modern-sticky-wishes.expanded .sticky-wishes-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.header-left, .header-right { display: flex; align-items: center; gap: 12px; }
+
+.header-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8); /* Giúp chữ nổi bật trên nền trong suốt */
+}
+
+/* --- Nội dung bên trong cũng áp dụng kính mờ nhẹ --- */
+.wishes-form-container {
+    background: rgba(255, 255, 255, 0.5); /* Nền bán trong suốt */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+.wish-card {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    margin-bottom: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.modern-form-input.custom-scrollbar {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.modern-form-input.custom-scrollbar:focus {
+    background: rgba(255, 255, 255, 0.95);
+}
