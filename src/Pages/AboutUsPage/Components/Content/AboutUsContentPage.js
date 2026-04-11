@@ -5,7 +5,7 @@ import api from '../../../../services/api';
 import SEO from '../../../../Features/SEO';
 import { showSuccessToast } from '../../../../Utils/toastHelper';
 import { Helmet } from 'react-helmet';
-import { Facebook, MessageCircle, Phone, Copy, Heart, X, ChevronLeft, ChevronRight, Calendar, Gift, ChevronDown, ExternalLink } from 'lucide-react';
+import { Facebook, MessageCircle, Phone, Copy, Heart, X, ChevronLeft, ChevronRight, Calendar, Gift, ChevronDown, ExternalLink, ChevronUp } from 'lucide-react';
 import HTMLFlipBook from 'react-pageflip';
 import "./AboutUsContentPage.css";
 import { useSettings } from '../../../../Context/SettingsContext';
@@ -245,7 +245,6 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
 
 const EventSchedule = React.memo(({ events, title, titleStyle }) => {
     const [openMenuId, setOpenMenuId] = useState(null);
-    const [mapEvent, setMapEvent] = useState(null); // State quản lý popup bản đồ
     const menuRef = useRef(null);
 
     useEffect(() => {
@@ -278,27 +277,47 @@ const EventSchedule = React.memo(({ events, title, titleStyle }) => {
             <div className="event-schedule-grid">
                 {events.map((event) => {
                     const { date, time } = formatDate(event.date, event.time);
+                    
+                    // Tạo link chỉ đường
+                    const directionsUrl = event.location?.lat 
+                        ? `https://www.google.com/maps/dir/?api=1&destination=${event.location.lat},${event.location.lng}`
+                        : event.mapUrl;
+
                     return (
                         <div key={event.id} className="event-card">
+                            {/* Giữ nguyên ảnh banner của sự kiện */}
                             <div className="event-card-image-wrapper">
                                 <img src={event.imageUrl || 'https://placehold.co/400x500/F2E8EB/5C5258?text=Event'} alt={event.title} loading="lazy" />
                             </div>
+                            
                             <div className="event-card-content">
                                 <h3 className="event-card-title">{event.title}</h3>
                                 <p className="event-card-time">{time} | {date}</p>
                                 <p className="event-card-address">{event.address}</p>
+
+                                {/* --- KHỐI BẢN ĐỒ NHÚNG TRỰC TIẾP --- */}
+                                {event.location?.lat && (
+                                    <div className="embedded-map-container">
+                                        <iframe 
+                                            title={`Bản đồ ${event.title}`}
+                                            width="100%" 
+                                            height="100%" 
+                                            frameBorder="0" 
+                                            scrolling="no" 
+                                            // Sử dụng URL chuẩn của Google Maps Embed (không cần API Key)
+                                            src={`https://maps.google.com/maps?q=${event.location.lat},${event.location.lng}&z=15&output=embed`}
+                                            loading="lazy" // Cực kỳ quan trọng để không block main thread
+                                        ></iframe>
+                                    </div>
+                                )}
+
                                 <div className="event-card-actions">
-                                    
-                                    {/* LOGIC NÚT XEM BẢN ĐỒ MỚI */}
-                                    {event.location?.lat ? (
-                                        <button onClick={() => setMapEvent(event)} className="event-btn map-btn">
-                                            <ExternalLink size={14} /> Xem bản đồ
-                                        </button>
-                                    ) : event.mapUrl ? (
-                                        <a href={event.mapUrl} target="_blank" rel="noopener noreferrer" className="event-btn map-btn">
-                                            <ExternalLink size={14} /> Xem bản đồ
+                                    {/* Chuyển nút Xem bản đồ thành Nút Chỉ đường */}
+                                    {directionsUrl && (
+                                        <a href={directionsUrl} target="_blank" rel="noopener noreferrer" className="event-btn map-btn">
+                                            <ExternalLink size={14} /> Chỉ đường
                                         </a>
-                                    ) : null}
+                                    )}
 
                                     <div className="calendar-menu-container">
                                         <button onClick={() => setOpenMenuId(openMenuId === event.id ? null : event.id)} className="event-btn calendar-btn">
@@ -319,59 +338,6 @@ const EventSchedule = React.memo(({ events, title, titleStyle }) => {
                     );
                 })}
             </div>
-
-            {/* POPUP (MODAL) HIỂN THỊ BẢN ĐỒ KHI CLICK */}
-            {mapEvent && (
-                <div 
-                    className="modern-lightbox" 
-                    onClick={() => setMapEvent(null)} 
-                    style={{ zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                >
-                    <button className="modern-lightbox-close" onClick={() => setMapEvent(null)}>
-                        <X size={32} />
-                    </button>
-                    
-                    <div 
-                        className="modern-lightbox-content" 
-                        onClick={e => e.stopPropagation()} 
-                        style={{ 
-                            width: '90%', maxWidth: '800px', height: '75vh', 
-                            backgroundColor: '#fff', borderRadius: '16px', 
-                            padding: '24px', display: 'flex', flexDirection: 'column',
-                            boxShadow: '0 10px 40px rgba(0,0,0,0.3)',
-                            position: 'relative'
-                        }}
-                    >
-                        <h3 style={{ marginTop: 0, marginBottom: '8px', color: 'var(--color-primary)', fontSize: '1.4rem' }}>
-                            {mapEvent.title}
-                        </h3>
-                        <p style={{ marginTop: 0, marginBottom: '20px', color: '#666', fontSize: '1rem', lineHeight: 1.5 }}>
-                            {mapEvent.address}
-                        </p>
-                        
-                        {/* Dùng iframe của Google Maps Embed API (Miễn phí, không cần key) */}
-                        <iframe 
-                            width="100%" 
-                            height="100%" 
-                            frameBorder="0" 
-                            scrolling="no" 
-                            src={`https://maps.google.com/maps?q=${mapEvent.location.lat},${mapEvent.location.lng}&z=16&output=embed`}
-                            style={{ borderRadius: '12px', flexGrow: 1, border: '1px solid #eaeaea' }}
-                            title="Bản đồ địa điểm"
-                        ></iframe>
-                        
-                        <a 
-                            href={`https://www.google.com/maps/dir/?api=1&destination=${mapEvent.location.lat},${mapEvent.location.lng}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="modern-btn-primary" 
-                            style={{ marginTop: '20px', textAlign: 'center', display: 'block', textDecoration: 'none', padding: '12px' }}
-                        >
-                            Chỉ đường bằng Google Maps
-                        </a>
-                    </div>
-                </div>
-            )}
         </section>
     );
 });
