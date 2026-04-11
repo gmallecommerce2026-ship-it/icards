@@ -304,8 +304,9 @@ const EventSchedule = React.memo(({ events, title, titleStyle }) => {
                                             height="100%" 
                                             frameBorder="0" 
                                             scrolling="no" 
-                                            src={`http://googleusercontent.com/maps.google.com/3{event.location.lat},${event.location.lng}&z=15&output=embed`}
-                                            loading="lazy" 
+                                            // Sử dụng URL chuẩn của Google Maps Embed (không cần API Key)
+                                            src={`https://maps.google.com/maps?q=${event.location.lat},${event.location.lng}&z=15&output=embed`}
+                                            loading="lazy" // Cực kỳ quan trọng để không block main thread
                                         ></iframe>
                                     </div>
                                 )}
@@ -340,46 +341,7 @@ const EventSchedule = React.memo(({ events, title, titleStyle }) => {
         </section>
     );
 });
-// Thêm component này ngay bên dưới EventSchedule
-const EventMapsSection = React.memo(({ events, titleStyle }) => {
-    if (!events || events.length === 0) return null;
-    
-    // Chỉ lấy những sự kiện có tọa độ bản đồ
-    const eventsWithMaps = events.filter(e => e.location && e.location.lat);
-    if (eventsWithMaps.length === 0) return null;
 
-    return (
-        <section className="section-container event-maps-section fade-in-up">
-            <SectionHeader title="Bản Đồ Địa Điểm" titleStyle={titleStyle} />
-            <div className="maps-grid">
-                {eventsWithMaps.map((event) => (
-                    <div key={`map-${event.id}`} className="map-card">
-                        <div className="map-card-header">
-                            <h3 className="map-event-title">{event.title}</h3>
-                            <p className="map-event-address">{event.address}</p>
-                        </div>
-                        <div className="modern-map-wrapper">
-                            <iframe 
-                                title={`Bản đồ ${event.title}`}
-                                width="100%" 
-                                height="100%" 
-                                frameBorder="0" 
-                                scrolling="no" 
-                                src={`https://maps.google.com/maps?q=${event.location.lat},${event.location.lng}&z=16&output=embed`}
-                                loading="lazy" 
-                            ></iframe>
-                        </div>
-                        {event.mapUrl && (
-                            <a href={event.mapUrl} target="_blank" rel="noopener noreferrer" className="modern-btn-primary map-direct-btn">
-                                <ExternalLink size={16} /> Mở bằng Google Maps
-                            </a>
-                        )}
-                    </div>
-                ))}
-            </div>
-        </section>
-    );
-});
 const debounce = (func, delay) => {
     let timeout;
     return (...args) => {
@@ -1656,12 +1618,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
         EVENT_DESCRIPTION: <EventDescription description={settings.eventDescription} style={eventDescriptionStyle} />,
         COUPLE_INFO: <CoupleInfo settings={settings}/>,
         PARTICIPANTS: <ParticipantsSection participants={settings.participants} title={settings.participantsTitle} titleStyle={settings.participantsTitleStyle} />,
-        EVENT_SCHEDULE: (
-            <>
-                <EventSchedule events={settings.events} title={settings.eventsTitle} titleStyle={settings.eventsTitleStyle} />
-                <EventMapsSection events={settings.events} titleStyle={settings.eventsTitleStyle} />
-            </>
-        ),
+        EVENT_SCHEDULE: <EventSchedule events={settings.events} title={settings.eventsTitle} titleStyle={settings.eventsTitleStyle} />,
         COUNTDOWN: <Countdown targetDate={settings.eventDate} title={settings.countdownTitle} titleStyle={settings.countdownTitleStyle} />,
         LOVE_STORY: <LoveStoryTimeline stories={settings.loveStory} title={settings.loveStoryTitle} titleStyle={settings.loveStoryTitleStyle} />,
         GALLERY: <Gallery images={settings.galleryImages} onImageClick={handleImageClick} title={settings.galleryTitle} titleStyle={settings.galleryTitleStyle} />,
