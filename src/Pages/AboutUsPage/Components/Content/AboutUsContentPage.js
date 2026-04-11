@@ -1194,11 +1194,11 @@ const RsvpSection = ({ resourceId, guestDetails }) => {
 // Thay thế toàn bộ component WishesSection cũ bằng code này
 const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
     const [wishes, setWishes] = useState([]);
-    const [content, setContent] = useState(''); // Chỉ cần lưu nội dung lời chúc
+    const [content, setContent] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false); // State quản lý đóng/mở Drawer
+    const [isExpanded, setIsExpanded] = useState(false);
 
-    // Tự động lấy tên từ URL/guestDetails, nếu không có fallback về "Khách mời"
+    // TỰ ĐỘNG LẤY TÊN KHÁCH MỜI: Từ guestDetails, nếu không có thì để "Khách mời"
     const guestName = guestDetails?.name || "Khách mời";
 
     useEffect(() => {
@@ -1222,14 +1222,15 @@ const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
         }
         setIsSubmitting(true);
         try {
-            // Gửi thẳng guestName được tự động gán
+            // Chỉ gửi content và tên đã được tự động gán, KHÔNG CẦN NHẬP TÊN
             await api.post(`/wishes/public/${resourceId}`, {
                 senderName: guestName,
                 content: content
             });
-            showSuccessToast("Gửi lời chúc thành công! Lời chúc sẽ được hiển thị sau khi duyệt.");
+            showSuccessToast("Gửi lời chúc thành công!");
             setContent('');
-            setIsExpanded(false); // Gửi xong thì đóng Drawer lại cho gọn
+            setIsExpanded(false); // Gửi xong thu nhỏ lại
+            // Khuyến nghị: Bạn có thể fetch lại list wishes ở đây nếu API trả về ngay
         } catch (err) {
             console.error("Có lỗi xảy ra, vui lòng thử lại.", err);
         } finally {
@@ -1237,25 +1238,21 @@ const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
         }
     };
 
-    // Ngăn chặn cuộn trang body khi Drawer đang mở
+    // Khóa cuộn trang khi mở full sổ lưu bút
     useEffect(() => {
         if (isExpanded) {
             document.body.style.overflow = 'hidden';
         } else {
-            document.body.style.overflow = 'auto';
+            document.body.style.overflow = '';
         }
-        return () => { document.body.style.overflow = 'auto'; };
+        return () => { document.body.style.overflow = ''; };
     }, [isExpanded]);
 
     return (
         <>
-            {/* Overlay làm tối nền khi mở Drawer */}
             <div className={`sticky-wishes-overlay ${isExpanded ? 'visible' : ''}`} onClick={() => setIsExpanded(false)}></div>
 
-            {/* Sticky Bottom Nav */}
             <div className={`modern-sticky-wishes ${isExpanded ? 'expanded' : ''}`}>
-                
-                {/* Header (Thanh Bar luôn hiển thị ở bottom) */}
                 <div className="sticky-wishes-header" onClick={() => setIsExpanded(!isExpanded)}>
                     <div className="header-left">
                         <MessageCircle size={22} className="pulse-icon" />
@@ -1268,15 +1265,14 @@ const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
                     </div>
                 </div>
 
-                {/* Body (Phần nội dung trượt lên) */}
                 <div className="sticky-wishes-body">
-                    {/* Khu vực Form tự động nhận diện user */}
                     <div className="wishes-form-container">
                         <p className="wishes-greeting">
-                            Xin chào <strong>{guestName}</strong>, hãy để lại những lời chúc tốt đẹp nhất dành cho chúng tôi nhé!
+                            Xin chào <strong>{guestName}</strong>, hãy để lại những lời chúc tốt đẹp nhất nhé!
                         </p>
                         <form onSubmit={handleSubmit} className="modern-rsvp-form">
                             <div className="modern-form-group">
+                                {/* CHỈ CÓ TEXTAREA ĐỂ NHẬP NỘI DUNG, ĐÃ ẨN INPUT TÊN */}
                                 <textarea 
                                     className="modern-form-input custom-scrollbar" 
                                     placeholder="Nhập lời chúc của bạn tại đây..." 
@@ -1292,9 +1288,8 @@ const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
                         </form>
                     </div>
 
-                    {/* Danh sách lời chúc hiển thị bên dưới Form */}
                     {wishes.length > 0 && (
-                        <div className="wishes-list-container custom-scrollbar">
+                        <div className="wishes-list-container">
                             <h4 className="wishes-list-title">Lời chúc từ mọi người</h4>
                             <div className="wishes-list">
                                 {wishes.map((wish) => (
@@ -1678,7 +1673,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
             />
         ),
     };
-
+    const hasWishesBlock = blocksToRender.includes('WISHES');
     return (
         <div className="modern-invitation">
             <Helmet>
@@ -1773,6 +1768,14 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                 <button className="share-button zalo" onClick={handleShareZalo}><MessageCircle size={20} /></button>
                 <button className="share-button copy" onClick={handleCopyLink}><Copy size={20} /></button>
             </div>
+
+            {isOpen && hasWishesBlock && (
+                <WishesSection 
+                    resourceId={resourceId} 
+                    settings={settings} 
+                    guestDetails={guestDetails} 
+                />
+            )}
 
             <main className={`modern-content ${isOpen ? 'visible' : ''}`}>
                 <div className="modern-container">

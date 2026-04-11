@@ -2868,3 +2868,122 @@ END: STYLES MỚI
 .modern-form-input.custom-scrollbar:focus {
     background: rgba(255, 255, 255, 0.95);
 }
+/* ===================================================================
+   STICKY WISHES NAV (FIXED GLOBAL GLASSMORPHISM UI)
+=================================================================== */
+
+/* Đẩy padding bottom của trang lên để nội dung cuối cùng (như nút Quà mừng) không bị thanh nav che khuất */
+.about-us-container .modern-container {
+    padding-bottom: 120px; 
+}
+
+/* Đẩy các nút Share lên cao hơn để tránh đè lên Sticky Nav */
+.about-us-container .modern-share-buttons {
+    bottom: calc(var(--spacing-2xl) + 80px);
+    z-index: 1000;
+}
+
+.sticky-wishes-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9998; 
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+}
+
+.sticky-wishes-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modern-sticky-wishes {
+    position: fixed; /* Cố định với Viewport */
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 800px;
+    
+    /* Hiệu ứng Glassmorphism Cao cấp */
+    background: rgba(255, 255, 255, 0.4); 
+    backdrop-filter: blur(25px) saturate(200%);
+    -webkit-backdrop-filter: blur(25px) saturate(200%);
+    
+    border-radius: 24px 24px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.8);
+    border-left: 1px solid rgba(255, 255, 255, 0.4);
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+    
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
+    
+    z-index: 9999; /* Luôn nổi lên trên cùng */
+    transition: height 0.5s cubic-bezier(0.32, 0.72, 0, 1), background 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    
+    /* Chiều cao khi đóng */
+    height: calc(70px + env(safe-area-inset-bottom));
+    overflow: hidden; /* Quan trọng để không tràn UI khi đóng */
+}
+
+/* Khi mở rộng, nền kính đậm hơn để dễ đọc text */
+.modern-sticky-wishes.expanded {
+    height: 85vh; 
+    max-height: 750px;
+    background: rgba(255, 255, 255, 0.85); 
+}
+
+/* --- Header --- */
+.sticky-wishes-header {
+    height: 70px;
+    min-height: 70px;
+    padding: 0 var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    user-select: none;
+}
+
+.modern-sticky-wishes.expanded .sticky-wishes-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.header-left, .header-right { display: flex; align-items: center; gap: 12px; }
+
+.header-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.wishes-form-container {
+    background: rgba(255, 255, 255, 0.6); 
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 1);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+}
+
+.wish-card {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 1);
+    margin-bottom: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+@media (max-width: 768px) {
+    .modern-sticky-wishes {
+        max-width: 100%;
+        border-radius: 20px 20px 0 0;
+    }
+}
