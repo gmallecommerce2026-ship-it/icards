@@ -1606,7 +1606,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
     const contactGroomStyle = createStyleObject(settings.contactGroomStyle);
     const contactBrideStyle = createStyleObject(settings.contactBrideStyle);
 
-    const defaultBlockOrder = ['EVENT_DESCRIPTION', 'COUPLE_INFO', 'PARTICIPANTS', 'EVENT_SCHEDULE', 'COUNTDOWN', 'LOVE_STORY', 'GALLERY', 'VIDEO', 'WISHES', 'CONTACT_INFO', 'QR_CODES', 'RSVP', 'CUSTOM_HTML'];
+    const defaultBlockOrder = ['BANNER_CAROUSEL', 'EVENT_DESCRIPTION', 'COUPLE_INFO', 'PARTICIPANTS', 'EVENT_SCHEDULE', 'COUNTDOWN', 'LOVE_STORY', 'GALLERY', 'VIDEO', 'WISHES', 'CONTACT_INFO', 'QR_CODES', 'RSVP', 'CUSTOM_HTML'];
     
     const blocksToRender = Array.isArray(settings.blocksOrder) && settings.blocksOrder.length > 0 
     ? settings.blocksOrder 
@@ -1721,7 +1721,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
             {/* ++ END: RENDER OVERLAY ++ */}
             {/* =================================================================== */}
 
-            {hasBanner && isOpen && <BannerCarousel images={settings.bannerImages} />}
+            {blocksToRender.includes('BANNER_CAROUSEL') && hasBanner && isOpen && <BannerCarousel images={settings.bannerImages} />}
 
             <div className={`modern-envelope ${isOpen ? 'closed' : ''}`}>
                 {/* START: MODIFIED ENVELOPE STRUCTURE */}
