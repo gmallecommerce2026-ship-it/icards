@@ -249,9 +249,11 @@ export const Content = () => {
                 const uniqueOccasionsMap = new Map();
                 allTemplates.forEach(template => {
                     const category = template.category || '';
+                    const group = template.group || ''; // Bổ sung group
                     const type = template.type || '';
-                    // Tạo key duy nhất dựa trên Category và Type
-                    const key = `${category.trim()}-${type.trim()}`;
+                    
+                    // Đưa group vào key để đảm bảo tính toàn vẹn của phân cấp
+                    const key = `${category.trim()}-${group.trim()}-${type.trim()}`;
                     
                     if (category && !uniqueOccasionsMap.has(key)) {
                         uniqueOccasionsMap.set(key, template);
@@ -383,11 +385,20 @@ export const Content = () => {
                                 {occasions.map((item) => (
                                     <OccasionCard
                                         key={item._id}
-                                        // Hiển thị tên Danh mục + Loại (VD: Thiệp Cưới Hiện Đại)
                                         title={`${item.category} ${item.type || ""}`.trim()}
                                         imgSrc={item.imgSrc || `https://placehold.co/324x324/e0f7fa/006064?text=${item.title}`}
-                                        // Điều hướng đến trang danh mục tương ứng
-                                        onClick={() => navigate(`/invitations/category/${titleToSlug(item.category)}/type/${titleToSlug(item.type)}`)}
+                                        onClick={() => {
+                                            const catSlug = titleToSlug(item.category);
+                                            const groupSlug = titleToSlug(item.group);
+                                            const typeSlug = titleToSlug(item.type);
+                                            
+                                            // Xây dựng URL động dựa trên sự tồn tại của các tham số
+                                            let url = `/invitations/category/${catSlug}`;
+                                            if (groupSlug) url += `/group/${groupSlug}`;
+                                            if (typeSlug) url += `/type/${typeSlug}`;
+                                            
+                                            navigate(url);
+                                        }}
                                     />
                                 ))}
                             </div>
