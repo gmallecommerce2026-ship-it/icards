@@ -949,7 +949,7 @@ const CoupleImageDisplay = ({ src, alt, position }) => {
             className="modern-couple-image" 
             style={{ 
                 position: 'relative', 
-                overflow: 'hidden', // Quan trọng: giấu phần ảnh thừa khi parallax
+                overflow: 'hidden', 
                 padding: 0,
                 display: 'block' 
             }}
@@ -957,17 +957,14 @@ const CoupleImageDisplay = ({ src, alt, position }) => {
             <img
                 src={src}
                 alt={alt}
-                className="parallax-image" // <-- Thêm class kích hoạt Parallax
-                data-speed="0.15" // <-- Tốc độ trượt
                 style={{
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
-                    // Sửa lại transform để dự phòng (hook sẽ overwrite translateY)
-                    transform: `scale(${Math.max(scale, 1.15)}) translate(${x / scale}px, ${y / scale}px)`,
+                    // Sử dụng chính xác scale và tọa độ để ảnh hiển thị đúng vùng đã crop
+                    transform: `scale(${scale}) translate(${x / scale}px, ${y / scale}px)`,
                     transformOrigin: 'center center',
-                    willChange: 'transform',
-                    transition: 'transform 0.1s cubic-bezier(0.25, 0.46, 0.45, 0.94)' // Smooth movement
+                    willChange: 'transform'
                 }}
             />
         </div>
