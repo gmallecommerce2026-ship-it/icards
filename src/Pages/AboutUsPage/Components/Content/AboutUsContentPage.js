@@ -1,6 +1,6 @@
 // train-data/FE/Pages/AboutUsPage/Components/Content/AboutUsContentPage.js
 import React, { useState, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import api from '../../../../services/api';
 import SEO from '../../../../Features/SEO';
 import { showSuccessToast } from '../../../../Utils/toastHelper';
