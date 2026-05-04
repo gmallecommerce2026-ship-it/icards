@@ -1191,16 +1191,23 @@ const RsvpSection = ({ resourceId, guestDetails }) => {
 // ===================================================================
 // ++ COMPONENT CHÍNH CỦA TRANG ++
 // ===================================================================
-const EventBottomBar = React.memo(({ resourceId }) => {
+const EventBottomBar = React.memo(({ resourceId, guestId }) => {
     const navigate = useNavigate();
 
     const handleScrollToRSVP = () => {
         const rsvpSection = document.getElementById('rsvp-section');
         if (rsvpSection) {
-            // Cuộn mượt mà tới form xác nhận, trừ hao header/padding
             const y = rsvpSection.getBoundingClientRect().top + window.scrollY - 40;
             window.scrollTo({ top: y, behavior: 'smooth' });
         }
+    };
+
+    const handleNavigateToWishes = () => {
+        // Gắn thêm guestId vào URL nếu có
+        const url = guestId 
+            ? `/events/${resourceId}/wishes?guestId=${guestId}` 
+            : `/events/${resourceId}/wishes`;
+        navigate(url);
     };
 
     return (
@@ -1208,7 +1215,7 @@ const EventBottomBar = React.memo(({ resourceId }) => {
             <button onClick={handleScrollToRSVP} className="bottom-btn rsvp-btn">
                 Xác nhận tham dự
             </button>
-            <button onClick={() => navigate(`/events/${resourceId}/wishes`)} className="bottom-btn wishes-btn">
+            <button onClick={handleNavigateToWishes} className="bottom-btn wishes-btn">
                 Gửi lời chúc
             </button>
             <button onClick={() => navigate('/invitations')} className="bottom-btn create-btn">
@@ -1734,7 +1741,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                     )}
                 </div>
             </main>
-            <EventBottomBar resourceId={resourceId} />
+            <EventBottomBar resourceId={resourceId} guestId={guestId} />
         </div>
     );
 };
