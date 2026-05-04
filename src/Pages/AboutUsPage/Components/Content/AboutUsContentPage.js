@@ -1864,8 +1864,8 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                         </section>
                     )}
                 </div>
+                <EventBottomBar resourceId={resourceId} />
             </main>
-            <EventBottomBar resourceId={resourceId} />
         </div>
     );
 };

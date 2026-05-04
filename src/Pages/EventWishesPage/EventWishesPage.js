@@ -12,41 +12,60 @@ const EventWishesPage = () => {
     const guestId = searchParams.get('guestId');
 
     const [wishes, setWishes] = useState([]);
-    const [senderName, setSenderName] = useState('');
+    const [senderName, setSenderName] = useState('Khách mời'); // Mặc định là Khách mời
     const [content, setContent] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    // Fetch danh sách lời chúc khi load trang
+    // Fetch dữ liệu khi load trang
     useEffect(() => {
         if (!id) return;
-        const fetchWishes = async () => {
+        
+        const fetchInitialData = async () => {
             try {
-                const res = await api.get(`/wishes/public/${id}`);
-                setWishes(res.data.data || []);
+                // Chuẩn bị 2 luồng gọi API
+                const fetchWishes = api.get(`/wishes/public/${id}`);
+                // Chỉ gọi API lấy thông tin thiệp/khách mời nếu có guestId trên URL
+                const fetchGuestInfo = guestId ? api.get(`/invitations/public/${id}?guestId=${guestId}`) : null;
+
+                // Chạy song song để tối ưu tốc độ
+                const [resWishes, resInv] = await Promise.all([
+                    fetchWishes,
+                    fetchGuestInfo
+                ]);
+
+                // Set danh sách lời chúc
+                setWishes(resWishes.data.data || []);
+
+                // Lấy tên khách mời từ chi tiết thiệp
+                if (resInv && resInv.data.data?.guestDetails?.name) {
+                    setSenderName(resInv.data.data.guestDetails.name);
+                }
             } catch (err) {
-                console.error("Lỗi tải lời chúc:", err);
+                console.error("Lỗi tải dữ liệu:", err);
             } finally {
                 setLoading(false);
             }
         };
-        fetchWishes();
-    }, [id]);
+
+        fetchInitialData();
+    }, [id, guestId]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!senderName.trim() || !content.trim()) {
-            showErrorToast("Vui lòng nhập đầy đủ tên và lời chúc!");
+        if (!content.trim()) {
+            showErrorToast("Vui lòng nhập lời chúc!");
             return;
         }
         setIsSubmitting(true);
         try {
             const res = await api.post(`/wishes/public/${id}`, {
-                senderName: senderName.trim(),
+                senderName: senderName, // Gửi tên đã được tự động lấy
                 content: content.trim()
             });
             showSuccessToast("Gửi lời chúc thành công!");
             setContent('');
+            
             // Đẩy lời chúc mới lên đầu danh sách
             if(res.data && res.data.data) {
                 setWishes(prev => [res.data.data, ...prev]);
@@ -88,10 +107,9 @@ const EventWishesPage = () => {
                             <label className="form-label">Tên của bạn</label>
                             <input 
                                 type="text"
-                                className="modern-form-input" 
-                                placeholder="Nhập tên của bạn..." 
+                                className="modern-form-input readonly-input" 
                                 value={senderName}
-                                onChange={(e) => setSenderName(e.target.value)}
+                                readOnly // Khóa không cho nhập
                             />
                         </div>
                         <div className="modern-form-group">
