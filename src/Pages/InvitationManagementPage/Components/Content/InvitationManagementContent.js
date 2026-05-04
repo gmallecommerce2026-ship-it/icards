@@ -1609,6 +1609,11 @@ const WishManagementPanel = ({ invitationId }) => {
                                 </span>
                             </div>
                             <div className="table-body-cell" style={{flex: 1, justifyContent: 'center', gap: '10px', flexDirection: 'row'}}>
+                                {/* --- NÚT BẬT FORM HỒI ĐÁP --- */}
+                                <button className="table-action-btn" onClick={() => { setReplyingWishId(wish._id); setReplyText(wish.reply || ''); }} title="Hồi đáp">
+                                    <EditIcon width="18" height="18" />
+                                </button>
+                                
                                 <button className="table-action-btn" onClick={() => handleToggleStatus(wish)} title="Ẩn/Hiện">
                                     {wish.status === 'approved' ? <CancelIcon /> : <CheckIcon />}
                                 </button>
