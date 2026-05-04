@@ -1191,7 +1191,7 @@ const RsvpSection = ({ resourceId, guestDetails }) => {
 // ===================================================================
 // ++ COMPONENT CHÍNH CỦA TRANG ++
 // ===================================================================
-const EventBottomBar = React.memo(({ resourceId, guestId }) => {
+const EventBottomBar = React.memo(({ resourceId, guestId, isOpen }) => {
     const navigate = useNavigate();
 
     const handleScrollToRSVP = () => {
@@ -1203,23 +1203,28 @@ const EventBottomBar = React.memo(({ resourceId, guestId }) => {
     };
 
     const handleNavigateToWishes = () => {
-        // Gắn thêm guestId vào URL nếu có
         const url = guestId 
             ? `/events/${resourceId}/wishes?guestId=${guestId}` 
             : `/events/${resourceId}/wishes`;
         navigate(url);
     };
 
+    // Nếu thiệp chưa mở, không render gì cả
+    if (!isOpen) return null;
+
     return (
-        <div className="modern-event-bottom-bar">
+        <div className="modern-event-bottom-bar fade-in-bottom">
             <button onClick={handleScrollToRSVP} className="bottom-btn rsvp-btn">
+                <Calendar size={18} style={{marginRight: '6px'}} />
                 Xác nhận tham dự
             </button>
             <button onClick={handleNavigateToWishes} className="bottom-btn wishes-btn">
+                <MessageCircle size={18} style={{marginRight: '6px'}} />
                 Gửi lời chúc
             </button>
             <button onClick={() => navigate('/invitations')} className="bottom-btn create-btn">
-                Tạo thiệp chúc mừng
+                <Heart size={18} style={{marginRight: '6px'}} />
+                Tạo thiệp
             </button>
         </div>
     );
@@ -1741,7 +1746,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                     )}
                 </div>
             </main>
-            <EventBottomBar resourceId={resourceId} guestId={guestId} />
+            <EventBottomBar resourceId={resourceId} guestId={guestId} isOpen={isOpen} />
         </div>
     );
 };

@@ -35,80 +35,101 @@
 }
 
 /* ===================================================================
-   FIXED BOTTOM NAVIGATION BAR
+   UPGRADED GLASSMORPHISM BOTTOM BAR
 =================================================================== */
 .modern-event-bottom-bar {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    bottom: 20px; /* Cách đáy một chút tạo cảm giác floating (nổi) */
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 600px;
+    
+    /* Hiệu ứng Kính mờ (Glassmorphism) */
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    
+    /* Viền và bóng đổ tinh tế */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
-    padding: 12px 20px;
+    padding: 10px;
     z-index: 9999;
-    gap: 12px;
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
-    /* Hỗ trợ an toàn cho thiết bị tai thỏ/nút home ảo (iPhone) */
-    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    gap: 10px;
+    border-radius: 20px; /* Bo góc cực mạnh cho hiện đại */
+    
+    /* An toàn cho iPhone */
+    margin-bottom: env(safe-area-inset-bottom);
 }
 
 .modern-event-bottom-bar .bottom-btn {
     flex: 1;
-    max-width: 250px;
-    height: 44px;
-    border-radius: 8px;
-    border: 1px solid var(--color-primary);
+    height: 48px;
+    border-radius: 14px;
+    border: none;
     background-color: transparent;
     color: var(--color-primary);
     font-weight: 600;
-    font-size: 14px;
-    padding: 10px 16px;
+    font-size: 13px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
     display: flex;
-    justify-content: center;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
+    text-transform: none; /* Bỏ uppercase cho nhẹ nhàng */
 }
 
+/* Nút chủ đạo (RSVP) */
 .modern-event-bottom-bar .bottom-btn.rsvp-btn {
-    background-color: var(--color-primary);
+    background: var(--color-primary);
     color: #fff;
+    box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.3);
 }
 
-.modern-event-bottom-bar .bottom-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+/* Hiệu ứng Hover/Active */
+.modern-event-bottom-bar .bottom-btn:active {
+    transform: scale(0.95);
 }
 
-/* Đẩy padding trang lên để nội dung cuối cùng không bị thanh nav che khuất */
-.about-us-container .modern-container {
-    padding-bottom: 90px; 
+.modern-event-bottom-bar .bottom-btn:not(.rsvp-btn):hover {
+    background: rgba(39, 84, 138, 0.1);
 }
 
-/* Đẩy cụm nút Share lên cao hơn để không bị Bottom Bar đè lên */
-.about-us-container .modern-share-buttons {
-    bottom: calc(env(safe-area-inset-bottom) + 90px);
-    z-index: 1000;
+/* Animation khi thiệp vừa mở */
+.fade-in-bottom {
+    animation: slideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-/* Responsive cho mobile nếu màn hình quá nhỏ */
-@media (max-width: 480px) {
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 100%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+/* Responsive cho màn hình cực nhỏ */
+@media (max-width: 400px) {
     .modern-event-bottom-bar {
-        padding: 10px 12px;
-        gap: 8px;
+        padding: 8px;
+        gap: 5px;
     }
     .modern-event-bottom-bar .bottom-btn {
-        font-size: 12px;
-        padding: 0 8px;
-        white-space: normal; /* Cho phép rớt dòng nếu text dài */
-        text-align: center;
-        line-height: 1.2;
+        font-size: 11px;
+        letter-spacing: -0.5px;
+    }
+    /* Ẩn bớt icon trên mobile cực nhỏ để tránh chật chội */
+    .modern-event-bottom-bar .bottom-btn svg {
+        display: none;
     }
 }
 /* Bọc tất cả style vào trong class .about-us-container */
