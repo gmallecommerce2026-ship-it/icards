@@ -8,7 +8,6 @@ import './InvitationManagementContent.css';
 import { FiMail } from 'react-icons/fi';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'; // <--- Thêm Import
 import { create } from 'zustand';
-import { Menu, MenuItem } from '@mui/material';
 const useTaskStore = create((set, get) => ({
     tasks: [],
     isLoading: false,
@@ -182,11 +181,13 @@ const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
     );
 };
 
-const GuestActionDropdown = ({ guest, invitationId, onSendEmail, onClose, anchorEl }) => {
+const GuestActionDropdown = ({ guest, invitationId, onSendEmail, onClose }) => {
+    const dropdownRef = useRef(null);
+    const [isDropUp, setIsDropUp] = useState(false); // State xác định hướng mở
     const invitationBaseUrl = `${window.location.origin}/events/${invitationId}`;
     const guestUrl = `${invitationBaseUrl}?guestId=${guest._id}`;
-    const dropdownRef = useRef(null);
 
+    // Logic đóng menu khi click ngoài (đã có)
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -196,6 +197,19 @@ const GuestActionDropdown = ({ guest, invitationId, onSendEmail, onClose, anchor
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [onClose]);
+
+    // Thêm logic tính toán khoảng trống
+    useEffect(() => {
+        if (dropdownRef.current) {
+            const rect = dropdownRef.current.getBoundingClientRect();
+            const spaceBelow = window.innerHeight - rect.bottom;
+            
+            // Nếu khoảng trống dưới màn hình nhỏ hơn chiều cao dropdown (khoảng 130px)
+            if (spaceBelow < 130) {
+                setIsDropUp(true);
+            }
+        }
+    }, []);
 
     const handleCopyLink = () => {
         navigator.clipboard.writeText(guestUrl).then(() => {
@@ -217,25 +231,16 @@ const GuestActionDropdown = ({ guest, invitationId, onSendEmail, onClose, anchor
     };
 
     return (
-        <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={onClose}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'center' }}
-            // Bỏ bóng mặc định của MUI nếu muốn giữ style cũ của bạn
-            PaperProps={{
-                style: {
-                    borderRadius: '8px',
-                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-                    border: '1px solid #f3f4f6'
-                }
-            }}
+        <div 
+            className={`guest-action-dropdown ${isDropUp ? 'drop-up' : ''}`} 
+            ref={dropdownRef}
         >
-            <MenuItem onClick={handleCopyLink} style={{ fontSize: '0.875rem', fontWeight: 500 }}>Copy link thiệp online</MenuItem>
-            <MenuItem onClick={handleSendEmail} style={{ fontSize: '0.875rem', fontWeight: 500 }}>Gửi email cho khách mời</MenuItem>
-            <MenuItem onClick={handleOpenLink} style={{ fontSize: '0.875rem', fontWeight: 500 }}>Xem trước thiệp online</MenuItem>
-        </Menu>
+            <ul>
+                <li onClick={handleCopyLink}>Copy link thiệp online</li>
+                <li onClick={handleSendEmail}>Gửi email cho khách mời</li>
+                <li onClick={handleOpenLink}>Xem trước thiệp online</li>
+            </ul>
+        </div>
     );
 };
 

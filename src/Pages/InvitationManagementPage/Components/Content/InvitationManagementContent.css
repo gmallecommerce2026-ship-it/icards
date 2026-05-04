@@ -1594,3 +1594,9 @@ body {
         width: auto !important;
     }
 }
+
+.guest-action-dropdown.drop-up {
+    top: auto;
+    bottom: 90%; /* Bắn ngược lên trên thẻ cha */
+    box-shadow: 0 -10px 15px -3px rgba(0,0,0,0.1), 0 -4px 6px -4px rgba(0,0,0,0.1);
+}
