@@ -1314,7 +1314,32 @@ const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
 // ===================================================================
 // ++ COMPONENT CHÍNH CỦA TRANG ++
 // ===================================================================
+const EventBottomBar = React.memo(({ resourceId }) => {
+    const navigate = useNavigate();
 
+    const handleScrollToRSVP = () => {
+        const rsvpSection = document.getElementById('rsvp-section');
+        if (rsvpSection) {
+            // Cuộn mượt mà tới form xác nhận, trừ hao header/padding
+            const y = rsvpSection.getBoundingClientRect().top + window.scrollY - 40;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+    };
+
+    return (
+        <div className="modern-event-bottom-bar">
+            <button onClick={handleScrollToRSVP} className="bottom-btn rsvp-btn">
+                Xác nhận tham dự
+            </button>
+            <button onClick={() => navigate(`/events/${resourceId}/wishes`)} className="bottom-btn wishes-btn">
+                Gửi lời chúc
+            </button>
+            <button onClick={() => navigate('/invitations')} className="bottom-btn create-btn">
+                Tạo thiệp chúc mừng
+            </button>
+        </div>
+    );
+});
 const WeddingInvitation = () => {
     const { id: resourceId } = useParams();
     const [searchParams] = useSearchParams();
@@ -1650,7 +1675,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
         ),
         QR_CODES: <GiftSection qrCodes={settings.qrCodes} title={settings.qrCodeTitle} titleStyle={settings.qrCodeTitleStyle} />,
         RSVP: (
-            <section className="section-container">
+            <section id="rsvp-section" className="section-container">
                 <SectionHeader 
                     title={settings.rsvpTitle || "Xác Nhận Tham Dự"} 
                     subtitle={settings.rsvpSubtitle || "Sự hiện diện của bạn là niềm vinh hạnh cho gia đình chúng tôi."}
@@ -1840,6 +1865,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                     )}
                 </div>
             </main>
+            <EventBottomBar resourceId={resourceId} />
         </div>
     );
 };
