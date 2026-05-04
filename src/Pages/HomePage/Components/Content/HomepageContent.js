@@ -74,17 +74,6 @@ const IntroSection = ({ content }) => {
     );
 };
 
-// Hàm tiện ích để chuẩn hóa chuỗi thành slug URL
-const titleToSlug = (title) => {
-    if (!title) return '';
-    return title
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d")
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '');
-};
 
 const ArrowButton = ({ direction, onClick }) => (
     <button className={`arrow-btn ${direction}`} onClick={onClick}>
