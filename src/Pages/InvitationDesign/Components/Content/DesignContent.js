@@ -4099,10 +4099,8 @@ const processTemplate = (templateData) => {
     }));
 };
 const TemplatePickerIntegrated = ({ templates, onSelectTemplate }) => {
-    // 1. Thêm State để lưu trữ từ khóa tìm kiếm
     const [searchTerm, setSearchTerm] = useState('');
 
-    // 2. Sử dụng useMemo để tối ưu hóa việc filter, tránh giật lag khi gõ phím
     const filteredTemplates = useMemo(() => {
         if (!searchTerm.trim()) return templates;
         const lowercasedTerm = searchTerm.toLowerCase();
@@ -4115,7 +4113,6 @@ const TemplatePickerIntegrated = ({ templates, onSelectTemplate }) => {
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <Typography variant="h6" gutterBottom>Chọn mẫu thiệp</Typography>
             
-            {/* Thanh tìm kiếm */}
             <TextField
                 fullWidth
                 size="small"
@@ -4130,77 +4127,80 @@ const TemplatePickerIntegrated = ({ templates, onSelectTemplate }) => {
                 }}
             />
 
-            {/* Vùng cuộn chứa Grid 2 cột */}
-            <Grid 
-                container 
-                spacing={1.5} 
+            {/* SỬ DỤNG CSS GRID CHUẨN ĐỂ ÉP BUỘC CHIA 2 CỘT TUYỆT ĐỐI */}
+            <Box 
                 sx={{ 
-                    maxHeight: 'calc(100vh - 180px)', // Đảm bảo trừ đi phần header và search
-                    overflowY: 'auto', 
-                    alignContent: 'flex-start',
-                    pb: 2 
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(2, 1fr)', // Ép chính xác 2 cột bằng nhau
+                    gap: 1.5, // Khoảng cách giữa 2 cột và các hàng
+                    maxHeight: 'calc(100vh - 180px)', 
+                    overflowY: 'auto',
+                    pb: 2,
+                    // Tùy chỉnh thêm thanh cuộn cho Sidebar gọn gàng
+                    '&::-webkit-scrollbar': { width: '6px' },
+                    '&::-webkit-scrollbar-thumb': { backgroundColor: 'divider', borderRadius: '10px' }
                 }}
             >
-                {/* Trạng thái Loading */}
+                {/* Trạng thái Loading (Chiếm toàn bộ 2 cột) */}
                 {templates.length === 0 && (
-                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                    <Box sx={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', p: 4 }}>
                         <CircularProgress />
-                    </Grid>
+                    </Box>
                 )}
 
-                {/* Trạng thái Không tìm thấy kết quả */}
+                {/* Trạng thái Không có kết quả (Chiếm toàn bộ 2 cột) */}
                 {templates.length > 0 && filteredTemplates.length === 0 && (
-                    <Grid item xs={12}>
+                    <Box sx={{ gridColumn: '1 / -1' }}>
                         <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4 }}>
                             Không tìm thấy mẫu thiệp nào phù hợp.
                         </Typography>
-                    </Grid>
+                    </Box>
                 )}
 
-                {/* Render danh sách thiệp */}
+                {/* Render danh sách thẻ thiệp */}
                 {filteredTemplates.map(template => (
-                    <Grid item key={template._id} xs={6}> {/* ĐỔI TỪ xs={12} SANG xs={6} ĐỂ CHIA 2 CỘT */}
-                        <Card 
-                            onClick={() => onSelectTemplate(template._id)} 
+                    <Card 
+                        key={template._id}
+                        onClick={() => onSelectTemplate(template._id)} 
+                        sx={{ 
+                            cursor: 'pointer', 
+                            '&:hover': { boxShadow: 4, transform: 'scale(1.02)', borderColor: 'primary.main' }, 
+                            transition: 'all 0.2s ease',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            border: '1px solid transparent',
+                        }}
+                    >
+                        <CardMedia 
+                            component="img" 
                             sx={{ 
-                                cursor: 'pointer', 
-                                '&:hover': { boxShadow: 4, transform: 'scale(1.02)', borderColor: 'primary.main' }, 
-                                transition: 'all 0.2s ease',
-                                height: '100%',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                border: '1px solid transparent'
-                            }}
-                        >
-                            <CardMedia 
-                                component="img" 
+                                aspectRatio: '3/4', 
+                                objectFit: 'cover',
+                                width: '100%' 
+                            }} 
+                            image={template.imgSrc || 'https://placehold.co/400x600/EBF1FB/B0C7EE?text=No+Image'} 
+                            crossOrigin="anonymous" 
+                            alt={template.title} 
+                        />
+                        <CardContent sx={{ p: 1, pb: '8px !important', flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Typography 
+                                variant="caption" 
+                                fontWeight="500" 
+                                align="center"
                                 sx={{ 
-                                    aspectRatio: '3/4', // Tỉ lệ chuẩn cho ảnh thiệp dọc
-                                    objectFit: 'cover' 
-                                }} 
-                                image={template.imgSrc || 'https://placehold.co/400x600/EBF1FB/B0C7EE?text=No+Image'} 
-                                crossOrigin="anonymous" 
-                                alt={template.title} 
-                            />
-                            <CardContent sx={{ p: 1, pb: '8px !important', flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Typography 
-                                    variant="caption" 
-                                    fontWeight="500" 
-                                    align="center"
-                                    sx={{ 
-                                        display: '-webkit-box', 
-                                        WebkitLineClamp: 2, // Hiển thị ... nếu tên quá 2 dòng
-                                        WebkitBoxOrient: 'vertical', 
-                                        overflow: 'hidden' 
-                                    }}
-                                >
-                                    {template.title}
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                                    display: '-webkit-box', 
+                                    WebkitLineClamp: 2, 
+                                    WebkitBoxOrient: 'vertical', 
+                                    overflow: 'hidden',
+                                    width: '100%'
+                                }}
+                            >
+                                {template.title}
+                            </Typography>
+                        </CardContent>
+                    </Card>
                 ))}
-            </Grid>
+            </Box>
         </Box>
     );
 };
