@@ -1487,7 +1487,8 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
 const WishManagementPanel = ({ invitationId }) => {
     const [wishes, setWishes] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const [replyingWishId, setReplyingWishId] = useState(null);
+    const [replyText, setReplyText] = useState('');
     const fetchWishes = useCallback(async () => {
         if (!invitationId) return;
         try {
@@ -1534,6 +1535,21 @@ const WishManagementPanel = ({ invitationId }) => {
         });
     };
 
+    const handleSaveReply = (wish) => {
+        const promise = api.put(`/wishes/${wish._id}`, { reply: replyText });
+        
+        handlePromiseToast(promise, {
+            pending: 'Đang gửi hồi đáp...',
+            success: 'Đã gửi hồi đáp thành công!',
+            error: 'Gửi hồi đáp thất bại!'
+        }).then(() => {
+            // Cập nhật lại UI ngay lập tức
+            setWishes(prev => prev.map(w => w._id === wish._id ? { ...w, reply: replyText } : w));
+            setReplyingWishId(null);
+            setReplyText('');
+        });
+    };
+
     if (loading) return <p>Đang tải dữ liệu lời chúc...</p>;
 
     return (
@@ -1562,7 +1578,30 @@ const WishManagementPanel = ({ invitationId }) => {
                                 <div style={{ fontSize: '12px', color: '#666' }}>{new Date(wish.createdAt).toLocaleDateString('vi-VN')}</div>
                             </div>
                             <div className="table-body-cell" style={{flex: 3, alignItems: 'flex-start', paddingLeft: '20px', paddingRight: '20px', whiteSpace: 'normal', lineHeight: '1.5'}}>
-                                "{wish.content}"
+                                <div style={{ fontStyle: 'italic' }}>"{wish.content}"</div>
+                                
+                                {/* Logic hiển thị Form hoặc Kết quả Hồi đáp */}
+                                {replyingWishId === wish._id ? (
+                                    <div style={{ width: '100%', marginTop: '12px' }}>
+                                        <textarea 
+                                            value={replyText}
+                                            onChange={(e) => setReplyText(e.target.value)}
+                                            style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc', minHeight: '60px', fontFamily: 'inherit', boxSizing: 'border-box' }}
+                                            placeholder="Nhập lời cảm ơn của bạn..."
+                                        />
+                                        <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                                            <button onClick={() => handleSaveReply(wish)} style={{ padding: '6px 14px', background: '#27548A', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 600 }}>Gửi hồi đáp</button>
+                                            <button onClick={() => { setReplyingWishId(null); setReplyText(''); }} style={{ padding: '6px 14px', background: '#fff', border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer' }}>Hủy</button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    wish.reply && (
+                                        <div style={{ background: '#f0f5fa', padding: '10px 15px', borderRadius: '6px', borderLeft: '3px solid #27548A', marginTop: '12px', width: '100%', boxSizing: 'border-box' }}>
+                                            <strong style={{ color: '#27548A', fontSize: '13px', display: 'block', marginBottom: '4px' }}>Phản hồi của bạn:</strong>
+                                            <span style={{ fontSize: '14px', color: '#333' }}>{wish.reply}</span>
+                                        </div>
+                                    )
+                                )}
                             </div>
                             <div className="table-body-cell" style={{flex: 1, justifyContent: 'center'}}>
                                 <span style={{ padding: '4px 12px', borderRadius: '20px', fontSize: '12px', backgroundColor: wish.status === 'approved' ? '#d1fae5' : '#fee2e2', color: wish.status === 'approved' ? '#065f46' : '#991b1b' }}>

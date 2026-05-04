@@ -1289,18 +1289,18 @@ const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
                         <div className="wishes-list-container">
                             <h4 className="wishes-list-title">Lời chúc từ mọi người</h4>
                             <div className="wishes-list">
-                                {wishes.map((wish) => (
+                                {wishes.map(wish => (
                                     <div key={wish._id} className="wish-card">
-                                        <div className="wish-card-header">
-                                            <div className="wish-avatar">
-                                                {wish.senderName.charAt(0).toUpperCase()}
-                                            </div>
-                                            <div className="wish-meta">
-                                                <h4>{wish.senderName}</h4>
-                                                <span>{new Date(wish.createdAt).toLocaleDateString('vi-VN')}</span>
-                                            </div>
-                                        </div>
                                         <p className="wish-content">"{wish.content}"</p>
+                                        <p className="wish-author">- {wish.senderName} -</p>
+                                        
+                                        {/* Kiểm tra nếu có reply thì mới render ra */}
+                                        {wish.reply && (
+                                            <div className="wish-reply-box">
+                                                <strong>Cô Dâu & Chú Rể:</strong>
+                                                <p>{wish.reply}</p>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
