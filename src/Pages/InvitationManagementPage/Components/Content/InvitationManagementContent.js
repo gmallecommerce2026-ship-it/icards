@@ -181,10 +181,10 @@ const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
     );
 };
 
-const GuestActionDropdown = ({ guest, invitationId, onSendEmail, onClose }) => {
-    const dropdownRef = useRef(null);
+const GuestActionDropdown = ({ guest, invitationId, onSendEmail, onClose, anchorEl }) => {
     const invitationBaseUrl = `${window.location.origin}/events/${invitationId}`;
     const guestUrl = `${invitationBaseUrl}?guestId=${guest._id}`;
+    const dropdownRef = useRef(null);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -216,13 +216,25 @@ const GuestActionDropdown = ({ guest, invitationId, onSendEmail, onClose }) => {
     };
 
     return (
-        <div className="guest-action-dropdown" ref={dropdownRef}>
-            <ul>
-                <li onClick={handleCopyLink}>Copy link thiệp online</li>
-                <li onClick={handleSendEmail}>Gửi email cho khách mời</li>
-                <li onClick={handleOpenLink}>Xem trước thiệp online</li>
-            </ul>
-        </div>
+        <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={onClose}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+            // Bỏ bóng mặc định của MUI nếu muốn giữ style cũ của bạn
+            PaperProps={{
+                style: {
+                    borderRadius: '8px',
+                    boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+                    border: '1px solid #f3f4f6'
+                }
+            }}
+        >
+            <MenuItem onClick={handleCopyLink} style={{ fontSize: '0.875rem', fontWeight: 500 }}>Copy link thiệp online</MenuItem>
+            <MenuItem onClick={handleSendEmail} style={{ fontSize: '0.875rem', fontWeight: 500 }}>Gửi email cho khách mời</MenuItem>
+            <MenuItem onClick={handleOpenLink} style={{ fontSize: '0.875rem', fontWeight: 500 }}>Xem trước thiệp online</MenuItem>
+        </Menu>
     );
 };
 
@@ -920,7 +932,9 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
     const [hasMasterGuests, setHasMasterGuests] = useState(false); // <-- THÊM STATE MỚI
     const [isMasterGuestModalOpen, setMasterGuestModalOpen] = useState(false);
     const selectAllCheckboxRef = useRef(null);
+    const [guestMenuAnchor, setGuestMenuAnchor] = useState(null);
 
+    
     useEffect(() => {
         const checkMasterGuests = async () => {
             try {
@@ -1174,7 +1188,13 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
 
     const handleToggleGuestMenu = (guestId, e) => {
         e.stopPropagation();
-        setOpenGuestMenu(prev => (prev === guestId ? null : guestId));
+        if (openGuestMenu === guestId) {
+            setOpenGuestMenu(null);
+            setGuestMenuAnchor(null);
+        } else {
+            setOpenGuestMenu(guestId);
+            setGuestMenuAnchor(e.currentTarget); // Truyền node HTML vào để MUI định vị
+        }
     };
 
     const formatCurrency = (value) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value || 0);
