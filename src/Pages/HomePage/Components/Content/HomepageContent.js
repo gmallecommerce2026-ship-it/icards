@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './HomepageContent.css';
 import { useNavigate, Link } from 'react-router-dom';
+import { titleToSlug } from '../../Utils/stringHelpers';
 import api from "../../../../services/api";
 import SEO from '../../../../Features/SEO';
 import { useSettings } from '../../../../Context/SettingsContext';
@@ -392,10 +393,19 @@ export const Content = () => {
                                             const groupSlug = titleToSlug(item.group);
                                             const typeSlug = titleToSlug(item.type);
                                             
-                                            // Xây dựng URL động dựa trên sự tồn tại của các tham số
+                                            // Bảo vệ an toàn: Nếu không tạo được catSlug thì không làm gì cả
+                                            if (!catSlug) return; 
+
                                             let url = `/invitations/category/${catSlug}`;
-                                            if (groupSlug) url += `/group/${groupSlug}`;
-                                            if (typeSlug) url += `/type/${typeSlug}`;
+                                            
+                                            // Ràng buộc cấu trúc URL liền mạch: Phải có Group thì mới nối thêm Type
+                                            if (groupSlug) {
+                                                url += `/group/${groupSlug}`;
+                                                if (typeSlug) {
+                                                    url += `/type/${typeSlug}`;
+                                                }
+                                            } 
+                                            // Nếu KHÔNG CÓ groupSlug, tuyệt đối bỏ qua typeSlug để tránh tạo ra URL rác
                                             
                                             navigate(url);
                                         }}
