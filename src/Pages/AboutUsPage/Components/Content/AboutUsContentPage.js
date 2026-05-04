@@ -1188,129 +1188,6 @@ const RsvpSection = ({ resourceId, guestDetails }) => {
     );
 };
 
-// Thay thế toàn bộ component WishesSection cũ bằng code này
-const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
-    const [wishes, setWishes] = useState([]);
-    const [content, setContent] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
-
-    // TỰ ĐỘNG LẤY TÊN KHÁCH MỜI: Từ guestDetails, nếu không có thì để "Khách mời"
-    const guestName = guestDetails?.name || "Khách mời";
-
-    useEffect(() => {
-        if (!resourceId) return;
-        const fetchWishes = async () => {
-            try {
-                const res = await api.get(`/wishes/public/${resourceId}`);
-                setWishes(res.data.data || []);
-            } catch (err) {
-                console.error("Lỗi tải lời chúc:", err);
-            }
-        };
-        fetchWishes();
-    }, [resourceId]);
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!content.trim()) {
-            showSuccessToast("Vui lòng nhập lời chúc!");
-            return;
-        }
-        setIsSubmitting(true);
-        try {
-            // Chỉ gửi content và tên đã được tự động gán, KHÔNG CẦN NHẬP TÊN
-            await api.post(`/wishes/public/${resourceId}`, {
-                senderName: guestName,
-                content: content
-            });
-            showSuccessToast("Gửi lời chúc thành công!");
-            setContent('');
-            setIsExpanded(false); // Gửi xong thu nhỏ lại
-            // Khuyến nghị: Bạn có thể fetch lại list wishes ở đây nếu API trả về ngay
-        } catch (err) {
-            console.error("Có lỗi xảy ra, vui lòng thử lại.", err);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    // Khóa cuộn trang khi mở full sổ lưu bút
-    useEffect(() => {
-        if (isExpanded) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
-        return () => { document.body.style.overflow = ''; };
-    }, [isExpanded]);
-
-    return (
-        <>
-            <div className={`sticky-wishes-overlay ${isExpanded ? 'visible' : ''}`} onClick={() => setIsExpanded(false)}></div>
-
-            <div className={`modern-sticky-wishes ${isExpanded ? 'expanded' : ''}`}>
-                <div className="sticky-wishes-header" onClick={() => setIsExpanded(!isExpanded)}>
-                    <div className="header-left">
-                        <MessageCircle size={22} className="pulse-icon" />
-                        <span className="header-title">{settings.wishesTitle || "Sổ Lưu Bút"}</span>
-                        {wishes.length > 0 && <span className="wishes-badge">{wishes.length}</span>}
-                    </div>
-                    <div className="header-right">
-                        <span className="header-hint">{isExpanded ? 'Đóng' : 'Gửi lời chúc'}</span>
-                        <ChevronUp size={24} className="toggle-icon" />
-                    </div>
-                </div>
-
-                <div className="sticky-wishes-body">
-                    <div className="wishes-form-container">
-                        <p className="wishes-greeting">
-                            Xin chào <strong>{guestName}</strong>, hãy để lại những lời chúc tốt đẹp nhất nhé!
-                        </p>
-                        <form onSubmit={handleSubmit} className="modern-rsvp-form">
-                            <div className="modern-form-group">
-                                {/* CHỈ CÓ TEXTAREA ĐỂ NHẬP NỘI DUNG, ĐÃ ẨN INPUT TÊN */}
-                                <textarea 
-                                    className="modern-form-input custom-scrollbar" 
-                                    placeholder="Nhập lời chúc của bạn tại đây..." 
-                                    rows="3"
-                                    value={content}
-                                    onChange={(e) => setContent(e.target.value)}
-                                    style={{ resize: 'none' }}
-                                />
-                            </div>
-                            <button type="submit" className="modern-btn-primary submit-btn" disabled={isSubmitting}>
-                                {isSubmitting ? 'Đang gửi...' : 'Gửi Lời Chúc'} <Heart size={16} style={{marginLeft: 4}}/>
-                            </button>
-                        </form>
-                    </div>
-
-                    {wishes.length > 0 && (
-                        <div className="wishes-list-container">
-                            <h4 className="wishes-list-title">Lời chúc từ mọi người</h4>
-                            <div className="wishes-list">
-                                {wishes.map(wish => (
-                                    <div key={wish._id} className="wish-card">
-                                        <p className="wish-content">"{wish.content}"</p>
-                                        <p className="wish-author">- {wish.senderName} -</p>
-                                        
-                                        {/* Kiểm tra nếu có reply thì mới render ra */}
-                                        {wish.reply && (
-                                            <div className="wish-reply-box">
-                                                <strong>Cô Dâu & Chú Rể:</strong>
-                                                <p>{wish.reply}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </>
-    );
-});
 // ===================================================================
 // ++ COMPONENT CHÍNH CỦA TRANG ++
 // ===================================================================
@@ -1645,7 +1522,6 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
         LOVE_STORY: <LoveStoryTimeline stories={settings.loveStory} title={settings.loveStoryTitle} titleStyle={settings.loveStoryTitleStyle} />,
         GALLERY: <Gallery images={settings.galleryImages} onImageClick={handleImageClick} title={settings.galleryTitle} titleStyle={settings.galleryTitleStyle} />,
         VIDEO: <EventVideo videoUrl={settings.videoUrl} title={settings.videoTitle} titleStyle={settings.videoTitleStyle} />,
-        WISHES: <WishesSection settings={settings} resourceId={resourceId} guestDetails={guestDetails} />,
         CONTACT_INFO: (
             <section className="section-container">
                 <SectionHeader title={settings.contactTitle || "Thông Tin Liên Hệ"} titleStyle={settings.contactTitleStyle} />
@@ -1791,13 +1667,6 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                 <button className="share-button copy" onClick={handleCopyLink}><Copy size={20} /></button>
             </div>
 
-            {isOpen && hasWishesBlock && (
-                <WishesSection 
-                    resourceId={resourceId} 
-                    settings={settings} 
-                    guestDetails={guestDetails} 
-                />
-            )}
 
             <main className={`modern-content ${isOpen ? 'visible' : ''}`}>
                 <div className="modern-container">
