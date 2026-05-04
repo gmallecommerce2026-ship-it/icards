@@ -1314,52 +1314,32 @@ const WishesSection = React.memo(({ resourceId, settings, guestDetails }) => {
 // ===================================================================
 // ++ COMPONENT CHÍNH CỦA TRANG ++
 // ===================================================================
-const EventBottomBar = () => {
+const EventBottomBar = React.memo(({ resourceId }) => {
     const navigate = useNavigate();
-    const { id } = useParams(); // Lấy ID của event hiện tại từ URL (/events/:id)
 
-    // 1. Xử lý Scroll mượt tới section Xác nhận tham dự
     const handleScrollToRSVP = () => {
         const rsvpSection = document.getElementById('rsvp-section');
         if (rsvpSection) {
-            // Margin top nới ra một chút nếu bạn có fixed header
-            const headerOffset = 80; 
-            const elementPosition = rsvpSection.getBoundingClientRect().top;
-            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-          
-            window.scrollTo({
-                 top: offsetPosition,
-                 behavior: "smooth"
-            });
+            // Cuộn mượt mà tới form xác nhận, trừ hao header/padding
+            const y = rsvpSection.getBoundingClientRect().top + window.scrollY - 40;
+            window.scrollTo({ top: y, behavior: 'smooth' });
         }
     };
 
-    // 2. Chuyển hướng sang page Gửi và theo dõi lời chúc riêng biệt
-    const handleNavigateToWishes = () => {
-        // Tách hẳn sang một page mới theo chuẩn RESTful UI
-        navigate(`/events/${id}/wishes`);
-    };
-
-    // 3. Link tới trang danh mục tất cả thiệp
-    const handleNavigateToCategories = () => {
-        // Dựa theo App.js của bạn, trang danh mục thiệp là /invitations
-        navigate('/invitations'); 
-    };
-
     return (
-        <div className="event-bottom-bar">
+        <div className="modern-event-bottom-bar">
             <button onClick={handleScrollToRSVP} className="bottom-btn rsvp-btn">
                 Xác nhận tham dự
             </button>
-            <button onClick={handleNavigateToWishes} className="bottom-btn wishes-btn">
+            <button onClick={() => navigate(`/events/${resourceId}/wishes`)} className="bottom-btn wishes-btn">
                 Gửi lời chúc
             </button>
-            <button onClick={handleNavigateToCategories} className="bottom-btn create-btn">
+            <button onClick={() => navigate('/invitations')} className="bottom-btn create-btn">
                 Tạo thiệp chúc mừng
             </button>
         </div>
     );
-};
+});
 const WeddingInvitation = () => {
     const { id: resourceId } = useParams();
     const [searchParams] = useSearchParams();
