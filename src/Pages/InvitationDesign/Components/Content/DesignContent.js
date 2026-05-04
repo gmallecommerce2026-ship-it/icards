@@ -4098,24 +4098,112 @@ const processTemplate = (templateData) => {
         }))
     }));
 };
-const TemplatePickerIntegrated = ({ templates, onSelectTemplate }) => (
-    <Box>
-        <Typography variant="h6" gutterBottom>Chọn mẫu thiệp</Typography>
-        <Grid container spacing={2} sx={{ pt: 1, maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}>
-            {templates.length === 0 && (<Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', p: 4 }}><CircularProgress /></Grid>)}
-            {templates.map(template => (
-                <Grid item key={template._id} xs={12}>
-                    <Card onClick={() => onSelectTemplate(template._id)} sx={{ cursor: 'pointer', '&:hover': { boxShadow: 4, transform: 'scale(1.02)' }, transition: 'all 0.2s ease' }}>
-                        <CardMedia component="img" height="150" image={template.imgSrc || 'https://placehold.co/400x400/EBF1FB/B0C7EE?text=No+Image'} crossOrigin="anonymous" alt={template.title} sx={{ objectFit: 'cover' }} />
-                        <CardContent sx={{ p: 1.5 }}>
-                            <Typography variant="body2" fontWeight="500">{template.title}</Typography>
-                        </CardContent>
-                    </Card>
-                </Grid>
-            ))}
-        </Grid>
-    </Box>
-);
+const TemplatePickerIntegrated = ({ templates, onSelectTemplate }) => {
+    // 1. Thêm State để lưu trữ từ khóa tìm kiếm
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // 2. Sử dụng useMemo để tối ưu hóa việc filter, tránh giật lag khi gõ phím
+    const filteredTemplates = useMemo(() => {
+        if (!searchTerm.trim()) return templates;
+        const lowercasedTerm = searchTerm.toLowerCase();
+        return templates.filter(t => 
+            t.title && t.title.toLowerCase().includes(lowercasedTerm)
+        );
+    }, [searchTerm, templates]);
+
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <Typography variant="h6" gutterBottom>Chọn mẫu thiệp</Typography>
+            
+            {/* Thanh tìm kiếm */}
+            <TextField
+                fullWidth
+                size="small"
+                variant="outlined"
+                placeholder="Tìm kiếm mẫu thiệp..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                sx={{ 
+                    mb: 2, 
+                    flexShrink: 0,
+                    '& .MuiOutlinedInput-root': { borderRadius: 1.5 } 
+                }}
+            />
+
+            {/* Vùng cuộn chứa Grid 2 cột */}
+            <Grid 
+                container 
+                spacing={1.5} 
+                sx={{ 
+                    maxHeight: 'calc(100vh - 180px)', // Đảm bảo trừ đi phần header và search
+                    overflowY: 'auto', 
+                    alignContent: 'flex-start',
+                    pb: 2 
+                }}
+            >
+                {/* Trạng thái Loading */}
+                {templates.length === 0 && (
+                    <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                        <CircularProgress />
+                    </Grid>
+                )}
+
+                {/* Trạng thái Không tìm thấy kết quả */}
+                {templates.length > 0 && filteredTemplates.length === 0 && (
+                    <Grid item xs={12}>
+                        <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 4 }}>
+                            Không tìm thấy mẫu thiệp nào phù hợp.
+                        </Typography>
+                    </Grid>
+                )}
+
+                {/* Render danh sách thiệp */}
+                {filteredTemplates.map(template => (
+                    <Grid item key={template._id} xs={6}> {/* ĐỔI TỪ xs={12} SANG xs={6} ĐỂ CHIA 2 CỘT */}
+                        <Card 
+                            onClick={() => onSelectTemplate(template._id)} 
+                            sx={{ 
+                                cursor: 'pointer', 
+                                '&:hover': { boxShadow: 4, transform: 'scale(1.02)', borderColor: 'primary.main' }, 
+                                transition: 'all 0.2s ease',
+                                height: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                border: '1px solid transparent'
+                            }}
+                        >
+                            <CardMedia 
+                                component="img" 
+                                sx={{ 
+                                    aspectRatio: '3/4', // Tỉ lệ chuẩn cho ảnh thiệp dọc
+                                    objectFit: 'cover' 
+                                }} 
+                                image={template.imgSrc || 'https://placehold.co/400x600/EBF1FB/B0C7EE?text=No+Image'} 
+                                crossOrigin="anonymous" 
+                                alt={template.title} 
+                            />
+                            <CardContent sx={{ p: 1, pb: '8px !important', flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Typography 
+                                    variant="caption" 
+                                    fontWeight="500" 
+                                    align="center"
+                                    sx={{ 
+                                        display: '-webkit-box', 
+                                        WebkitLineClamp: 2, // Hiển thị ... nếu tên quá 2 dòng
+                                        WebkitBoxOrient: 'vertical', 
+                                        overflow: 'hidden' 
+                                    }}
+                                >
+                                    {template.title}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+        </Box>
+    );
+};
 const SortablePageItem = ({ id, page, isSelected, onSelect, onRemove }) => {
     const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id });
     const style = {
