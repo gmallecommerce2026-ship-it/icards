@@ -2665,7 +2665,7 @@ const BudgetManagementPanel = ({ invitationId, initialBudget = [], onDataChange 
     const saveBudgetToDB = async (updatedData) => {
         try {
             // Giả định bạn có API endpoint tương tự như tasks
-            const response = await api.put(`/invitations/${invitationId}/budget`, { budget: updatedData });
+            const response = await api.put(`/invitations/${invitationId}/budgetRequest`, { budget: updatedData });
             onDataChange(response.data.data, 'update-budget');
         } catch (error) {
             showErrorToast('Không thể lưu dữ liệu ngân sách.');
