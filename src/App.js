@@ -36,7 +36,7 @@ const SearchResultsPage =  lazy(() => import('./Pages/SearchResultsPage/SearchRe
 const FaqPage =  lazy(() => import('./Pages/FaqPage/FaqPage'));
 const BlogsPage =  lazy(() => import('./Pages/BlogsPage/BlogsPage'));
 const BlogDetailsPage =  lazy(() => import('./Pages/BlogsDetailPage/BlogsDetailPage'));
-
+const EventWishesPage = lazy(() => import('./Pages/EventWishesPage/EventWishesPage'));
 
 // --- WELCOME POPUP COMPONENT ---
 const popupStyles = `
@@ -322,7 +322,7 @@ function App() {
                 </Route>
 
                 {/* ===== CÁC ROUTE KHÔNG CÓ LAYOUT CHUNG ===== */}
-                
+                <Route path="/events/:id/wishes" element={<EventWishesPage />} />
                 {/* --- Nhóm các route cần đăng nhập (Trang Canvas) --- */}
                 <Route element={<ProtectedRoute />}>
                     <Route path="/canvas/template/:templateId" element={<InvitationDesignPage />} />
