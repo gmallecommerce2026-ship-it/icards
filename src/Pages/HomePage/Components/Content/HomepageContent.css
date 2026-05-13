@@ -63,10 +63,11 @@ body {
 }
 
 .occasions-carousel {
-    position: relative;
-    width: 100%;
     display: flex;
     align-items: center;
+    position: relative;
+    width: 100%;
+    margin-bottom: 2rem;
 }
 
 .occasions-container {
@@ -468,5 +469,125 @@ body {
     .intro-html-content {
         text-align: left; /* Mobile để canh trái dễ đọc hơn justify */
         padding: 0 10px;
+    }
+}
+
+/* --- CHỈNH SỬA CAROUSEL UI/UX --- */
+.occasions-carousel {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.occasions-container {
+    display: flex;
+    gap: 24px; /* Khoảng cách giữa các ảnh */
+    overflow-x: auto; /* Cho phép cuộn ngang */
+    scroll-behavior: smooth;
+    
+    /* Bắt dính item khi cuộn (Scroll Snapping) - Rất quan trọng cho UX Mobile */
+    scroll-snap-type: x mandatory;
+    
+    /* Padding hai bên để ảnh đầu và cuối không sát rạt lề màn hình */
+    padding: 10px 20px; 
+    
+    /* Ẩn thanh cuộn mặc định xấu xí của trình duyệt */
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Ẩn thanh cuộn trên Chrome, Safari, Opera */
+.occasions-container::-webkit-scrollbar {
+    display: none;
+}
+
+.occasion-item {
+    flex: 0 0 auto; /* Không cho phép item tự động co giãn */
+    width: clamp(160px, 20vw, 220px); /* Kích thước ảnh tự động co giãn linh hoạt */
+    cursor: pointer;
+    scroll-snap-align: start; /* Khi cuộn, trình duyệt tự bắt dính vào lề trái của item */
+    transition: transform 0.3s ease;
+}
+
+.occasion-item:hover {
+    transform: translateY(-5px); /* Hiệu ứng nảy nhẹ khi hover */
+}
+
+.occasion-image-wrapper {
+    width: 100%;
+    aspect-ratio: 1 / 1; /* Đảm bảo khung ảnh luôn vuông */
+    border-radius: 50%; /* Bo tròn thành hình tròn (nếu thiết kế yêu cầu vuông thì bỏ dòng này đi) */
+    overflow: hidden;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* Đổ bóng nhẹ cho khối ảnh */
+}
+
+.occasion-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Đảm bảo ảnh không bị méo */
+    transition: transform 0.5s ease;
+}
+
+.occasion-item:hover .occasion-image-wrapper img {
+    transform: scale(1.1); /* Zoom nhẹ ảnh khi hover */
+}
+
+.occasion-title {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* UI Nút bấm mũi tên Mượt mà */
+.arrow-btn {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.arrow-btn:hover {
+    background: #f8f9fa;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+.arrow-btn.prev {
+    left: -20px;
+}
+
+.arrow-btn.next {
+    right: -20px;
+}
+
+/* Đảo ngược mũi tên cho nút Prev */
+.arrow-btn.prev svg {
+    transform: rotate(180deg);
+}
+
+/* Responsive cho điện thoại (Ẩn nút bấm để cuộn tay vuốt chạm) */
+@media (max-width: 768px) {
+    .arrow-btn {
+        display: none; 
+    }
+    
+    .occasions-container {
+        padding: 10px 15px; /* Giảm padding trên mobile */
     }
 }

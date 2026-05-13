@@ -295,7 +295,12 @@ export const Content = () => {
 
     const handleScroll = (direction) => {
         if (occasionContainerRef.current) {
-            const scrollAmount = occasionContainerRef.current.querySelector('.occasion-item').offsetWidth + 20;
+            // Lấy toàn bộ chiều rộng của container đang hiển thị (ví dụ viewport đang chứa được 4 ảnh)
+            const containerWidth = occasionContainerRef.current.offsetWidth;
+            
+            // Cuộn đi một đoạn bằng 80% chiều rộng của container để luôn thấy 1 phần ảnh bị cắt (nhấn mạnh có thể cuộn tiếp)
+            const scrollAmount = containerWidth * 0.8;
+            
             occasionContainerRef.current.scrollBy({
                 left: direction === 'next' ? scrollAmount : -scrollAmount,
                 behavior: 'smooth'
