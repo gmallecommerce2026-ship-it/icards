@@ -1,6 +1,6 @@
 // src/Pages/HomePage/Components/Content/HomepageContent.js
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import './HomepageContent.css';
 import { useNavigate, Link } from 'react-router-dom';
 import api from "../../../../services/api";
@@ -234,6 +234,32 @@ export const Content = () => {
 
     const secondaryBanners = homeBanners.filter(b => b.id !== homeBanner?.id).slice(0, 2);
     const introContent = settings?.introText || undefined;
+    const sortedOccasions = useMemo(() => {
+        if (!occasions || occasions.length === 0) return [];
+        
+        // Lấy mảng thứ tự từ settings (nếu chưa có thì trả về mảng gốc)
+        const occasionOrder = settings?.occasionOrder || [];
+        if (occasionOrder.length === 0) return occasions;
+
+        // Clone mảng để không làm đột biến state gốc
+        const sorted = [...occasions];
+        
+        sorted.sort((a, b) => {
+            const keyA = `${(a.category || '').trim()}-${(a.group || '').trim()}-${(a.type || '').trim()}`;
+            const keyB = `${(b.category || '').trim()}-${(b.group || '').trim()}-${(b.type || '').trim()}`;
+            
+            let indexA = occasionOrder.indexOf(keyA);
+            let indexB = occasionOrder.indexOf(keyB);
+            
+            // Nếu có dịp mới chưa có trong order, đẩy xuống cuối
+            if (indexA === -1) indexA = 99999;
+            if (indexB === -1) indexB = 99999;
+            
+            return indexA - indexB;
+        });
+
+        return sorted;
+    }, [occasions, settings]);
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -402,34 +428,25 @@ export const Content = () => {
                         <div className="occasions-carousel">
                             <ArrowButton direction="prev" onClick={() => handleScroll('prev')} />
                             <div className="occasions-container" ref={occasionContainerRef}>
-                                {occasions.map((item) => (
-                                    <OccasionCard
-                                        key={item._id}
-                                        title={`${item.category} ${item.type || ""}`.trim()}
-                                        imgSrc={item.imgSrc || `https://placehold.co/324x324/e0f7fa/006064?text=${item.title}`}
-                                        onClick={() => {
-                                            const catSlug = titleToSlug(item.category);
-                                            const groupSlug = titleToSlug(item.group);
-                                            const typeSlug = titleToSlug(item.type);
-                                            
-                                            // Bảo vệ an toàn: Nếu không tạo được catSlug thì không làm gì cả
-                                            if (!catSlug) return; 
-
-                                            let url = `/invitations/category/${catSlug}`;
-                                            
-                                            // Ràng buộc cấu trúc URL liền mạch: Phải có Group thì mới nối thêm Type
-                                            if (groupSlug) {
-                                                url += `/group/${groupSlug}`;
-                                                if (typeSlug) {
-                                                    url += `/type/${typeSlug}`;
-                                                }
-                                            } 
-                                            // Nếu KHÔNG CÓ groupSlug, tuyệt đối bỏ qua typeSlug để tránh tạo ra URL rác
-                                            
-                                            navigate(url);
-                                        }}
-                                    />
-                                ))}
+                                {sortedOccasions.length > 0 ? (
+                                    <div className="occasions-carousel">
+                                        <ArrowButton direction="prev" onClick={() => handleScroll('prev')} />
+                                        <div className="occasions-container" ref={occasionContainerRef}>
+                                            {/* SỬA Ở ĐÂY: Dùng sortedOccasions để lặp */}
+                                            {sortedOccasions.map((item) => (
+                                                <OccasionCard
+                                                    key={item._id}
+                                                    title={`${item.category} ${item.type || ""}`.trim()}
+                                                    imgSrc={item.imgSrc || `https://placehold.co/324x324/e0f7fa/006064?text=${item.title}`}
+                                                    // ... (giữ nguyên phần onClick của bạn)
+                                                />
+                                            ))}
+                                        </div>
+                                        <ArrowButton direction="next" onClick={() => handleScroll('next')} />
+                                    </div>
+                                ) : (
+                                    <div style={{textAlign: 'center', color: '#666'}}>Đang cập nhật các dịp...</div>
+                                )}
                             </div>
                             <ArrowButton direction="next" onClick={() => handleScroll('next')} />
                         </div>
