@@ -13,17 +13,15 @@ const IntroSection = ({ content }) => {
     const contentRef = useRef(null);
     const [shouldShowButton, setShouldShowButton] = useState(false);
 
-    // Kiểm tra chiều cao thực tế để quyết định có hiện nút hay không
     useEffect(() => {
         if (contentRef.current && contentRef.current.scrollHeight > 200) {
             setShouldShowButton(true);
         }
     }, [content]);
 
-    // Nội dung mặc định chuẩn SEO nếu chưa có dữ liệu từ Settings
     const defaultContent = `
         <h3>Về iCards - Nền Tảng Thiết Kế Thiệp Online Hàng Đầu</h3>
-        <p>Chào mừng bạn đến với <strong>iCards</strong>, giải pháp toàn diện giúp bạn tạo ra những tấm thiệp mời, thiệp chúc mừng ấn tượng và mang đậm dấu ấn cá nhân. Dù là thiệp cưới sang trọng, thiệp sinh nhật vui nhộn hay thiệp sự kiện chuyên nghiệp, chúng tôi đều cung cấp hàng ngàn mẫu thiết kế độc đáo để bạn lựa chọn.</p>
+        <p>Chào mừng bạn đến với <strong>iCards</strong>, giải pháp toàn diện giúp bạn tạo ra những tấm thiệp mời, thiệp chúc mừng ấn tượng và mang đậm dấu ấn cá nhân.</p>
         <p>Với công cụ thiết kế trực quan, bạn không cần phải là một chuyên gia đồ họa. Chỉ cần vài thao tác kéo thả, chỉnh sửa nội dung, bạn đã có ngay một tấm thiệp ưng ý để gửi đến người thân, bạn bè và đối tác.</p>
         <h4>Tại sao chọn iCards?</h4>
         <ul>
@@ -50,7 +48,6 @@ const IntroSection = ({ content }) => {
                     className="intro-html-content"
                     dangerouslySetInnerHTML={{ __html: finalContent }} 
                 />
-                {/* Lớp phủ mờ khi chưa mở rộng */}
                 {!isExpanded && shouldShowButton && <div className="content-fade-overlay"></div>}
             </div>
 
@@ -73,7 +70,6 @@ const IntroSection = ({ content }) => {
     );
 };
 
-// Hàm tiện ích để chuẩn hóa chuỗi thành slug URL
 const titleToSlug = (title) => {
     if (!title) return '';
     return title
@@ -101,16 +97,15 @@ const OccasionCard = ({ title, imgSrc, onClick }) => (
         <p className="occasion-title">{title}</p>
     </div>
 );
+
 const HomeSkeleton = () => {
     return (
         <div className="homepage-skeleton">
-            {/* Hero Banner Skeleton */}
             <div style={{ width: '100%', aspectRatio: '16/9', maxHeight: '600px', marginBottom: '20px' }}>
                 <Skeleton type="rect" height="100%" />
             </div>
 
             <div className="homepage-main" style={{ padding: '0 20px', maxWidth: '1440px', margin: '0 auto' }}>
-                {/* Occasions Section Skeleton */}
                 <div style={{ marginBottom: '40px', marginTop: '40px' }}>
                      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
                          <Skeleton type="text" width="200px" height="20px" />
@@ -128,7 +123,6 @@ const HomeSkeleton = () => {
                      </div>
                 </div>
 
-                {/* Products Grid Skeleton */}
                 <div style={{ marginBottom: '40px' }}>
                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
                          <Skeleton type="title" width="300px" height="40px" />
@@ -146,6 +140,7 @@ const HomeSkeleton = () => {
         </div>
     );
 };
+
 const InvitationCard = React.memo(({ _id, title, imgSrc }) => {
     const navigate = useNavigate();
     const handleNavigate = () => navigate(`/invitation/${_id}`);
@@ -234,14 +229,13 @@ export const Content = () => {
 
     const secondaryBanners = homeBanners.filter(b => b.id !== homeBanner?.id).slice(0, 2);
     const introContent = settings?.introText || undefined;
+    
     const sortedOccasions = useMemo(() => {
         if (!occasions || occasions.length === 0) return [];
         
-        // Lấy mảng thứ tự từ settings (nếu chưa có thì trả về mảng gốc)
         const occasionOrder = settings?.occasionOrder || [];
         if (occasionOrder.length === 0) return occasions;
 
-        // Clone mảng để không làm đột biến state gốc
         const sorted = [...occasions];
         
         sorted.sort((a, b) => {
@@ -251,7 +245,6 @@ export const Content = () => {
             let indexA = occasionOrder.indexOf(keyA);
             let indexB = occasionOrder.indexOf(keyB);
             
-            // Nếu có dịp mới chưa có trong order, đẩy xuống cuối
             if (indexA === -1) indexA = 99999;
             if (indexB === -1) indexB = 99999;
             
@@ -260,19 +253,14 @@ export const Content = () => {
 
         return sorted;
     }, [occasions, settings]);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                // --- THAY ĐỔI LOGIC XỬ LÝ DỮ LIỆU ---
-                // Lấy danh sách lớn hơn để có đủ dữ liệu lọc trùng lặp (ví dụ 50 item)
                 const response = await api.get('/invitation-templates?limit=50');
                 const allTemplates = response.data.data || [];
 
-                // 1. Xử lý "Occasions" (Slider):
-                // Mục tiêu: Chỉ hiển thị các cặp "Category + Type" duy nhất.
-                // Ví dụ: Nếu có 5 mẫu "Thiệp Cưới - Hiện Đại", chỉ lấy 1 mẫu làm đại diện.
-                // Cập nhật logic trong useEffect của HomepageContent.js
                 const uniqueOccasionsMap = new Map();
                 allTemplates.forEach(template => {
                     const category = template.category || '';
@@ -285,44 +273,17 @@ export const Content = () => {
                     }
                 });
 
-                let processedOccasions = Array.from(uniqueOccasionsMap.values());
-
-                // TÍCH HỢP LOGIC SORTING TỪ SETTINGS
-                // Đảm bảo bạn đang lấy đúng cấu trúc settings trả về từ API
-                const occasionOrder = settings?.occasionOrder || settings?.homepage?.occasionOrder || [];
-
-                if (occasionOrder.length > 0) {
-                    processedOccasions.sort((a, b) => {
-                        const keyA = `${(a.category || '').trim()}-${(a.group || '').trim()}-${(a.type || '').trim()}`;
-                        const keyB = `${(b.category || '').trim()}-${(b.group || '').trim()}-${(b.type || '').trim()}`;
-                        
-                        let indexA = occasionOrder.indexOf(keyA);
-                        let indexB = occasionOrder.indexOf(keyB);
-                        
-                        // Nếu có danh mục mới chưa được admin cấu hình, đẩy nó xuống cuối cùng
-                        if (indexA === -1) indexA = Number.MAX_SAFE_INTEGER;
-                        if (indexB === -1) indexB = Number.MAX_SAFE_INTEGER;
-                        
-                        return indexA - indexB;
-                    });
-                }
-
+                // Chỉ cần lưu danh sách không trùng lặp, logic Sort đã có useMemo lo
+                const processedOccasions = Array.from(uniqueOccasionsMap.values());
                 setOccasions(processedOccasions);
 
-                // 2. Xử lý "Featured Invitations" (Grid):
-                // Lấy 8 mẫu thiệp đầu tiên (hoặc có thể random nếu muốn) để hiển thị ở lưới sản phẩm
                 const usedIds = new Set(processedOccasions.map(item => item._id));
-
-                // Lọc danh sách gốc: Chỉ lấy những mẫu chưa xuất hiện trong Occasions
                 const availableForFeatured = allTemplates.filter(t => !usedIds.has(t._id));
-
-                // Lấy 8 mẫu thiệp từ danh sách đã lọc (đảm bảo không trùng)
                 const featured = availableForFeatured.slice(0, 8);
                 setFeaturedInvitations(featured);
 
             } catch (error) {
                 console.error("Failed to fetch homepage data:", error);
-                // Fallback nếu lỗi
                 setOccasions([]);
                 setFeaturedInvitations([]);
             } finally {
@@ -349,6 +310,7 @@ export const Content = () => {
     }
     
     const renderHeroBanner = () => {
+        // ... (Giữ nguyên không đổi)
         if (!homeBanner) {
             return (
                 <div
@@ -423,30 +385,34 @@ export const Content = () => {
                         <h2 className="section-title">NHỮNG DỊP LAN TỎA NIỀM VUI</h2>
                     </div>
                     
-                    {/* Chỉ hiển thị slider nếu có dữ liệu */}
-                    {occasions.length > 0 ? (
+                    {sortedOccasions.length > 0 ? (
                         <div className="occasions-carousel">
                             <ArrowButton direction="prev" onClick={() => handleScroll('prev')} />
                             <div className="occasions-container" ref={occasionContainerRef}>
-                                {sortedOccasions.length > 0 ? (
-                                    <div className="occasions-carousel">
-                                        <ArrowButton direction="prev" onClick={() => handleScroll('prev')} />
-                                        <div className="occasions-container" ref={occasionContainerRef}>
-                                            {/* SỬA Ở ĐÂY: Dùng sortedOccasions để lặp */}
-                                            {sortedOccasions.map((item) => (
-                                                <OccasionCard
-                                                    key={item._id}
-                                                    title={`${item.category} ${item.type || ""}`.trim()}
-                                                    imgSrc={item.imgSrc || `https://placehold.co/324x324/e0f7fa/006064?text=${item.title}`}
-                                                    // ... (giữ nguyên phần onClick của bạn)
-                                                />
-                                            ))}
-                                        </div>
-                                        <ArrowButton direction="next" onClick={() => handleScroll('next')} />
-                                    </div>
-                                ) : (
-                                    <div style={{textAlign: 'center', color: '#666'}}>Đang cập nhật các dịp...</div>
-                                )}
+                                {sortedOccasions.map((item) => (
+                                    <OccasionCard
+                                        key={item._id}
+                                        title={`${item.category} ${item.type || ""}`.trim()}
+                                        imgSrc={item.imgSrc || `https://placehold.co/324x324/e0f7fa/006064?text=${item.title}`}
+                                        onClick={() => {
+                                            const catSlug = titleToSlug(item.category);
+                                            const groupSlug = titleToSlug(item.group);
+                                            const typeSlug = titleToSlug(item.type);
+                                            
+                                            if (!catSlug) return; 
+
+                                            let url = `/invitations/category/${catSlug}`;
+                                            
+                                            if (groupSlug) {
+                                                url += `/group/${groupSlug}`;
+                                                if (typeSlug) {
+                                                    url += `/type/${typeSlug}`;
+                                                }
+                                            } 
+                                            navigate(url);
+                                        }}
+                                    />
+                                ))}
                             </div>
                             <ArrowButton direction="next" onClick={() => handleScroll('next')} />
                         </div>
