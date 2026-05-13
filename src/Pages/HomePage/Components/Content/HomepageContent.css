@@ -518,7 +518,6 @@ body {
 .occasion-image-wrapper {
     width: 100%;
     aspect-ratio: 1 / 1; /* Đảm bảo khung ảnh luôn vuông */
-    border-radius: 50%; /* Bo tròn thành hình tròn (nếu thiết kế yêu cầu vuông thì bỏ dòng này đi) */
     overflow: hidden;
     margin-bottom: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.08); /* Đổ bóng nhẹ cho khối ảnh */
