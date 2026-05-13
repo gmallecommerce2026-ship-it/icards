@@ -246,21 +246,41 @@ export const Content = () => {
                 // 1. Xử lý "Occasions" (Slider):
                 // Mục tiêu: Chỉ hiển thị các cặp "Category + Type" duy nhất.
                 // Ví dụ: Nếu có 5 mẫu "Thiệp Cưới - Hiện Đại", chỉ lấy 1 mẫu làm đại diện.
+                // Cập nhật logic trong useEffect của HomepageContent.js
                 const uniqueOccasionsMap = new Map();
                 allTemplates.forEach(template => {
                     const category = template.category || '';
-                    const group = template.group || ''; // Bổ sung group
+                    const group = template.group || ''; 
                     const type = template.type || '';
                     
-                    // Đưa group vào key để đảm bảo tính toàn vẹn của phân cấp
                     const key = `${category.trim()}-${group.trim()}-${type.trim()}`;
-                    
                     if (category && !uniqueOccasionsMap.has(key)) {
                         uniqueOccasionsMap.set(key, template);
                     }
                 });
-                // Chuyển Map thành Array cho slider
-                const processedOccasions = Array.from(uniqueOccasionsMap.values());
+
+                let processedOccasions = Array.from(uniqueOccasionsMap.values());
+
+                // TÍCH HỢP LOGIC SORTING TỪ SETTINGS
+                // Đảm bảo bạn đang lấy đúng cấu trúc settings trả về từ API
+                const occasionOrder = settings?.occasionOrder || settings?.homepage?.occasionOrder || [];
+
+                if (occasionOrder.length > 0) {
+                    processedOccasions.sort((a, b) => {
+                        const keyA = `${(a.category || '').trim()}-${(a.group || '').trim()}-${(a.type || '').trim()}`;
+                        const keyB = `${(b.category || '').trim()}-${(b.group || '').trim()}-${(b.type || '').trim()}`;
+                        
+                        let indexA = occasionOrder.indexOf(keyA);
+                        let indexB = occasionOrder.indexOf(keyB);
+                        
+                        // Nếu có danh mục mới chưa được admin cấu hình, đẩy nó xuống cuối cùng
+                        if (indexA === -1) indexA = Number.MAX_SAFE_INTEGER;
+                        if (indexB === -1) indexB = Number.MAX_SAFE_INTEGER;
+                        
+                        return indexA - indexB;
+                    });
+                }
+
                 setOccasions(processedOccasions);
 
                 // 2. Xử lý "Featured Invitations" (Grid):
