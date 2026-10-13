@@ -1,9 +1,10 @@
-// TrainData/FE/Features/SEO.js
+// Frontend/src/Features/SEO.js
 import { useEffect } from 'react';
 
-const SEO = ({ title, description, keywords, imageUrl, url, schema, robots, canonicalUrl }) => {
+const SEO = ({ title, description, keywords, imageUrl, url, schema, robots, canonicalUrl, type = 'website' }) => {
   useEffect(() => {
-    document.title = title || 'iCards.com.vn';
+    const pageTitle = title || 'iCards.com.vn';
+    document.title = pageTitle;
 
     const setMetaTag = (attr, attrValue, content) => {
       let element = document.querySelector(`meta[${attr}="${attrValue}"]`);
@@ -15,39 +16,45 @@ const SEO = ({ title, description, keywords, imageUrl, url, schema, robots, cano
       element.setAttribute('content', content || '');
     };
 
-    // --- THÊM MỚI: Xử lý thẻ link canonical ---
     const setLinkTag = (rel, href) => {
-        let element = document.querySelector(`link[rel="${rel}"]`);
-        if (!element) {
-            element = document.createElement('link');
-            element.setAttribute('rel', rel);
-            document.head.appendChild(element);
-        }
-        element.setAttribute('href', href || '');
+      let element = document.querySelector(`link[rel="${rel}"]`);
+      if (!element) {
+        element = document.createElement('link');
+        element.setAttribute('rel', rel);
+        document.head.appendChild(element);
+      }
+      element.setAttribute('href', href || '');
     };
 
+    const currentUrl = window.location.origin + (url || window.location.pathname);
+    const finalCanonical = canonicalUrl || currentUrl;
+
+    // Meta SEO cơ bản
     setMetaTag('name', 'description', description);
     if (keywords) setMetaTag('name', 'keywords', keywords);
-    // --- THÊM MỚI: Xử lý thẻ robots ---
-    if (robots) setMetaTag('name', 'robots', robots);
-
-    // --- THÊM MỚI: Xử lý thẻ canonical ---
-    setLinkTag('canonical', canonicalUrl || window.location.href);
+    setMetaTag('name', 'robots', robots || 'index, follow');
+    setLinkTag('canonical', finalCanonical);
 
     // Open Graph
-    setMetaTag('property', 'og:title', title);
+    setMetaTag('property', 'og:type', type);
+    setMetaTag('property', 'og:site_name', 'iCards.com.vn');
+    setMetaTag('property', 'og:locale', 'vi_VN');
+    setMetaTag('property', 'og:title', pageTitle);
     setMetaTag('property', 'og:description', description);
-    setMetaTag('property', 'og:type', 'website');
-    if (url) setMetaTag('property', 'og:url', window.location.origin + url);
-    if (imageUrl) setMetaTag('property', 'og:image', imageUrl);
+    setMetaTag('property', 'og:url', currentUrl);
+    if (imageUrl) {
+      setMetaTag('property', 'og:image', imageUrl);
+      setMetaTag('property', 'og:image:secure_url', imageUrl);
+    }
 
-    // Twitter Card
+    // Twitter Cards
     setMetaTag('name', 'twitter:card', 'summary_large_image');
-    setMetaTag('name', 'twitter:title', title);
+    setMetaTag('name', 'twitter:site', '@icards_vn');
+    setMetaTag('name', 'twitter:title', pageTitle);
     setMetaTag('name', 'twitter:description', description);
     if (imageUrl) setMetaTag('name', 'twitter:image', imageUrl);
 
-    // JSON-LD Schema
+    // Schema JSON-LD
     const schemaScriptId = 'app-schema-ld-json';
     let schemaScript = document.getElementById(schemaScriptId);
     if (schemaScript) schemaScript.remove();
@@ -59,7 +66,7 @@ const SEO = ({ title, description, keywords, imageUrl, url, schema, robots, cano
       document.head.appendChild(schemaScript);
     }
 
-  }, [title, description, keywords, imageUrl, url, schema, robots, canonicalUrl]);
+  }, [title, description, keywords, imageUrl, url, schema, robots, canonicalUrl, type]);
 
   return null;
 };

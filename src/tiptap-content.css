@@ -123,3 +123,51 @@
     display: table;
     clear: both;
 }
+
+/* === XỬ LÝ HIỂN THỊ BẢNG (TABLE) GIỐNG EXCEL/WORD === */
+
+/* 1. Cấu trúc khung bảng chung */
+.ProseMirror table,
+.tiptap-content table {
+    border-collapse: collapse;
+    table-layout: fixed;
+    width: 100% !important;
+    margin: 1.5rem 0;
+    overflow: hidden;
+}
+
+/* 2. Cấu trúc các ô (cell) và đường viền */
+.ProseMirror table td,
+.ProseMirror table th,
+.tiptap-content table td,
+.tiptap-content table th {
+    min-width: 1em;
+    border: 1px solid #ced4da !important; /* Màu viền xám chuẩn của Excel */
+    padding: 8px 12px !important;
+    vertical-align: top;
+    box-sizing: border-box;
+    position: relative;
+    text-align: left;
+    word-break: break-word; /* Tránh việc chữ dài làm vỡ bố cục bảng */
+}
+
+/* 3. Style riêng cho hàng tiêu đề (Header) */
+.ProseMirror table th,
+.tiptap-content table th {
+    font-weight: 700;
+    background-color: #f8f9fa !important; /* Màu nền xám nhạt làm nổi bật tiêu đề */
+}
+
+/* 4. Đảm bảo bảng có thể cuộn ngang trên điện thoại nếu quá nhiều cột */
+.tiptap-content {
+    /* Đảm bảo container không bị vỡ trên mobile */
+    max-width: 100%;
+}
+
+@media (max-width: 768px) {
+    .tiptap-content table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap; /* Tùy chọn: giúp text không bị ép dòng quá mức trên mobile */
+    }
+}

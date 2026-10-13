@@ -351,7 +351,7 @@ const Content = () => {
                 window.scrollTo(0, 0);
 
                 // Tăng lượt xem cho mẫu thiệp
-                api.post(`/v1/invitation-templates/${invitationId}/view`).catch(err => {
+                api.post(`/invitation-templates/${invitationId}/view`).catch(err => {
                     console.error("Lỗi khi tăng lượt xem:", err);
                 });
                 

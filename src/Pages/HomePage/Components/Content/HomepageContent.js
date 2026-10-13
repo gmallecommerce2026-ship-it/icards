@@ -7,6 +7,7 @@ import api from "../../../../services/api";
 import SEO from '../../../../Features/SEO';
 import { useSettings } from '../../../../Context/SettingsContext';
 import Skeleton from '../../../../Components/Skeleton/Skeleton';
+import UniversalBanner from '../../../../Components/UniversalBanner/UniversalBanner';
 
 const IntroSection = ({ content }) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -41,28 +42,28 @@ const IntroSection = ({ content }) => {
                 <p className="section-subtitle">VỀ CHÚNG TÔI</p>
                 <h2 className="section-title">GIỚI THIỆU ICARDS</h2>
             </div>
-            
+
             <div className={`intro-content-wrapper ${isExpanded ? 'expanded' : 'collapsed'}`}>
-                <div 
+                <div
                     ref={contentRef}
                     className="intro-html-content"
-                    dangerouslySetInnerHTML={{ __html: finalContent }} 
+                    dangerouslySetInnerHTML={{ __html: finalContent }}
                 />
                 {!isExpanded && shouldShowButton && <div className="content-fade-overlay"></div>}
             </div>
 
             {shouldShowButton && (
-                <button 
-                    className="intro-toggle-btn" 
+                <button
+                    className="intro-toggle-btn"
                     onClick={() => setIsExpanded(!isExpanded)}
                 >
                     {isExpanded ? 'Thu gọn' : 'Xem thêm'}
-                    <svg 
-                        width="12" height="8" viewBox="0 0 12 8" fill="none" 
+                    <svg
+                        width="12" height="8" viewBox="0 0 12 8" fill="none"
                         xmlns="http://www.w3.org/2000/svg"
                         style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}
                     >
-                        <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                 </button>
             )}
@@ -70,21 +71,10 @@ const IntroSection = ({ content }) => {
     );
 };
 
-const titleToSlug = (title) => {
-    if (!title) return '';
-    return title
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d")
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '');
-};
-
 const ArrowButton = ({ direction, onClick }) => (
     <button className={`arrow-btn ${direction}`} onClick={onClick}>
         <svg width="13" height="22" viewBox="0 0 13 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M11 2L3 11L11 20" stroke="black" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M11 2L3 11L11 20" stroke="black" strokeWidth="2" strokeLinecap="round" />
         </svg>
     </button>
 );
@@ -107,31 +97,17 @@ const HomeSkeleton = () => {
 
             <div className="homepage-main" style={{ padding: '0 20px', maxWidth: '1440px', margin: '0 auto' }}>
                 <div style={{ marginBottom: '40px', marginTop: '40px' }}>
-                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
-                         <Skeleton type="text" width="200px" height="20px" />
-                     </div>
-                     <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
-                         <Skeleton type="title" width="400px" height="40px" />
-                     </div>
-                     <div style={{ display: 'flex', gap: '20px', overflow: 'hidden' }}>
-                         {[1, 2, 3, 4, 5].map((i) => (
-                             <div key={i} style={{ minWidth: '200px', flex: 1 }}>
-                                 <Skeleton type="rect" height="200px" style={{ borderRadius: '12px', marginBottom: '10px' }} />
-                                 <Skeleton type="text" width="80%" height="20px" style={{ margin: '0 auto' }} />
-                             </div>
-                         ))}
-                     </div>
-                </div>
-
-                <div style={{ marginBottom: '40px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
-                         <Skeleton type="title" width="300px" height="40px" />
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                        <Skeleton type="text" width="200px" height="20px" />
                     </div>
-                    <div className="product-grid">
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                            <div key={i} className="product-item">
-                                <Skeleton type="rect" height="300px" style={{ borderRadius: '12px', marginBottom: '10px' }} />
-                                <Skeleton type="text" width="90%" />
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
+                        <Skeleton type="title" width="400px" height="40px" />
+                    </div>
+                    <div style={{ display: 'flex', gap: '20px', overflow: 'hidden' }}>
+                        {[1, 2, 3, 4, 5].map((i) => (
+                            <div key={i} style={{ minWidth: '200px', flex: 1 }}>
+                                <Skeleton type="rect" height="200px" style={{ borderRadius: '12px', marginBottom: '10px' }} />
+                                <Skeleton type="text" width="80%" height="20px" style={{ margin: '0 auto' }} />
                             </div>
                         ))}
                     </div>
@@ -157,64 +133,6 @@ const InvitationCard = React.memo(({ _id, title, imgSrc }) => {
     );
 });
 
-const BannerContent = ({ banner }) => (
-    <>
-        <img src={banner.imageUrl} alt={banner.name || 'Banner'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        {(banner.title || banner.subtitle) && (
-            <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                color: 'white',
-                textShadow: '2px 2px 8px rgba(0,0,0,0.7)'
-            }}>
-                {banner.title && <h2 style={{ fontSize: '2.5rem', margin: 0 }}>{banner.title}</h2>}
-                {banner.subtitle && <p style={{ fontSize: '1.2rem', margin: '8px 0 0' }}>{banner.subtitle}</p>}
-            </div>
-        )}
-    </>
-);
-
-const SecondaryBanner = ({ banner }) => {
-    if (!banner) return null;
-
-    const bannerStyle = {
-        width: '100%',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        textAlign: 'center',
-        position: 'relative',
-        backgroundColor: '#f0f0f0',
-        aspectRatio: '1520 / 634'
-    };
-
-    const renderBanner = () => {
-        if (banner.htmlContent) {
-            return <div style={bannerStyle} dangerouslySetInnerHTML={{ __html: banner.htmlContent }} />;
-        }
-        return (
-            <div style={bannerStyle}>
-                <BannerContent banner={banner} />
-            </div>
-        );
-    };
-
-    if (banner.link) {
-        const isExternal = banner.link.startsWith('http');
-        if (isExternal) {
-            return (
-                <a href={banner.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-                    {renderBanner()}
-                </a>
-            );
-        }
-        return <Link to={banner.link}>{renderBanner()}</Link>;
-    }
-
-    return renderBanner();
-};
-
 export const Content = () => {
     const navigate = useNavigate();
     const occasionContainerRef = useRef(null);
@@ -225,82 +143,53 @@ export const Content = () => {
     const { settings, loading: settingsLoading } = useSettings();
 
     const homeBanners = settings?.banners?.filter(b => b.displayPage === 'home' && b.isEnabled) || [];
-    const homeBanner = homeBanners.find(b => b.name?.toLowerCase().includes('chính')) || homeBanners[0];
+    const homeBanner = homeBanners.find(b => b.name?.toLowerCase().includes('chính')) || homeBanners[0] || {}; // Đảm bảo luôn trả về object
 
     const secondaryBanners = homeBanners.filter(b => b.id !== homeBanner?.id).slice(0, 2);
     const introContent = settings?.introText || undefined;
-    
-    const sortedOccasions = useMemo(() => {
-        if (!occasions || occasions.length === 0) return [];
-        
-        const occasionOrder = settings?.occasionOrder || [];
-        if (occasionOrder.length === 0) return occasions;
-
-        const sorted = [...occasions];
-        
-        sorted.sort((a, b) => {
-            const keyA = `${(a.category || '').trim()}-${(a.group || '').trim()}-${(a.type || '').trim()}`;
-            const keyB = `${(b.category || '').trim()}-${(b.group || '').trim()}-${(b.type || '').trim()}`;
-            
-            let indexA = occasionOrder.indexOf(keyA);
-            let indexB = occasionOrder.indexOf(keyB);
-            
-            if (indexA === -1) indexA = 99999;
-            if (indexB === -1) indexB = 99999;
-            
-            return indexA - indexB;
-        });
-
-        return sorted;
-    }, [occasions, settings]);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const response = await api.get('/invitation-templates?limit=50');
-                const allTemplates = response.data.data || [];
+                const [blocksResponse, templatesResponse] = await Promise.all([
+                    api.get('/template-blocks'),
+                    api.get('/invitation-templates?limit=50')
+                ]);
 
-                const uniqueOccasionsMap = new Map();
-                allTemplates.forEach(template => {
-                    const category = template.category || '';
-                    const group = template.group || ''; 
-                    const type = template.type || '';
-                    
-                    const key = `${category.trim()}-${group.trim()}-${type.trim()}`;
-                    if (category && !uniqueOccasionsMap.has(key)) {
-                        uniqueOccasionsMap.set(key, template);
-                    }
-                });
+                const allBlocks = blocksResponse.data?.data || [];
+                const mappedOccasions = allBlocks
+                    .filter(block => block.isActive)
+                    .map(block => ({
+                        _id: block._id,
+                        title: block.title,
+                        slug: block.slug,
+                        imgSrc: block.templates?.[0]?.imgSrc || 'https://placehold.co/324x324/e0f7fa/006064?text=iCards'
+                    }));
 
-                // Chỉ cần lưu danh sách không trùng lặp, logic Sort đã có useMemo lo
-                const processedOccasions = Array.from(uniqueOccasionsMap.values());
-                setOccasions(processedOccasions);
+                setOccasions(mappedOccasions);
 
-                const usedIds = new Set(processedOccasions.map(item => item._id));
-                const availableForFeatured = allTemplates.filter(t => !usedIds.has(t._id));
-                const featured = availableForFeatured.slice(0, 8);
-                setFeaturedInvitations(featured);
+                const allTemplates = templatesResponse.data?.data || [];
+                const usedTemplateIds = new Set(allBlocks.flatMap(block => block.templates?.map(t => t._id) || []));
+                const featured = allTemplates.filter(t => !usedTemplateIds.has(t._id));
 
+                setFeaturedInvitations(featured.slice(0, 8));
             } catch (error) {
-                console.error("Failed to fetch homepage data:", error);
+                console.error("Lỗi khi tải dữ liệu trang chủ:", error);
                 setOccasions([]);
                 setFeaturedInvitations([]);
             } finally {
                 setLoading(false);
             }
         };
+
         fetchData();
     }, []);
 
     const handleScroll = (direction) => {
         if (occasionContainerRef.current) {
-            // Lấy toàn bộ chiều rộng của container đang hiển thị (ví dụ viewport đang chứa được 4 ảnh)
             const containerWidth = occasionContainerRef.current.offsetWidth;
-            
-            // Cuộn đi một đoạn bằng 80% chiều rộng của container để luôn thấy 1 phần ảnh bị cắt (nhấn mạnh có thể cuộn tiếp)
             const scrollAmount = containerWidth * 0.8;
-            
             occasionContainerRef.current.scrollBy({
                 left: direction === 'next' ? scrollAmount : -scrollAmount,
                 behavior: 'smooth'
@@ -313,60 +202,6 @@ export const Content = () => {
     if (loading || settingsLoading) {
         return <HomeSkeleton />;
     }
-    
-    const renderHeroBanner = () => {
-        // ... (Giữ nguyên không đổi)
-        if (!homeBanner) {
-            return (
-                <div
-                    className="hero-image-background"
-                    style={{ backgroundImage: `url(https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/herohome.png)` }}
-                />
-            );
-        }
-
-        if (homeBanner.htmlContent) {
-            return <div dangerouslySetInnerHTML={{ __html: homeBanner.htmlContent }} />;
-        }
-
-        const bannerContent = (
-            <>
-                {homeBanner.mediaType === 'video' && homeBanner.videoUrl ? (
-                    <video
-                        src={homeBanner.videoUrl}
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="hero-video-background"
-                    />
-                ) : (
-                    <div
-                        className="hero-image-background"
-                        style={{ backgroundImage: `url(${homeBanner.imageUrl || 'https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/herohome.png'})` }}
-                    />
-                )}
-                <div className="hero-content">
-                    {homeBanner.title && <h1 className="hero-title">{homeBanner.title}</h1>}
-                    {homeBanner.subtitle && <p className="hero-subtitle">{homeBanner.subtitle}</p>}
-                </div>
-            </>
-        );
-
-        if (homeBanner.link) {
-            const isExternal = homeBanner.link.startsWith('http');
-            if (isExternal) {
-                return (
-                    <a href={homeBanner.link} target="_blank" rel="noopener noreferrer" className="hero-link-wrapper">
-                        {bannerContent}
-                    </a>
-                );
-            }
-            return <Link to={homeBanner.link} className="hero-link-wrapper">{bannerContent}</Link>;
-        }
-
-        return bannerContent;
-    };
 
     const HOMEPAGE_IMAGE = "https://imagedelivery.net/mYCNH6-2h27PJijuhYd-fw/32c7501a-ed3b-4466-876b-48bcfb13d600/public";
 
@@ -379,8 +214,14 @@ export const Content = () => {
                 imageUrl={HOMEPAGE_IMAGE}
                 url="/"
             />
-            <section className="hero-section">
-                {renderHeroBanner()}
+
+            {/* SỬ DỤNG TRỰC TIẾP UNIVERSAL BANNER TẠI ĐÂY */}
+            <section className="homepage-hero-wrapper" style={{ width: '100%', overflow: 'hidden' }}>
+                <UniversalBanner
+                    banner={homeBanner}
+                    variant="hero"
+                    defaultImg="https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/herohome.png"
+                />
             </section>
 
             <main className="homepage-main">
@@ -389,45 +230,29 @@ export const Content = () => {
                         <p className="section-subtitle">NHỮNG CƠ HỘI MỌI NGƯỜI KẾT NỐI THÂN THIẾT</p>
                         <h2 className="section-title">NHỮNG DỊP LAN TỎA NIỀM VUI</h2>
                     </div>
-                    
-                    {sortedOccasions.length > 0 ? (
+
+                    {occasions.length > 0 ? (
                         <div className="occasions-carousel">
                             <ArrowButton direction="prev" onClick={() => handleScroll('prev')} />
                             <div className="occasions-container" ref={occasionContainerRef}>
-                                {sortedOccasions.map((item) => (
+                                {occasions.map((item) => (
                                     <OccasionCard
                                         key={item._id}
-                                        title={`${item.category} ${item.type || ""}`.trim()}
-                                        imgSrc={item.imgSrc || `https://placehold.co/324x324/e0f7fa/006064?text=${item.title}`}
-                                        onClick={() => {
-                                            const catSlug = titleToSlug(item.category);
-                                            const groupSlug = titleToSlug(item.group);
-                                            const typeSlug = titleToSlug(item.type);
-                                            
-                                            if (!catSlug) return; 
-
-                                            let url = `/invitations/category/${catSlug}`;
-                                            
-                                            if (groupSlug) {
-                                                url += `/group/${groupSlug}`;
-                                                if (typeSlug) {
-                                                    url += `/type/${typeSlug}`;
-                                                }
-                                            } 
-                                            navigate(url);
-                                        }}
+                                        title={item.title}
+                                        imgSrc={item.imgSrc || `https://placehold.co/324x324/e0f7fa/006064?text=${encodeURIComponent(item.title)}`}
+                                        onClick={() => navigate(`/collection/${item.slug}`)}
                                     />
                                 ))}
                             </div>
                             <ArrowButton direction="next" onClick={() => handleScroll('next')} />
                         </div>
                     ) : (
-                        <div style={{textAlign: 'center', color: '#666'}}>Đang cập nhật các dịp...</div>
+                        <div style={{ textAlign: 'center', color: '#666' }}>Đang cập nhật các khối...</div>
                     )}
                 </section>
 
                 <section className="section-products">
-                     <div className="section-header">
+                    <div className="section-header">
                         <p className="section-subtitle">KHÁM PHÁ NHỮNG MẪU THIỆP ĐỘC ĐÁO</p>
                         <h2 className="section-title">MẪU THIỆP NỔI BẬT</h2>
                     </div>
@@ -442,7 +267,7 @@ export const Content = () => {
                                 />
                             ))
                         ) : (
-                            <div style={{gridColumn: '1/-1', textAlign: 'center'}}>Chưa có mẫu thiệp nổi bật nào.</div>
+                            <div style={{ gridColumn: '1/-1', textAlign: 'center' }}>Chưa có mẫu thiệp nổi bật nào.</div>
                         )}
                     </div>
                     <button className="view-more-btn" onClick={() => navigate('/invitations')}>XEM TẤT CẢ</button>
@@ -450,7 +275,11 @@ export const Content = () => {
 
                 <section className="section-features">
                     {secondaryBanners.map((banner, index) => (
-                        <SecondaryBanner key={banner.id || index} banner={banner} />
+                        <UniversalBanner
+                            key={banner.id || index}
+                            banner={banner}
+                            variant="secondary"
+                        />
                     ))}
                 </section>
 

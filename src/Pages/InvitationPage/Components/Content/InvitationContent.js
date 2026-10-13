@@ -1,106 +1,133 @@
 // src/Pages/InvitationPage/Components/Content/InvitationContent.js
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation, Link } from 'react-router-dom';
 import api from '../../../../services/api';
 import './InvitationContent.css';
 import { useSettings } from '../../../../Context/SettingsContext';
 import Skeleton from '../../../../Components/Skeleton/Skeleton';
+import UniversalBanner from '../../../../Components/UniversalBanner/UniversalBanner';
 
 // Card component to display each invitation
-const InvitationCard = ({ id, title, imgSrc }) => {
+const InvitationCard = ({ id, title, imgSrc, forwardState }) => {
     const navigate = useNavigate();
-    const handleClick = () => navigate(`/invitation/${id}`);
+    const handleClick = () => {
+        if (forwardState) {
+            // Nếu đang trong luồng tạo thiệp cảm ơn, đẩy state đi tiếp
+            navigate(`/invitation/${id}`, { state: forwardState });
+        } else {
+            navigate(`/invitation/${id}`);
+        }
+    };
 
     return (
         <div className="invitation-card-item" onClick={handleClick}>
             <div className="invitation-card-image-wrapper">
-                <img src={imgSrc} alt={title} onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/400x500/EAEAEA/CCC?text=Image'; }}/>
+                <img src={imgSrc} alt={title} onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x500/EAEAEA/CCC?text=Image'; }} />
             </div>
             <p className="invitation-card-title">{title}</p>
         </div>
     );
 };
+
 const titleToSlug = (title) => {
-        if (!title) return '';
-        return title
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/đ/g, "d")
-            .replace(/\s+/g, '-')
-            .replace(/[^\w-]+/g, '');
-    };
+    if (!title) return '';
+    return title
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/\s+/g, '-')
+        .replace(/[^\w-]+/g, '');
+};
+
+// Hàm hỗ trợ map slug danh mục sang displayPage key của Banner
+const getDisplayPageKey = (categorySlug) => {
+    if (!categorySlug) return 'invitations'; // Mặc định là trang chung
+    if (categorySlug.includes('chuc-mung')) return 'greetings';
+    if (categorySlug.includes('cam-on')) return 'thanks';
+    if (categorySlug.includes('thiep-moi')) return 'invitations';
+    return 'others'; // Fallback cho các danh mục khác
+};
+
+// Hàm hỗ trợ lấy nội dung mặc định theo danh mục
+const getDefaultBannerTexts = (categorySlug) => {
+    if (!categorySlug || categorySlug.includes('thiep-moi')) {
+        return { title: "Tạo Lời Mời Hoàn Hảo", subtitle: "Chọn từ hàng trăm mẫu thiết kế chuyên nghiệp của chúng tôi" };
+    }
+    if (categorySlug.includes('chuc-mung')) {
+        return { title: "Thiệp Chúc Mừng Ý Nghĩa", subtitle: "Gửi gắm yêu thương qua từng thiết kế tinh tế" };
+    }
+    if (categorySlug.includes('cam-on')) {
+        return { title: "Lời Cảm Ơn Chân Thành", subtitle: "Thiết kế thiệp cảm ơn độc đáo dành riêng cho bạn" };
+    }
+    return { title: "Khám Phá Các Mẫu Thiệp", subtitle: "Thiết kế ấn tượng, thao tác dễ dàng chỉ trong vài phút" };
+};
+
+
 // --- Main Page Component ---
 const InvitationPageContent = () => {
-    // Sửa lại để nhận `typeName` làm tham số lọc chính
     const { categoryName, groupName, typeName } = useParams();
     const navigate = useNavigate();
+    const location = useLocation(); 
     const [allTemplates, setAllTemplates] = useState([]);
     const [loading, setLoading] = useState(true);
     const { settings } = useSettings();
     const filtersRef = useRef(null);
+
+    // Nhận diện luồng tạo thiệp cảm ơn
+    const isCreatingThankYou = location.state?.purpose === 'create_thank_you';
+    const returnUrl = location.state?.returnUrl;
 
     useEffect(() => {
         const filtersEl = filtersRef.current;
         if (!filtersEl) return;
 
         const handleWheelScroll = (e) => {
-            // Nếu không có thanh cuộn ngang thì không làm gì cả
             if (filtersEl.scrollWidth <= filtersEl.clientWidth) {
                 return;
             }
-
             const isAtStart = filtersEl.scrollLeft === 0;
-            // Trừ 1 pixel để xử lý lỗi làm tròn của trình duyệt
             const isAtEnd = filtersEl.scrollLeft + filtersEl.clientWidth >= filtersEl.scrollWidth - 1;
 
-            // e.deltaY > 0 là cuộn xuống (sang phải), < 0 là cuộn lên (sang trái)
             if ((e.deltaY > 0 && !isAtEnd) || (e.deltaY < 0 && !isAtStart)) {
-                // Ngăn trang cuộn dọc và thực hiện cuộn ngang
                 e.preventDefault();
                 filtersEl.scrollLeft += e.deltaY;
             }
-            // Nếu đã ở đầu hoặc cuối, không làm gì để trình duyệt tự cuộn dọc trang
         };
 
         filtersEl.addEventListener('wheel', handleWheelScroll);
-
-        // Dọn dẹp listener khi component bị hủy
         return () => {
             filtersEl.removeEventListener('wheel', handleWheelScroll);
         };
     }, []);
+
+    // ===== LOGIC CHỌN BANNER TỰ ĐỘNG =====
     const banners = settings?.banners || [];
-    const invitationBanner = banners.find(b => b.displayPage === 'invitations' && b.isEnabled) || banners.find(b => b.displayPage === 'all' && b.isEnabled);
+    const displayPageKey = getDisplayPageKey(categoryName);
+    const { title: defaultTitle, subtitle: defaultSubtitle } = getDefaultBannerTexts(categoryName);
+
+    // Ưu tiên 1: Banner khớp với danh mục đang xem
+    // Ưu tiên 2: Fallback về banner trang Thiệp Mời chung
+    // Ưu tiên 3: Fallback về banner dùng cho tất cả (all)
+    const invitationBanner = banners.find(b => b.displayPage === displayPageKey && b.isEnabled) 
+                          || banners.find(b => b.displayPage === 'invitations' && b.isEnabled) 
+                          || banners.find(b => b.displayPage === 'all' && b.isEnabled);
+    // =====================================
+
     const groupsForCurrentCategory = useMemo(() => {
         if (!categoryName) return [];
         const templatesInCategory = allTemplates.filter(t => titleToSlug(t.category) === categoryName);
         return [...new Set(templatesInCategory.map(t => t.group).filter(Boolean))];
     }, [allTemplates, categoryName]);
+
     const typesForCurrentGroup = useMemo(() => {
         if (!categoryName || !groupName) return [];
-        const templatesInGroup = allTemplates.filter(t => 
-            titleToSlug(t.category) === categoryName && 
+        const templatesInGroup = allTemplates.filter(t =>
+            titleToSlug(t.category) === categoryName &&
             titleToSlug(t.group) === groupName
         );
         return [...new Set(templatesInGroup.map(t => t.type).filter(Boolean))];
     }, [allTemplates, categoryName, groupName]);
-    // const filteredTemplates = useMemo(() => {
-    //     if (!categoryName) return allTemplates;
-
-    //     let filtered = allTemplates.filter(template => titleToSlug(template.category) === categoryName);
-
-    //     if (groupName) {
-    //         filtered = filtered.filter(template => titleToSlug(template.group) === groupName);
-    //     }
-
-    //     if (typeName) {
-    //         filtered = filtered.filter(template => titleToSlug(template.type) === typeName);
-    //     }
-
-    //     return filtered;
-    // }, [allTemplates, categoryName, groupName, typeName]);
-    
 
     useEffect(() => {
         const fetchAllTemplates = async () => {
@@ -117,18 +144,8 @@ const InvitationPageContent = () => {
         fetchAllTemplates();
     }, []);
 
-    // [SỬA LỖI LOGIC] - Lấy ra các 'type' để làm bộ lọc, thay vì 'group'
-    // const typesForCurrentCategory = useMemo(() => {
-    //     if (!categoryName) return [];
-    //     const templatesInCategory = allTemplates.filter(t => titleToSlug(t.category) === categoryName);
-    //     // Trả về danh sách các 'type' duy nhất trong category hiện tại
-    //     return [...new Set(templatesInCategory.map(t => t.type).filter(Boolean))];
-    // }, [allTemplates, categoryName]);
-
-    // Lọc template để hiển thị ra lưới dựa trên categoryName và typeName
     const filteredTemplates = useMemo(() => {
         if (!categoryName) return allTemplates;
-
         let filtered = allTemplates.filter(template => titleToSlug(template.category) === categoryName);
 
         if (groupName) {
@@ -144,50 +161,49 @@ const InvitationPageContent = () => {
 
     return (
         <main className="invitation-page">
-            <section className="hero-section">
-                {invitationBanner ? (
-                    invitationBanner.htmlContent ? (
-                        <div dangerouslySetInnerHTML={{ __html: invitationBanner.htmlContent }} />
-                    ) : (
-                        <>
-                            {invitationBanner.mediaType === 'video' && invitationBanner.videoUrl ? (
-                                <video 
-                                    src={invitationBanner.videoUrl} 
-                                    autoPlay 
-                                    loop 
-                                    muted 
-                                    playsInline 
-                                    className="hero-video-background"
-                                />
-                            ) : (
-                                <div 
-                                    className="hero-image-background"
-                                    style={{ backgroundImage: `url(${invitationBanner.imageUrl || 'https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/default-banner.png'})` }}
-                                />
-                            )}
-                            <div className="hero-content">
-                                {invitationBanner.title && <h1 className="hero-title">{invitationBanner.title}</h1>}
-                                {invitationBanner.subtitle && <p className="hero-subtitle">{invitationBanner.subtitle}</p>}
-                            </div>
-                        </>
-                    )
-                ) : (
-                    <>
-                        <div 
-                            className="hero-image-background"
-                            style={{ backgroundImage: `url('https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/default-banner.png')` }}
-                        />
-                        <div className="hero-content">
-                            <h1 className="hero-title">Tạo Lời Mời Hoàn Hảo</h1>
-                            <p className="hero-subtitle">Chọn từ hàng trăm mẫu thiết kế chuyên nghiệp của chúng tôi</p>
-                        </div>
-                    </>
-                )}
+            {isCreatingThankYou && (
+                <div style={{
+                    backgroundColor: '#e6f7ff',
+                    padding: '12px 24px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderBottom: '1px solid #91d5ff',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 100
+                }}>
+                    <span style={{ color: '#0050b3', fontWeight: 500 }}>
+                        Bạn đang chọn mẫu để tạo Thiệp Cảm Ơn.
+                    </span>
+                    <button
+                        onClick={() => navigate(returnUrl || '/')}
+                        style={{
+                            border: '1px solid #1890ff',
+                            background: 'white',
+                            color: '#1890ff',
+                            padding: '6px 16px',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 500,
+                            transition: 'all 0.3s'
+                        }}
+                    >
+                        Hủy & Quay lại
+                    </button>
+                </div>
+            )}
+
+            <section className="page-hero-wrapper" style={{ width: '100%', overflow: 'hidden' }}>
+                <UniversalBanner
+                    banner={invitationBanner}
+                    defaultTitle={defaultTitle}
+                    defaultSubtitle={defaultSubtitle}
+                />
             </section>
 
             <div className="container">
                 <div className="section-container">
-                    {/* [SỬA LỖI HIỂN THỊ] - Filter giờ sẽ hiển thị các 'type' */}
                     {groupsForCurrentCategory.length > 0 && (
                         <div className="invitation-type-filters" ref={filtersRef} style={{ marginBottom: typeName || groupName ? '10px' : '30px' }}>
                             <button
@@ -211,7 +227,6 @@ const InvitationPageContent = () => {
                         </div>
                     )}
 
-                    {/* FILTER CHO TYPE (Cấp 3 - Chỉ hiện khi đã chọn Group) */}
                     {groupName && typesForCurrentGroup.length > 0 && (
                         <div className="invitation-type-filters" style={{ marginBottom: '30px' }}>
                             <button
@@ -235,23 +250,8 @@ const InvitationPageContent = () => {
                         </div>
                     )}
 
-                    {/* Vị trí quảng cáo: Ngay dưới bộ lọc */}
-                    {/* <div className="ads-container">
-                        <div className="placeholder-ad">Vị trí đặt quảng cáo (970x250)</div> */}
-                        {/*
-                        Hãy thay thế đoạn mã trên bằng mã AdSense thực tế của bạn khi đã có tài khoản:
-                        <ins className="adsbygoogle"
-                             style={{ display: 'block' }}
-                             data-ad-client="ca-pub-1234567890123456"
-                             data-ad-slot="1234567890"
-                             data-ad-format="auto"
-                             data-full-width-responsive="true"></ins>
-                        */}
-                    {/* </div> */}
-
                     <div className="invitation-grid">
                         {loading ? (
-                            // Render 8-12 thẻ skeleton card
                             Array.from({ length: 12 }).map((_, index) => (
                                 <div key={index} className="invitation-card-item">
                                     <div className="invitation-card-image-wrapper">
@@ -269,6 +269,7 @@ const InvitationPageContent = () => {
                                     id={item._id}
                                     title={item.title}
                                     imgSrc={item.imgSrc}
+                                    forwardState={location.state} 
                                 />
                             ))
                         ) : (

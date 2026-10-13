@@ -10,6 +10,7 @@ import 'leaflet/dist/leaflet.css';
 import './App.css';
 import './tiptap-content.css'
 import './BannerStyles.css'
+import CollectionPage from './Pages/CollectionPage/CollectionPage';
 // --- CORE COMPONENTS ---
 import ScrollToTop from './Features/ScrollToTop';
 import GlobalHeader from './Pages/Components/GlobalHeader';
@@ -297,6 +298,7 @@ function App() {
                     {/* --- Các route công khai --- */}
                     <Route path="/" element={<HomePage />} />
                     <Route path="/shop" element={<ProductPage />} />
+                    <Route path="/collection/:slug" element={<CollectionPage />} />
                     <Route path="/product/:productId" element={<ProductDetailsPage />} />
                     <Route path="/invitations" element={<InvitationPage />} />
                     <Route path="/invitations/category/:categoryName" element={<InvitationPage />} />

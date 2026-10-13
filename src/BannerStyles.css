@@ -6,25 +6,25 @@
 .hero-section-invitations,
 .hero-section-pro {
   width: 100%;
-  height: 60vh; /* Chiều cao mặc định, có thể tùy biến */
-  min-height: 400px; /* Chiều cao tối thiểu để đảm bảo banner không quá nhỏ */
-  max-height: 80vh; /* Chiều cao tối đa theo yêu cầu */
+  height: 60vh;
+  min-height: 400px;
+  max-height: 80vh;
   
   /* Cấu hình hiển thị */
   display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  justify-content: flex-start; /* Sửa từ 'center' thành 'flex-start' để đẩy khối nội dung sang trái */
+  align-items: center; /* Giữ nguyên 'center' để căn giữa theo chiều dọc */
+  text-align: left; /* Sửa từ 'center' thành 'left' để căn chữ sang trái */
   
   /* Cấu hình nền và hình ảnh */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   
-  color: #ffffff; /* Màu chữ mặc định là trắng */
-  padding: 2rem;
+  color: #ffffff;
+  padding: 2rem 5%; /* Cập nhật padding để tạo lề 5% cho hai bên (tùy chỉnh theo ý muốn) */
   box-sizing: border-box;
-  position: relative; /* Cần thiết cho lớp phủ (overlay) */
+  position: relative;
   overflow: hidden;
 }
 

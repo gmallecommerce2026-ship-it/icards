@@ -155,7 +155,23 @@
     margin: 0;
     font-style: italic;
 }
+/* Đảm bảo nội dung từ CustomEditor (HTML thô) khi render trong Preview luôn có viền bảng */
+.event-settings-preview-container table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 1rem 0;
+}
 
+.event-settings-preview-container table th,
+.event-settings-preview-container table td {
+    border: 1px solid #ced4da !important;
+    padding: 8px 12px !important;
+}
+
+.event-settings-preview-container table th {
+    background-color: #f8f9fa !important;
+    font-weight: 600 !important;
+}
 /* --- UX UPGRADE: Clickable Cards --- */
 .clickable-card {
     cursor: pointer;

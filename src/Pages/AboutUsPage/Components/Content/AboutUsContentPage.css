@@ -3084,3 +3084,146 @@ END: STYLES MỚI
         border-radius: 20px 20px 0 0;
     }
 }
+
+
+.recipient-name {
+    font-size: 1.1rem; /* Điều chỉnh lại size nếu tên dài */
+    word-break: break-word;
+    padding: 0 10px;
+}
+
+/* ===================================================================
+   LARGE NEAREST EVENT MAP (MINIMAL & CLICKABLE)
+=================================================================== */
+.nearest-event-section {
+    padding-top: var(--spacing-xl);
+}
+
+.large-map-wrapper {
+    background: var(--color-white);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--color-border-light);
+    margin: 0 auto;
+    max-width: 900px;
+    transition: all var(--transition-normal);
+}
+
+.large-map-wrapper:hover {
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-5px);
+}
+
+.clickable-map-container {
+    position: relative;
+    width: 100%;
+    height: 450px;
+}
+
+/* Lớp phủ đè lên iframe, bắt mọi cú click để chuyển hướng */
+.map-click-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    cursor: pointer;
+    background: rgba(0,0,0,0); /* Trong suốt */
+}
+
+/* Đảm bảo iframe không cản trở lớp phủ */
+.clickable-map-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; 
+}
+
+@media (max-width: 768px) {
+    .clickable-map-container {
+        height: 300px;
+    }
+}
+/* =========================================
+   FLOATING MUSIC PLAYER
+   ========================================= */
+.floating-music-player {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 1000;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark, #1a3a63) 100%);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.floating-music-player:hover {
+    transform: scale(1.1);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+}
+
+.music-disc {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.music-disc.spinning {
+    animation: spin-disc 4s linear infinite;
+}
+
+@keyframes spin-disc {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hiệu ứng sóng âm mini phát ra khi đang play */
+.sound-waves {
+    position: absolute;
+    top: -8px;
+    right: -5px;
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    height: 15px;
+    transform: rotate(15deg);
+}
+
+.sound-waves .wave {
+    width: 3px;
+    background-color: var(--color-accent, #e8b86d);
+    border-radius: 3px;
+    animation: bounce-wave 1s infinite alternate;
+}
+
+.sound-waves .w1 { animation-delay: 0.1s; }
+.sound-waves .w2 { animation-delay: 0.3s; height: 10px; }
+.sound-waves .w3 { animation-delay: 0.5s; height: 5px; }
+
+@keyframes bounce-wave {
+    0% { height: 3px; }
+    100% { height: 15px; }
+}
+
+@media (max-width: 768px) {
+    .floating-music-player {
+        bottom: 80px; /* Đẩy lên cao 1 chút trên Mobile để không che thanh EventBottomBar */
+        left: 20px;
+        width: 45px;
+        height: 45px;
+    }
+}

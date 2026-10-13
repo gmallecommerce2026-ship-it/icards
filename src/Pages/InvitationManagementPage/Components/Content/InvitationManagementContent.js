@@ -18,7 +18,7 @@ const useTaskStore = create((set, get) => ({
         try {
             const response = await api.get(`/invitations/${invitationId}/tasks`);
             let fetchedTasks = response.data.data || [];
-            
+
             // Tự động Migration dữ liệu cũ (nếu có)
             if (fetchedTasks.length > 0 && !fetchedTasks[0].subTasks) {
                 fetchedTasks = [{
@@ -61,7 +61,7 @@ const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
         g.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (g.email && g.email.toLowerCase().includes(searchTerm.toLowerCase()))
     ), [masterGuests, searchTerm]);
-    
+
     useEffect(() => {
         const fetchMasterGuests = async () => {
             try {
@@ -84,7 +84,7 @@ const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
             selectAllCheckboxRef.current.checked = numVisible > 0 && numSelected === numVisible;
         }
     }, [selectedGuests, filteredGuests]);
-    
+
     const handleSelectGuest = (guestId) => {
         setSelectedGuests(prev => {
             const newSet = new Set(prev);
@@ -96,7 +96,7 @@ const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
             return newSet;
         });
     };
-    
+
     const handleSelectAllGuests = () => {
         if (selectedGuests.size === filteredGuests.length) {
             setSelectedGuests(new Set());
@@ -116,7 +116,7 @@ const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
         }
     };
 
-    
+
     if (loading) return <p>Đang tải danh bạ...</p>;
 
     return (
@@ -131,17 +131,17 @@ const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
 
             {/* Phần Content bên trong */}
             <div style={{ padding: '20px' }}>
-                 <p style={{ marginTop: 0 }}>Chọn khách mời từ danh bạ để thêm vào sự kiện hiện tại.</p>
-                 <div style={{display: 'flex', gap: '20px', margin: '20px 0', alignItems: 'center'}}>
-                    <input 
+                <p style={{ marginTop: 0 }}>Chọn khách mời từ danh bạ để thêm vào sự kiện hiện tại.</p>
+                <div style={{ display: 'flex', gap: '20px', margin: '20px 0', alignItems: 'center' }}>
+                    <input
                         className="filter-input"
                         placeholder="Tìm kiếm trong danh bạ..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
                     />
-                    <button 
+                    <button
                         className="guest-action-btn"
-                        onClick={handleAddSelectedToInvitation} 
+                        onClick={handleAddSelectedToInvitation}
                         disabled={selectedGuests.size === 0}
                     >
                         Thêm {selectedGuests.size} khách đã chọn
@@ -156,8 +156,8 @@ const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
                         />
                         <label>Chọn tất cả</label>
                     </div>
-                 </div>
-                
+                </div>
+
                 <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
                     {/* ... (giữ nguyên phần render danh sách filteredGuests) ... */}
                     {filteredGuests.length > 0 ? filteredGuests.map(guest => (
@@ -174,7 +174,7 @@ const MasterGuestPanel = ({ user, onAddGuestsToInvitation, onClose }) => {
                                 <div style={{ color: '#666', fontSize: '14px' }}>{guest.email}</div>
                             </div>
                         </div>
-                    )) : <p style={{textAlign: 'center', color: '#666', marginTop: '20px'}}>Không tìm thấy khách mời nào.</p>}
+                    )) : <p style={{ textAlign: 'center', color: '#666', marginTop: '20px' }}>Không tìm thấy khách mời nào.</p>}
                 </div>
             </div>
         </div>
@@ -203,7 +203,7 @@ const GuestActionDropdown = ({ guest, invitationId, onSendEmail, onClose }) => {
         if (dropdownRef.current) {
             const rect = dropdownRef.current.getBoundingClientRect();
             const spaceBelow = window.innerHeight - rect.bottom;
-            
+
             // Nếu khoảng trống dưới màn hình nhỏ hơn chiều cao dropdown (khoảng 130px)
             if (spaceBelow < 130) {
                 setIsDropUp(true);
@@ -231,8 +231,8 @@ const GuestActionDropdown = ({ guest, invitationId, onSendEmail, onClose }) => {
     };
 
     return (
-        <div 
-            className={`guest-action-dropdown ${isDropUp ? 'drop-up' : ''}`} 
+        <div
+            className={`guest-action-dropdown ${isDropUp ? 'drop-up' : ''}`}
             ref={dropdownRef}
         >
             <ul>
@@ -274,15 +274,15 @@ const SelectGroupModal = ({ groups, onClose, onConfirm, count }) => {
     return (
         <Modal onClose={onClose} size="normal">
             <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <h3 style={{fontFamily: "'SVN-Gilroy', sans-serif", color: "#27548a"}}>Thêm vào nhóm</h3>
+                <h3 style={{ fontFamily: "'SVN-Gilroy', sans-serif", color: "#27548a" }}>Thêm vào nhóm</h3>
                 <p>Thêm <strong>{count}</strong> khách mời đã chọn vào nhóm:</p>
                 <select value={selectedGroupId} onChange={(e) => setSelectedGroupId(e.target.value)} className="settings-select">
                     <option value="">-- Vui lòng chọn nhóm --</option>
                     {groups.map(g => <option key={g._id} value={g._id}>{g.name}</option>)}
                 </select>
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '10px' }}>
-                     <button type="button" onClick={onClose} className="guest-action-btn" style={{background: 'white', borderColor: '#ccc'}}>Hủy</button>
-                     <button type="button" onClick={handleConfirm} className="guest-action-btn" style={{background: '#27548a', color: 'white', borderColor: '#27548a'}}>Xác nhận</button>
+                    <button type="button" onClick={onClose} className="guest-action-btn" style={{ background: 'white', borderColor: '#ccc' }}>Hủy</button>
+                    <button type="button" onClick={handleConfirm} className="guest-action-btn" style={{ background: '#27548a', color: 'white', borderColor: '#27548a' }}>Xác nhận</button>
                 </div>
             </div>
         </Modal>
@@ -336,11 +336,11 @@ const GroupIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="n
 const ExportIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>);
 const ImportIcon = () => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 12 12 7 7 12"></polyline><line x1="12" y1="7" x2="12" y2="21"></line></svg>);
 // const InfoIcon = () => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>);
-const EditIcon = ({width="20", height="20"}) => (<svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>);
-const DeleteIcon = ({width="20", height="20"}) => (<svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>);
+const EditIcon = ({ width = "20", height = "20" }) => (<svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>);
+const DeleteIcon = ({ width = "20", height = "20" }) => (<svg width={width} height={height} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>);
 const BackArrowIcon = () => (<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>);
 const CloseIcon = () => (<svg width="13.4px" height="13.4px" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
-const RequiredIcon = () => (<svg width="12px" height="12px" viewBox="0 0 24 24" fill="red"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>);
+const RequiredIcon = () => (<svg width="12px" height="12px" viewBox="0 0 24 24" fill="red"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" /></svg>);
 const SaveIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>);
 const CancelIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>);
 const SendEmailIcon = () => (<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0 1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>);
@@ -352,7 +352,7 @@ const StatItem = ({ label, value }) => (
     </div>
 );
 
-const VerticalSeparator = () => <div style={{width: '1px', height: '52px', backgroundColor: '#E0E0E0'}} />;
+const VerticalSeparator = () => <div style={{ width: '1px', height: '52px', backgroundColor: '#E0E0E0' }} />;
 
 const SettingsField = ({ label, required, description, children }) => (
     <div style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
@@ -362,7 +362,7 @@ const SettingsField = ({ label, required, description, children }) => (
         </div>
         {description && (
             <div style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "16px", color: "rgba(102,102,102,1)" }}
-                 dangerouslySetInnerHTML={{ __html: description }}></div>
+                dangerouslySetInnerHTML={{ __html: description }}></div>
         )}
         {children}
     </div>
@@ -429,7 +429,7 @@ const AddGuestForm = ({ onSave, onClose, onManageGroups, invitationId }) => {
             return;
         }
         setIsSubmitting(true);
-        
+
         const promise = api.post(`/invitations/${invitationId}/guests`, { ...formData, group: formData.group || null });
 
         handlePromiseToast(promise, {
@@ -437,10 +437,10 @@ const AddGuestForm = ({ onSave, onClose, onManageGroups, invitationId }) => {
             success: 'Đã thêm khách mời thành công!',
             error: 'Thêm khách mời thất bại!'
         }).then((response) => {
-            onSave(response.data.data, 'add-guest'); 
+            onSave(response.data.data, 'add-guest');
             onClose();
         }).catch(err => console.error(err))
-        .finally(() => setIsSubmitting(false));
+            .finally(() => setIsSubmitting(false));
     };
 
     return (
@@ -467,8 +467,8 @@ const AddGuestForm = ({ onSave, onClose, onManageGroups, invitationId }) => {
                             <div onClick={onManageGroups} style={{ cursor: 'pointer', fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "16px", color: "rgba(39,84,138,1)", fontWeight: "500" }}>[Quản lý nhóm]</div>
                         </div>
                         <select name="group" value={formData.group} onChange={handleChange} style={{ borderColor: "rgb(128,128,128)", borderWidth: "0.5px", borderStyle: "solid", width: "100%", height: "40px", padding: "0 20px", boxSizing: 'border-box' }}>
-                             <option value="">Chọn nhóm khách mời (không bắt buộc)</option>
-                             {availableGroups.map(g => <option key={g._id} value={g._id}>{g.name}</option>)}
+                            <option value="">Chọn nhóm khách mời (không bắt buộc)</option>
+                            {availableGroups.map(g => <option key={g._id} value={g._id}>{g.name}</option>)}
                         </select>
                     </div>
                 </div>
@@ -502,7 +502,7 @@ const UpdateGuestForm = ({ guestToEdit, onSave, onClose, onManageGroups, invitat
         };
         fetchGroups();
     }, [invitationId]);
-    
+
     useEffect(() => {
         if (guestToEdit) {
             setFormData({
@@ -531,7 +531,7 @@ const UpdateGuestForm = ({ guestToEdit, onSave, onClose, onManageGroups, invitat
             return;
         }
         setIsSubmitting(true);
-        
+
         const promise = api.put(`/invitations/${invitationId}/guests/${guestToEdit._id}`, { ...formData, group: formData.group || null });
 
         handlePromiseToast(promise, {
@@ -539,10 +539,10 @@ const UpdateGuestForm = ({ guestToEdit, onSave, onClose, onManageGroups, invitat
             success: 'Đã cập nhật khách mời thành công!',
             error: 'Cập nhật thất bại!'
         }).then((response) => {
-            onSave(response.data.data, 'update-guest'); 
+            onSave(response.data.data, 'update-guest');
             onClose();
         }).catch(err => console.error(err))
-        .finally(() => setIsSubmitting(false));
+            .finally(() => setIsSubmitting(false));
     };
 
     return (
@@ -576,9 +576,9 @@ const UpdateGuestForm = ({ guestToEdit, onSave, onClose, onManageGroups, invitat
                         </select>
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                         <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                             <label style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "16px", fontWeight: "500" }}>Tiền mừng</label>
-                            <div style={{display: 'flex', gap: '10px'}}>
+                            <div style={{ display: 'flex', gap: '10px' }}>
                                 <input name="giftAmount" type="number" value={formData.giftAmount} onChange={handleChange} placeholder="Số tiền mừng" style={{ borderColor: "rgb(128,128,128)", borderWidth: "0.5px", borderStyle: "solid", height: "40px", padding: "0 20px", flex: 3 }} />
                                 <select name="giftUnit" value={formData.giftUnit} onChange={handleChange} style={{ borderColor: "rgb(128,128,128)", borderWidth: "0.5px", borderStyle: "solid", height: "40px", padding: "0 10px", flex: 2 }}>
                                     <option value="VND">VND</option>
@@ -652,8 +652,8 @@ const ManageGroupsModalContent = ({ invitationId, onClose, onDataChange }) => {
         }
     }, [invitationId]);
 
-    useEffect(() => { 
-        fetchGroups(); 
+    useEffect(() => {
+        fetchGroups();
     }, [fetchGroups]);
 
     const handleAddGroup = async () => {
@@ -668,11 +668,11 @@ const ManageGroupsModalContent = ({ invitationId, onClose, onDataChange }) => {
             const newGroup = response.data.data;
             setGroups(prev => [...prev, newGroup]);
             onDataChange(newGroup, 'add-group');
-            setNewGroupName(''); 
+            setNewGroupName('');
             setNewGroupSalutation('Lời xưng hô mặc định');
         });
     };
-    
+
     const handleSaveEdit = async (groupId) => {
         if (!editedName.trim()) {
             showErrorToast('Tên nhóm không được để trống.');
@@ -707,15 +707,15 @@ const ManageGroupsModalContent = ({ invitationId, onClose, onDataChange }) => {
                 </div>
             </div>
             <div style={{ display: "flex", flexDirection: "row", justifyContent: "start", alignItems: "center", gap: "20px", padding: "0 20px", width: "100%", boxSizing: 'border-box' }}>
-                    <input 
-                            placeholder="Nhập tên nhóm mới..." 
-                            value={newGroupName}
-                            onChange={e => setNewGroupName(e.target.value)}
-                            style={{ borderColor: "rgb(128,128,128)", borderWidth: "0.5px", borderStyle: "solid", flex: 1, height: "40px", padding: '0 20px' }} 
-                        />             
+                <input
+                    placeholder="Nhập tên nhóm mới..."
+                    value={newGroupName}
+                    onChange={e => setNewGroupName(e.target.value)}
+                    style={{ borderColor: "rgb(128,128,128)", borderWidth: "0.5px", borderStyle: "solid", flex: 1, height: "40px", padding: '0 20px' }}
+                />
                 <select value={newGroupSalutation} onChange={e => setNewGroupSalutation(e.target.value)} style={{ borderColor: "rgb(128,128,128)", borderWidth: "0.5px", borderStyle: "solid", flex: 1, height: "40px", padding: '0 20px' }}>
-                {availableSalutations.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
+                    {availableSalutations.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
                 <button onClick={handleAddGroup} style={{ backgroundColor: "rgba(39,84,138,1)", width: "180px", height: "40px", display: "flex", justifyContent: "center", alignItems: "center", color: 'white', border: 'none', cursor: 'pointer', textTransform: 'uppercase', fontWeight: 600 }}>Thêm mới</button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", padding: "0 20px 20px", width: "100%", boxSizing: 'border-box' }}>
@@ -731,12 +731,12 @@ const ManageGroupsModalContent = ({ invitationId, onClose, onDataChange }) => {
                             <>
                                 <div style={{ borderRight: "0.5px solid rgb(128,128,128)", width: "60px", minHeight: "60px", display: "flex", justifyContent: "center", alignItems: "center" }}>{index + 1}</div>
                                 <div style={{ borderRight: "0.5px solid rgb(128,128,128)", flex: 1.5, minHeight: "60px", display: "flex", alignItems: "center", padding: "5px 10px" }}>
-                                    <input value={editedName} onChange={e => setEditedName(e.target.value)} style={{width: '100%', padding: '8px'}}/>
+                                    <input value={editedName} onChange={e => setEditedName(e.target.value)} style={{ width: '100%', padding: '8px' }} />
                                 </div>
                                 <div style={{ borderRight: "0.5px solid rgb(128,128,128)", flex: 3, minHeight: "60px", display: "flex", alignItems: "center", padding: "5px 10px" }}>
-                                     <select value={editedSalutation} onChange={e => setEditedSalutation(e.target.value)} style={{width: '100%', padding: '8px'}}>
-                                         {availableSalutations.map(s => <option key={s} value={s}>{s}</option>)}
-                                     </select>
+                                    <select value={editedSalutation} onChange={e => setEditedSalutation(e.target.value)} style={{ width: '100%', padding: '8px' }}>
+                                        {availableSalutations.map(s => <option key={s} value={s}>{s}</option>)}
+                                    </select>
                                 </div>
                                 <div style={{ flex: 1, minHeight: "60px", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px" }}>
                                     <button onClick={() => handleSaveEdit(group._id)} className="table-action-btn"><SaveIcon /></button>
@@ -744,13 +744,13 @@ const ManageGroupsModalContent = ({ invitationId, onClose, onDataChange }) => {
                                 </div>
                             </>
                         ) : (
-                             <>
+                            <>
                                 <div style={{ borderRight: "0.5px solid rgb(128,128,128)", width: "60px", minHeight: "60px", display: "flex", justifyContent: "center", alignItems: "center" }}>{index + 1}</div>
                                 <div style={{ borderRight: "0.5px solid rgb(128,128,128)", flex: 1.5, minHeight: "60px", display: "flex", alignItems: "center", paddingLeft: "20px" }}>{group.name}</div>
                                 <div style={{ borderRight: "0.5px solid rgb(128,128,128)", flex: 3, minHeight: "60px", display: "flex", alignItems: "center", paddingLeft: "20px" }}>{group.salutation}</div>
                                 <div style={{ flex: 1, minHeight: "60px", display: "flex", justifyContent: "center", alignItems: "center", gap: "8px" }}>
-                                    <button onClick={() => { setEditingGroupId(group._id); setEditedName(group.name); setEditedSalutation(group.salutation);}} className="table-action-btn"><EditIcon width="20" height="20"/></button>
-                                    <button onClick={() => setGroupToDelete(group._id)} className="table-action-btn"><DeleteIcon width="20" height="20"/></button>
+                                    <button onClick={() => { setEditingGroupId(group._id); setEditedName(group.name); setEditedSalutation(group.salutation); }} className="table-action-btn"><EditIcon width="20" height="20" /></button>
+                                    <button onClick={() => setGroupToDelete(group._id)} className="table-action-btn"><DeleteIcon width="20" height="20" /></button>
                                     <input type="checkbox" style={{ width: '16px', height: '16px' }} />
                                 </div>
                             </>
@@ -790,7 +790,7 @@ const GuestCard = ({ guest, onEdit, onDelete, onSendEmail, index, groupName, isS
                         type="checkbox"
                         checked={isSelected}
                         onChange={onSelect}
-                        style={{width: '18px', height: '18px', cursor: 'pointer'}}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
                         onClick={(e) => e.stopPropagation()}
                     />
                     <div className="guest-card-number">#{index + 1}</div>
@@ -820,7 +820,7 @@ const GuestCard = ({ guest, onEdit, onDelete, onSendEmail, index, groupName, isS
                         <span className="guest-info-value">{guest.email}</span>
                     </div>
                 )}
-                 {guest.phone && (
+                {guest.phone && (
                     <div className="guest-info-item">
                         <span className="guest-info-label">Điện thoại:</span>
                         <span className="guest-info-value">{guest.phone}</span>
@@ -872,13 +872,13 @@ const ImportHelpModal = ({ onClose }) => {
         const worksheet = XLSX.utils.json_to_sheet(sampleData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Danh Sách Mẫu");
-        worksheet['!cols'] = [ { wch: 25 }, { wch: 30 }, { wch: 15 }, { wch: 25 }];
+        worksheet['!cols'] = [{ wch: 25 }, { wch: 30 }, { wch: 15 }, { wch: 25 }];
         XLSX.writeFile(workbook, "file-mau-nhap-khach-moi.xlsx");
     };
 
     return (
         <Modal onClose={onClose} size="normal">
-             <div style={{ backgroundColor: "rgba(255,255,255,1)", display: "flex", flexDirection: "column", justifyContent: "start", alignItems: "center", gap: "20px" }}>
+            <div style={{ backgroundColor: "rgba(255,255,255,1)", display: "flex", flexDirection: "column", justifyContent: "start", alignItems: "center", gap: "20px" }}>
                 <div style={{ backgroundColor: "rgba(39,84,138,1)", height: "53.4px", width: "100%", display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: "12px 20px", boxSizing: 'border-box' }}>
                     <div style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "20px", color: "rgba(255,255,255,1)", fontWeight: "700" }}>Hướng dẫn nhập khách từ Excel</div>
                     <div onClick={onClose} style={{ cursor: 'pointer', backgroundColor: "rgba(255,255,255,1)", borderRadius: "59px", width: "29.4px", height: "29.4px", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -892,7 +892,7 @@ const ImportHelpModal = ({ onClose }) => {
                         <li>Dòng đầu tiên của trang tính phải là <strong>dòng tiêu đề</strong>.</li>
                         <li>Cột <strong>"Tên Khách Mời"</strong> là bắt buộc. Các khách mời không có tên sẽ bị bỏ qua.</li>
                         <li>Các cột được hệ thống hỗ trợ bao gồm:
-                            <ul style={{marginTop: '10px', listStyleType: 'disc', marginLeft: '20px'}}>
+                            <ul style={{ marginTop: '10px', listStyleType: 'disc', marginLeft: '20px' }}>
                                 <li><code>Tên Khách Mời</code> (Bắt buộc)</li>
                                 <li><code>Email</code> (Không bắt buộc)</li>
                                 <li><code>Số Điện Thoại</code> (Không bắt buộc)</li>
@@ -900,10 +900,10 @@ const ImportHelpModal = ({ onClose }) => {
                             </ul>
                         </li>
                     </ul>
-                     <p>Các cột khác không có trong danh sách trên sẽ được bỏ qua khi nhập.</p>
+                    <p>Các cột khác không có trong danh sách trên sẽ được bỏ qua khi nhập.</p>
 
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-                         <button onClick={handleDownloadSample} className="guest-action-btn" style={{width: 'auto', padding: '0 25px', backgroundColor: '#e8f0fe', borderColor: '#27548a'}}>
+                        <button onClick={handleDownloadSample} className="guest-action-btn" style={{ width: 'auto', padding: '0 25px', backgroundColor: '#e8f0fe', borderColor: '#27548a' }}>
                             Tải file mẫu
                         </button>
                     </div>
@@ -940,12 +940,12 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
     const selectAllCheckboxRef = useRef(null);
     const [guestMenuAnchor, setGuestMenuAnchor] = useState(null);
 
-    
+
     useEffect(() => {
         const checkMasterGuests = async () => {
             try {
                 // Chỉ cần lấy 1 khách để kiểm tra sự tồn tại, cho hiệu năng tốt hơn
-                const response = await api.get('/master-guests?limit=1'); 
+                const response = await api.get('/master-guests?limit=1');
                 if (response.data.data && response.data.data.length > 0) {
                     setHasMasterGuests(true);
                 }
@@ -980,7 +980,7 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
             return true;
         });
     }, [guests, searchTerm, filterGroup, filterStatus, filterEmailStatus]);
-    
+
     useEffect(() => {
         if (selectAllCheckboxRef.current) {
             const numSelected = selectedGuestIds.size;
@@ -1010,7 +1010,7 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
             setSelectedGuestIds(new Set(filteredGuests.map(g => g._id)));
         }
     };
-    
+
     const handleBulkDelete = () => {
         if (selectedGuestIds.size === 0) return;
         setBulkDeleteModalOpen(true);
@@ -1024,7 +1024,7 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
             success: 'Đã xóa các khách mời đã chọn!',
             error: 'Xóa hàng loạt thất bại!'
         }).then((response) => {
-            onDataChange(response.data.data, 'update-settings'); 
+            onDataChange(response.data.data, 'update-settings');
             setSelectedGuestIds(new Set());
         }).finally(() => setBulkDeleteModalOpen(false));
     };
@@ -1042,10 +1042,10 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
             onDataChange(response.data.data, 'update-settings');
             setSelectedGuestIds(new Set());
         }).catch(() => {
-             onDataChange(invitation, 'update-settings');
+            onDataChange(invitation, 'update-settings');
         });
     };
-    
+
     const handleBulkAddToGroup = () => {
         if (selectedGuestIds.size === 0) return;
         setAddToGroupModalOpen(true);
@@ -1055,10 +1055,10 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
         const ids = Array.from(selectedGuestIds);
         const promise = api.put(`/invitations/${invitationId}/guests/bulk-update`, {
             guestIds: ids,
-            updateData: { group: groupId } 
+            updateData: { group: groupId }
         });
         const actionText = groupId ? 'thêm vào nhóm' : 'loại bỏ khỏi nhóm';
-        
+
         handlePromiseToast(promise, {
             pending: `Đang ${actionText}...`,
             success: `Đã ${actionText} thành công!`,
@@ -1086,7 +1086,7 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
                     showErrorToast("File Excel trống hoặc không có dữ liệu.");
                     return;
                 }
-                
+
                 const firstRow = jsonData[0];
                 if (!('Tên Khách Mời' in firstRow)) {
                     showErrorToast('File Excel phải có cột "Tên Khách Mời". Vui lòng kiểm tra lại file mẫu.');
@@ -1099,7 +1099,7 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
                         groupNameToIdMap.set(group.name, group._id);
                     });
                 }
-                
+
                 const processedGuests = jsonData.map(row => {
                     const groupName = row['Nhóm Khách Mời'] || "";
                     return {
@@ -1122,14 +1122,14 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
                     success: 'Nhập danh sách khách mời thành công!',
                     error: 'Nhập danh sách thất bại. Vui lòng kiểm tra lại file.'
                 }).then((response) => {
-                     onDataChange(response.data.data, 'update-settings');
+                    onDataChange(response.data.data, 'update-settings');
                 });
 
             } catch (error) {
                 console.error("Lỗi khi đọc file Excel:", error);
                 showErrorToast("Đã có lỗi xảy ra khi đọc file Excel. File có thể bị hỏng.");
             } finally {
-                if(importFileInputRef.current) {
+                if (importFileInputRef.current) {
                     importFileInputRef.current.value = "";
                 }
             }
@@ -1152,7 +1152,7 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
             const worksheet = XLSX.utils.json_to_sheet(dataForExport);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Danh Sách Khách Mời");
-            worksheet['!cols'] = [ { wch: 5 }, { wch: 25 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 10 }, { wch: 15 }, { wch: 15 }];
+            worksheet['!cols'] = [{ wch: 5 }, { wch: 25 }, { wch: 15 }, { wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 10 }, { wch: 15 }, { wch: 15 }];
             const fileName = `danh-sach-khach-moi-${invitation.slug || 'thiep-moi'}.xlsx`;
             XLSX.writeFile(workbook, fileName);
             showSuccessToast("Đã xuất file Excel thành công!");
@@ -1248,7 +1248,7 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
                             </button>
                         )}
                         <button onClick={() => setManageGroupsModalOpen(true)} className="guest-action-btn"> <GroupIcon /> <span>Quản lý nhóm</span> </button>
-                        
+
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                             <button onClick={() => setImportHelpModalOpen(true)} className="guest-action-btn">
                                 <ImportIcon /> <span>Nhập từ Excel</span>
@@ -1275,7 +1275,7 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
                     <input className="filter-input" placeholder="Tìm kiếm theo tên hoặc email..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
                     <select className="filter-select" value={filterGroup} onChange={e => setFilterGroup(e.target.value)}>
                         <option value="all">Tất cả nhóm</option>
-                        {invitation?.guestGroups?.map(group => ( <option key={group._id} value={group._id}>{group.name}</option> ))}
+                        {invitation?.guestGroups?.map(group => (<option key={group._id} value={group._id}>{group.name}</option>))}
                     </select>
                     <select className="filter-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
                         <option value="all">Tất cả trạng thái</option>
@@ -1292,48 +1292,48 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
                 </div>
 
                 <div style={{ boxShadow: "0px 0px 8px 0px rgba(0,0,0,0.3)", width: '100%', display: isMobileOrTablet ? 'grid' : 'flex', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1px', backgroundColor: '#E0E0E0', flexDirection: 'row', justifyContent: "center", alignItems: "center", overflow: 'hidden' }}>
-                    <StatItem label="Tổng số khách mời" value={stats.total} /> { !isMobileOrTablet && <VerticalSeparator /> }
-                    <StatItem label="Tham gia" value={stats.attending} /> { !isMobileOrTablet && <VerticalSeparator /> }
-                    <StatItem label="Không tham gia" value={stats.declined} /> { !isMobileOrTablet && <VerticalSeparator /> }
-                    <StatItem label="Không xác nhận" value={stats.pending} /> { !isMobileOrTablet && <VerticalSeparator /> }
+                    <StatItem label="Tổng số khách mời" value={stats.total} /> {!isMobileOrTablet && <VerticalSeparator />}
+                    <StatItem label="Tham gia" value={stats.attending} /> {!isMobileOrTablet && <VerticalSeparator />}
+                    <StatItem label="Không tham gia" value={stats.declined} /> {!isMobileOrTablet && <VerticalSeparator />}
+                    <StatItem label="Không xác nhận" value={stats.pending} /> {!isMobileOrTablet && <VerticalSeparator />}
                     <StatItem label="Tiền mừng" value={formatCurrency(stats.totalGiftAmount)} />
                 </div>
 
                 {isMobileOrTablet ? (
-                <div className="guest-cards-container">
-                    {filteredGuests.map((guest, index) => (
-                        <GuestCard 
-                            key={guest._id} 
-                            guest={guest} 
-                            onEdit={openEditModal}
-                            onDelete={handleDeleteRequest}
-                            onSendEmail={handleSendEmail}
-                            isSelected={selectedGuestIds.has(guest._id)}
-                            onSelect={() => handleToggleSelect(guest._id)}
-                            index={index} 
-                            groupName={groupMap.get(guest.group) || 'Chưa chọn nhóm'} 
-                        />
-                    ))}
-                </div>
+                    <div className="guest-cards-container">
+                        {filteredGuests.map((guest, index) => (
+                            <GuestCard
+                                key={guest._id}
+                                guest={guest}
+                                onEdit={openEditModal}
+                                onDelete={handleDeleteRequest}
+                                onSendEmail={handleSendEmail}
+                                isSelected={selectedGuestIds.has(guest._id)}
+                                onSelect={() => handleToggleSelect(guest._id)}
+                                index={index}
+                                groupName={groupMap.get(guest.group) || 'Chưa chọn nhóm'}
+                            />
+                        ))}
+                    </div>
                 ) : (
                     <div style={{ display: "flex", flexDirection: "column", width: "100%" }}>
                         <div style={{ display: "flex", width: '100%' }}>
-                            <div className="table-header-cell" style={{width: "60px", overflow: "hidden" }}>#</div>
-                            <div className="table-header-cell" style={{width: "83px", overflow: "hidden"}}>Gửi thiệp</div>
-                            <div className="table-header-cell" style={{flex: 2, justifyContent: 'start', paddingLeft: '20px'}}>Tên khách mời</div>
-                            <div className="table-header-cell" style={{flex: 2.5, justifyContent: 'start', paddingLeft: '20px'}}>Email</div>
-                            <div className="table-header-cell" style={{flex: 1.5, overflow: "hidden", justifyContent: 'start', paddingLeft: '20px'}}>Điện thoại</div>
-                            <div className="table-header-cell" style={{flex: 2, overflow: "hidden"}}>Nhóm khách mời</div>
-                            <div className="table-header-cell" style={{flex: 1, overflow: "hidden", justifyContent: 'start', paddingLeft: '20px'}}>Tham gia</div>
-                            <div className="table-header-cell" style={{flex: 1, overflow: "hidden", justifyContent: 'start', paddingLeft: '20px'}}>Đi cùng</div>
-                            <div className="table-header-cell" style={{flex: 1.5, overflow: "hidden", justifyContent: 'start', paddingLeft: '20px'}}>Mừng cưới</div>
-                            <div className="table-header-cell" style={{flex: 2, overflow: "hidden"}}>Tác vụ</div>
-                            <div className="table-header-cell" style={{flex: '0 0 40px'}}>
-                                <input 
+                            <div className="table-header-cell" style={{ width: "60px", overflow: "hidden" }}>#</div>
+                            <div className="table-header-cell" style={{ width: "83px", overflow: "hidden" }}>Gửi thiệp</div>
+                            <div className="table-header-cell" style={{ flex: 2, justifyContent: 'start', paddingLeft: '20px' }}>Tên khách mời</div>
+                            <div className="table-header-cell" style={{ flex: 2.5, justifyContent: 'start', paddingLeft: '20px' }}>Email</div>
+                            <div className="table-header-cell" style={{ flex: 1.5, overflow: "hidden", justifyContent: 'start', paddingLeft: '20px' }}>Điện thoại</div>
+                            <div className="table-header-cell" style={{ flex: 2, overflow: "hidden" }}>Nhóm khách mời</div>
+                            <div className="table-header-cell" style={{ flex: 1, overflow: "hidden", justifyContent: 'start', paddingLeft: '20px' }}>Tham gia</div>
+                            <div className="table-header-cell" style={{ flex: 1, overflow: "hidden", justifyContent: 'start', paddingLeft: '20px' }}>Đi cùng</div>
+                            <div className="table-header-cell" style={{ flex: 1.5, overflow: "hidden", justifyContent: 'start', paddingLeft: '20px' }}>Mừng cưới</div>
+                            <div className="table-header-cell" style={{ flex: 2, overflow: "hidden" }}>Tác vụ</div>
+                            <div className="table-header-cell" style={{ flex: '0 0 40px' }}>
+                                <input
                                     ref={selectAllCheckboxRef}
                                     type="checkbox"
                                     onChange={handleToggleSelectAll}
-                                    style={{width: '16px', height: '16px', cursor: 'pointer'}}
+                                    style={{ width: '16px', height: '16px', cursor: 'pointer' }}
                                 />
                             </div>
                         </div>
@@ -1343,59 +1343,59 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
                                 display: "flex",
                                 width: '100%',
                                 backgroundColor: index % 2 === 0 ? 'rgba(239,239,239,1)' : 'white',
-                                position: 'relative', 
-                                zIndex: isMenuOpen ? 20 : 'auto' 
+                                position: 'relative',
+                                zIndex: isMenuOpen ? 20 : 'auto'
                             };
 
                             return (
-                            <div key={guest._id} style={rowStyle}>
-                                <div className="table-body-cell" style={{width: "60px"}}>{index + 1}</div>
-                                <div className="table-body-cell action-cell" style={{width: "83px", cursor: "pointer"}}>
-                                    <div onClick={(e) => handleToggleGuestMenu(guest._id, e)}>
-                                        <FiMail className="send-icon-glow" />
+                                <div key={guest._id} style={rowStyle}>
+                                    <div className="table-body-cell" style={{ width: "60px" }}>{index + 1}</div>
+                                    <div className="table-body-cell action-cell" style={{ width: "83px", cursor: "pointer" }}>
+                                        <div onClick={(e) => handleToggleGuestMenu(guest._id, e)}>
+                                            <FiMail className="send-icon-glow" />
+                                        </div>
+                                        {openGuestMenu === guest._id && (
+                                            <GuestActionDropdown
+                                                guest={guest}
+                                                invitationId={invitationId}
+                                                onSendEmail={handleSendEmail}
+                                                onClose={() => setOpenGuestMenu(null)}
+                                            />
+                                        )}
                                     </div>
-                                    {openGuestMenu === guest._id && (
-                                        <GuestActionDropdown
-                                            guest={guest}
-                                            invitationId={invitationId}
-                                            onSendEmail={handleSendEmail}
-                                            onClose={() => setOpenGuestMenu(null)}
+                                    <div className="table-body-cell" style={{ flex: 2, alignItems: 'flex-start', paddingLeft: '20px' }}>
+                                        <div title={guest.name} style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "20px", color: "rgba(39,84,138,1)", fontWeight: "700" }}>
+                                            {guest.name}
+                                        </div>
+                                    </div>
+                                    <div className="table-body-cell" style={{ flex: 2.5, alignItems: 'flex-start', paddingLeft: '20px', overflow: 'hidden' }}>
+                                        <div title={guest.email || 'Chưa có email'} style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "16px" }}>
+                                            {guest.email || 'N/A'}
+                                        </div>
+                                        <div style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "14px", color: "rgba(102,102,102,1)" }}>
+                                            {guest.email ? getEmailStatusDisplayText(guest.emailStatus) : 'Không có Email'}
+                                        </div>
+                                    </div>
+                                    <div className="table-body-cell" style={{ flex: 1.5, overflow: "hidden", alignItems: 'flex-start', paddingLeft: '20px' }}>{guest.phone || 'N/A'}</div>
+                                    <div className="table-body-cell" style={{ flex: 2, overflow: "hidden" }}> <div className="group-tag">{groupMap.get(guest.group) || 'Chưa chọn nhóm'}</div> </div>
+                                    <div className="table-body-cell" style={{ flex: 1, overflow: "hidden", alignItems: 'flex-start', paddingLeft: '20px' }}>{guest.status === 'attending' ? 'Có' : (guest.status === 'declined' ? 'Không' : 'Chờ')}</div>
+                                    <div className="table-body-cell" style={{ flex: 1, overflow: "hidden", alignItems: 'flex-start', paddingLeft: '20px' }}>{guest.attendingCount || 0}</div>
+                                    <div className="table-body-cell" style={{ flex: 1.5, overflow: "hidden", alignItems: 'flex-start', paddingLeft: '20px' }}>{formatCurrency(guest.giftAmount)}</div>
+                                    <div className="table-body-cell" style={{ flex: 2, overflow: "hidden", flexDirection: 'row', gap: '16px' }}>
+                                        <button className="table-action-btn" onClick={() => openEditModal(guest)}> <EditIcon /> </button>
+                                        <button className="table-action-btn" onClick={() => handleDeleteRequest(guest._id)}> <DeleteIcon /> </button>
+                                    </div>
+                                    <div className="table-body-cell" style={{ flex: '0 0 40px' }}>
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedGuestIds.has(guest._id)}
+                                            onChange={() => handleToggleSelect(guest._id)}
+                                            onClick={(e) => e.stopPropagation()}
+                                            style={{ width: '16px', height: '16px', cursor: 'pointer' }}
                                         />
-                                    )}
-                                </div>                             
-                                <div className="table-body-cell" style={{flex: 2, alignItems: 'flex-start', paddingLeft: '20px'}}>
-                                    <div title={guest.name} style={{fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "20px", color: "rgba(39,84,138,1)", fontWeight: "700" }}>
-                                        {guest.name}
                                     </div>
                                 </div>
-                                <div className="table-body-cell" style={{flex: 2.5, alignItems: 'flex-start', paddingLeft: '20px', overflow: 'hidden'}}>
-                                    <div title={guest.email || 'Chưa có email'} style={{fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "16px"}}>
-                                        {guest.email || 'N/A'}
-                                    </div>
-                                    <div style={{fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "14px", color: "rgba(102,102,102,1)"}}>
-                                        {guest.email ? getEmailStatusDisplayText(guest.emailStatus) : 'Không có Email'}
-                                    </div>
-                                </div>
-                                <div className="table-body-cell" style={{flex: 1.5, overflow: "hidden", alignItems: 'flex-start', paddingLeft: '20px'}}>{guest.phone || 'N/A'}</div>
-                                <div className="table-body-cell" style={{flex: 2, overflow: "hidden"}}> <div className="group-tag">{groupMap.get(guest.group) || 'Chưa chọn nhóm'}</div> </div>
-                                <div className="table-body-cell" style={{flex: 1, overflow: "hidden", alignItems: 'flex-start', paddingLeft: '20px'}}>{guest.status === 'attending' ? 'Có' : (guest.status === 'declined' ? 'Không' : 'Chờ')}</div>
-                                <div className="table-body-cell" style={{flex: 1, overflow: "hidden", alignItems: 'flex-start', paddingLeft: '20px'}}>{guest.attendingCount || 0}</div>
-                                <div className="table-body-cell" style={{flex: 1.5, overflow: "hidden", alignItems: 'flex-start', paddingLeft: '20px'}}>{formatCurrency(guest.giftAmount)}</div>
-                                <div className="table-body-cell" style={{flex: 2, overflow: "hidden", flexDirection: 'row', gap: '16px'}}>
-                                    <button className="table-action-btn" onClick={() => openEditModal(guest)}> <EditIcon /> </button>
-                                    <button className="table-action-btn" onClick={() => handleDeleteRequest(guest._id)}> <DeleteIcon /> </button>
-                                </div>
-                                <div className="table-body-cell" style={{flex: '0 0 40px'}}>
-                                    <input 
-                                        type="checkbox"
-                                        checked={selectedGuestIds.has(guest._id)}
-                                        onChange={() => handleToggleSelect(guest._id)}
-                                        onClick={(e) => e.stopPropagation()}
-                                        style={{width: '16px', height: '16px', cursor: 'pointer'}}
-                                    />
-                                </div>
-                            </div>
-                        );
+                            );
                         })}
                     </div>
                 )}
@@ -1406,7 +1406,7 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
                         onDelete={handleBulkDelete}
                         onSendEmail={handleBulkSendEmail}
                         onAddToGroup={handleBulkAddToGroup}
-                        onRemoveFromGroup={() => confirmBulkUpdateGroup(null)} 
+                        onRemoveFromGroup={() => confirmBulkUpdateGroup(null)}
                         onDeselectAll={() => setSelectedGuestIds(new Set())}
                     />
                 )}
@@ -1454,16 +1454,16 @@ const GuestManagementPanel = ({ invitationId, guests = [], onDataChange, invitat
                 <Modal onClose={() => setManageGroupsModalOpen(false)} size="large">
                     <ManageGroupsModalContent
                         invitationId={invitationId}
-                        onDataChange={onDataChange} 
+                        onDataChange={onDataChange}
                         onClose={() => setManageGroupsModalOpen(false)}
                     />
                 </Modal>
             )}
             {guestToDelete && (
-                <DeleteConfirmationModal onClose={() => setGuestToDelete(null)} onConfirm={confirmDeleteGuest} message="Bạn có chắc muốn xóa khách mời này?"/>
+                <DeleteConfirmationModal onClose={() => setGuestToDelete(null)} onConfirm={confirmDeleteGuest} message="Bạn có chắc muốn xóa khách mời này?" />
             )}
             {isImportHelpModalOpen && (
-                 <ImportHelpModal onClose={() => handleUploadFile()} />
+                <ImportHelpModal onClose={() => handleUploadFile()} />
             )}
 
             {/* 3. THÊM MODAL RENDER MASTER GUEST VÀO ĐÂY */}
@@ -1507,10 +1507,10 @@ const WishManagementPanel = ({ invitationId }) => {
 
     const handleToggleStatus = (wish) => {
         const newStatus = wish.status === 'approved' ? 'hidden' : 'approved';
-        
+
         // SỬA Ở ĐÂY: Gọi trực tiếp vào ID của lời chúc thay vì lồng qua invitationId
         const promise = api.put(`/wishes/${wish._id}`, { status: newStatus });
-        
+
         handlePromiseToast(promise, {
             pending: 'Đang cập nhật trạng thái...',
             success: 'Cập nhật thành công!',
@@ -1522,10 +1522,10 @@ const WishManagementPanel = ({ invitationId }) => {
 
     const handleDeleteWish = (wishId) => {
         if (!window.confirm("Bạn có chắc chắn muốn xóa lời chúc này?")) return;
-        
+
         // SỬA Ở ĐÂY: Gọi trực tiếp vào ID của lời chúc thay vì lồng qua invitationId
         const promise = api.delete(`/wishes/${wishId}`);
-        
+
         handlePromiseToast(promise, {
             pending: 'Đang xóa lời chúc...',
             success: 'Đã xóa thành công!',
@@ -1537,7 +1537,7 @@ const WishManagementPanel = ({ invitationId }) => {
 
     const handleSaveReply = (wish) => {
         const promise = api.put(`/wishes/${wish._id}`, { reply: replyText });
-        
+
         handlePromiseToast(promise, {
             pending: 'Đang gửi hồi đáp...',
             success: 'Đã gửi hồi đáp thành công!',
@@ -1558,32 +1558,54 @@ const WishManagementPanel = ({ invitationId }) => {
                 <div style={{ fontFamily: "'SVN-Gilroy', sans-serif", fontSize: "20px", color: "rgba(39,84,138,1)", textTransform: "uppercase", fontWeight: "700" }}>Quản lý lời chúc ({wishes.length})</div>
             </div>
 
+            <button
+                className="guest-action-btn" // Tái sử dụng class có sẵn trong CSS của bạn để đồng bộ UI
+                onClick={() => window.open('https://icards.com.vn/invitations/category/thiep-cam-on', '_blank')}
+                style={{
+                    backgroundColor: "#27548A", // Màu xanh brand chủ đạo của bạn
+                    color: "white",
+                    borderColor: "#27548A",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    height: "40px",
+                    textTransform: "uppercase",
+                    fontWeight: 600
+                }}
+            >
+                {/* Icon trái tim để thêm phần cảm xúc cho nút "Cảm ơn" */}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                Tạo thiệp cảm ơn
+            </button>
+
             <div style={{ display: "flex", flexDirection: "column", width: "100%", boxShadow: "0px 0px 8px 0px rgba(0,0,0,0.1)" }}>
                 <div style={{ display: "flex", width: '100%', backgroundColor: '#f5f5f5', fontWeight: 'bold' }}>
-                    <div className="table-header-cell" style={{width: "60px"}}>#</div>
-                    <div className="table-header-cell" style={{flex: 1.5, paddingLeft: '20px', justifyContent: 'flex-start'}}>Người gửi</div>
-                    <div className="table-header-cell" style={{flex: 3, paddingLeft: '20px', justifyContent: 'flex-start'}}>Nội dung lời chúc</div>
-                    <div className="table-header-cell" style={{flex: 1, justifyContent: 'center'}}>Trạng thái</div>
-                    <div className="table-header-cell" style={{flex: 1, justifyContent: 'center'}}>Hành động</div>
+                    <div className="table-header-cell" style={{ width: "60px" }}>#</div>
+                    <div className="table-header-cell" style={{ flex: 1.5, paddingLeft: '20px', justifyContent: 'flex-start' }}>Người gửi</div>
+                    <div className="table-header-cell" style={{ flex: 3, paddingLeft: '20px', justifyContent: 'flex-start' }}>Nội dung lời chúc</div>
+                    <div className="table-header-cell" style={{ flex: 1, justifyContent: 'center' }}>Trạng thái</div>
+                    <div className="table-header-cell" style={{ flex: 1, justifyContent: 'center' }}>Hành động</div>
                 </div>
-                
+
                 {wishes.length === 0 ? (
                     <div style={{ padding: '30px', textAlign: 'center', color: '#666' }}>Chưa có lời chúc nào.</div>
                 ) : (
                     wishes.map((wish, index) => (
                         <div key={wish._id} style={{ display: "flex", width: '100%', backgroundColor: index % 2 === 0 ? 'white' : 'rgba(239,239,239,1)', borderBottom: '1px solid #eee', alignItems: 'center' }}>
-                            <div className="table-body-cell" style={{width: "60px"}}>{index + 1}</div>
-                            <div className="table-body-cell" style={{flex: 1.5, alignItems: 'flex-start', paddingLeft: '20px', flexDirection: 'column'}}>
+                            <div className="table-body-cell" style={{ width: "60px" }}>{index + 1}</div>
+                            <div className="table-body-cell" style={{ flex: 1.5, alignItems: 'flex-start', paddingLeft: '20px', flexDirection: 'column' }}>
                                 <div style={{ fontWeight: 'bold', color: 'rgba(39,84,138,1)' }}>{wish.senderName}</div>
                                 <div style={{ fontSize: '12px', color: '#666' }}>{new Date(wish.createdAt).toLocaleDateString('vi-VN')}</div>
                             </div>
-                            <div className="table-body-cell" style={{flex: 3, alignItems: 'flex-start', paddingLeft: '20px', paddingRight: '20px', whiteSpace: 'normal', lineHeight: '1.5'}}>
+                            <div className="table-body-cell" style={{ flex: 3, alignItems: 'flex-start', paddingLeft: '20px', paddingRight: '20px', whiteSpace: 'normal', lineHeight: '1.5' }}>
                                 <div style={{ fontStyle: 'italic' }}>"{wish.content}"</div>
-                                
+
                                 {/* Logic hiển thị Form hoặc Kết quả Hồi đáp */}
                                 {replyingWishId === wish._id ? (
                                     <div style={{ width: '100%', marginTop: '12px' }}>
-                                        <textarea 
+                                        <textarea
                                             value={replyText}
                                             onChange={(e) => setReplyText(e.target.value)}
                                             style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ccc', minHeight: '60px', fontFamily: 'inherit', boxSizing: 'border-box' }}
@@ -1603,17 +1625,17 @@ const WishManagementPanel = ({ invitationId }) => {
                                     )
                                 )}
                             </div>
-                            <div className="table-body-cell" style={{flex: 1, justifyContent: 'center'}}>
+                            <div className="table-body-cell" style={{ flex: 1, justifyContent: 'center' }}>
                                 <span style={{ padding: '4px 12px', borderRadius: '20px', fontSize: '12px', backgroundColor: wish.status === 'approved' ? '#d1fae5' : '#fee2e2', color: wish.status === 'approved' ? '#065f46' : '#991b1b' }}>
                                     {wish.status === 'approved' ? 'Đang hiển thị' : 'Đang ẩn'}
                                 </span>
                             </div>
-                            <div className="table-body-cell" style={{flex: 1, justifyContent: 'center', gap: '10px', flexDirection: 'row'}}>
+                            <div className="table-body-cell" style={{ flex: 1, justifyContent: 'center', gap: '10px', flexDirection: 'row' }}>
                                 {/* --- NÚT BẬT FORM HỒI ĐÁP --- */}
                                 <button className="table-action-btn" onClick={() => { setReplyingWishId(wish._id); setReplyText(wish.reply || ''); }} title="Hồi đáp">
                                     <EditIcon width="18" height="18" />
                                 </button>
-                                
+
                                 <button className="table-action-btn" onClick={() => handleToggleStatus(wish)} title="Ẩn/Hiện">
                                     {wish.status === 'approved' ? <CancelIcon /> : <CheckIcon />}
                                 </button>
@@ -1631,58 +1653,94 @@ const WishManagementPanel = ({ invitationId }) => {
 
 const EventManagementPanel = ({ invitation, onDataChange }) => {
     const [reminders, setReminders] = useState([]);
+    const [eventDate, setEventDate] = useState(''); // Thêm state cho ngày sự kiện
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         if (invitation && invitation.settings) {
             setReminders(invitation.settings.emailReminders || []);
+
+            // Xử lý hiển thị ngày giờ (format YYYY-MM-DDTHH:mm cho thẻ input type="datetime-local")
+            if (invitation.settings.eventDate) {
+                const dateObj = new Date(invitation.settings.eventDate);
+                const tzoffset = dateObj.getTimezoneOffset() * 60000;
+                const localISOTime = (new Date(dateObj - tzoffset)).toISOString().slice(0, 16);
+                setEventDate(localISOTime);
+            }
         }
     }, [invitation]);
 
     const handleReminderUpdate = (newReminders) => {
-         setReminders(newReminders);
+        setReminders(newReminders);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!eventDate) {
+            showErrorToast("Vui lòng thiết lập Thời gian diễn ra sự kiện!");
+            return;
+        }
+
         setIsSaving(true);
-        
+
         if (!invitation?._id) {
             showErrorToast("Không tìm thấy ID của thiệp mời để lưu cài đặt.");
             setIsSaving(false);
             return;
         }
-        
-        // Cập nhật chỉ phần reminders, giữ nguyên các settings khác
+
+        // Cập nhật cả eventDate và emailReminders
         const payload = {
             settingsData: {
                 ...invitation.settings,
+                eventDate: new Date(eventDate), // Gửi chuẩn ISO Date xuống BE
                 emailReminders: reminders
-            } 
+            }
         };
 
         const promise = api.put(`/invitations/${invitation._id}/settings`, payload);
 
         handlePromiseToast(promise, {
             pending: 'Đang lưu cài đặt sự kiện...',
-            success: 'Đã lưu thiết lập email nhắc nhở thành công!',
+            success: 'Đã lưu thiết lập sự kiện thành công!',
             error: 'Lưu cài đặt thất bại!'
         }).then((response) => onDataChange(response.data.data, 'update-settings'))
-          .catch(err => {
-              console.error("Lỗi khi lưu cài đặt:", err.response?.data || err.message);
-          })
-          .finally(() => setIsSaving(false));
+            .catch(err => {
+                console.error("Lỗi khi lưu cài đặt:", err.response?.data || err.message);
+            })
+            .finally(() => setIsSaving(false));
     };
 
     return (
         <form onSubmit={handleSubmit} className="settings-panel-wrapper">
             <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
+
+                {/* Khu vực thiết lập thời gian sự kiện chính */}
+                <div>
+                    <h3 className="settings-section-title">Thông tin Sự kiện chính</h3>
+                    <SettingsField
+                        label="Thời gian diễn ra sự kiện"
+                        required
+                        description="Hệ thống Cronjob sẽ sử dụng mốc thời gian này để tự động đếm ngược và gửi email nhắc nhở cho khách mời."
+                    >
+                        <input
+                            type="datetime-local"
+                            value={eventDate}
+                            onChange={(e) => setEventDate(e.target.value)}
+                            className="settings-input"
+                            style={{ borderColor: "rgb(128,128,128)", borderWidth: "0.5px", borderStyle: "solid", height: '40px', padding: '0 15px', width: '100%', boxSizing: 'border-box' }}
+                        />
+                    </SettingsField>
+                </div>
+
+                {/* Khu vực thiết lập nhắc nhở */}
                 <div>
                     <h3 className="settings-section-title">Thiết lập Email Nhắc nhở sự kiện</h3>
-                    <ReminderSettings 
-                        reminders={reminders} 
-                        onUpdate={handleReminderUpdate} 
-                        eventDate={invitation?.settings?.eventDate}
+                    <ReminderSettings
+                        reminders={reminders}
+                        onUpdate={handleReminderUpdate}
+                        eventDate={eventDate} // Truyền local state xuống để tính toán Real-time
                     />
                 </div>
             </div>
@@ -1734,15 +1792,15 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSaving(true);
-        
+
         if (!invitation?._id) return;
-        
+
         // Merge lại với emailReminders cũ để không bị ghi đè mất khi lưu ở tab này
         const payload = {
             settingsData: {
                 ...settings,
                 emailReminders: invitation?.settings?.emailReminders || []
-            } 
+            }
         };
 
         const promise = api.put(`/invitations/${invitation._id}/settings`, payload);
@@ -1752,7 +1810,7 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
             success: 'Đã lưu tất cả thay đổi thành công!',
             error: 'Lưu cài đặt thất bại!'
         }).then((response) => onDataChange(response.data.data, 'update-settings'))
-          .finally(() => setIsSaving(false));
+            .finally(() => setIsSaving(false));
     };
 
     const emailDescription = useMemo(() => {
@@ -1766,17 +1824,17 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
     return (
         <form onSubmit={handleSubmit} className="settings-panel-wrapper">
             <div className="settings-notice-box">
-                <span style={{ fontWeight: "700" }}>Lưu ý:</span> Hệ thống sẽ tự động thay đổi cụm từ <code style={{fontWeight: 700}}>&#123;TênKháchMời&#125;</code> và <code style={{fontWeight: 700}}>&#123;LờiXưngHô&#125;</code>.
+                <span style={{ fontWeight: "700" }}>Lưu ý:</span> Hệ thống sẽ tự động thay đổi cụm từ <code style={{ fontWeight: 700 }}>&#123;TênKháchMời&#125;</code> và <code style={{ fontWeight: 700 }}>&#123;LờiXưngHô&#125;</code>.
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "40px" }}>
                 <div>
                     <h3 className="settings-section-title">Cài đặt Email & Lời chào</h3>
                     {/* Đã xóa <ReminderSettings /> ở đây */}
                     <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
-                        <SettingsField 
-                            label="Tiêu đề & Nội dung thiệp (Dùng cho Email)" 
-                            required 
-                            description={emailDescription} 
+                        <SettingsField
+                            label="Tiêu đề & Nội dung thiệp (Dùng cho Email)"
+                            required
+                            description={emailDescription}
                         >
                             <div className="email-compose-container">
                                 <div className="email-compose-header">
@@ -1788,20 +1846,20 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
                                     </div>
                                     <div className="email-compose-field">
                                         <span>Chủ đề:</span>
-                                        <input 
-                                            name="title" 
-                                            value={settings.title} 
-                                            onChange={handleChange} 
+                                        <input
+                                            name="title"
+                                            value={settings.title}
+                                            onChange={handleChange}
                                             className="email-compose-subject"
                                             placeholder="Tiêu đề thiệp của bạn (cũng là chủ đề email)"
                                         />
                                     </div>
                                 </div>
                                 <div className="email-compose-body">
-                                    <textarea 
-                                        name="description" 
-                                        value={settings.description} 
-                                        onChange={handleChange} 
+                                    <textarea
+                                        name="description"
+                                        value={settings.description}
+                                        onChange={handleChange}
                                         className="email-compose-textarea"
                                         placeholder="Mô tả thiệp của bạn (cũng là nội dung email)..."
                                     />
@@ -1809,18 +1867,18 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
                             </div>
                         </SettingsField>
                         <SettingsField
-                            label="Kiểu hiển thị Lời Xưng Hô" 
-                            required 
+                            label="Kiểu hiển thị Lời Xưng Hô"
+                            required
                             description="Kiểu hiển thị bạn chọn ở đây sẽ sử dụng cho biến: <code>&#123;LờiXưngHô&#125;</code>"
                         >
                             <select name="salutationStyle" value={settings.salutationStyle} onChange={handleChange} className="settings-select">
-                                <option>Thân gửi</option> 
-                                <option>Kính mời</option> 
+                                <option>Thân gửi</option>
+                                <option>Kính mời</option>
                                 <option>Trân trọng kính mời</option>
                             </select>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px' }}>
-                                <input 
-                                    type="checkbox" 
+                                <input
+                                    type="checkbox"
                                     id="useGlobalSalutation"
                                     name="useGlobalSalutation"
                                     checked={settings.useGlobalSalutation}
@@ -1838,19 +1896,19 @@ const InvitationSettingsPanel = ({ invitation, onDataChange }) => {
                     <h3 className="settings-section-title">Cài đặt Khu vực Lời chúc</h3>
                     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                         <SettingsField label="Tiêu đề khu vực lời chúc" required>
-                            <input 
-                                name="wishesTitle" 
-                                value={settings.wishesTitle} 
-                                onChange={handleChange} 
+                            <input
+                                name="wishesTitle"
+                                value={settings.wishesTitle}
+                                onChange={handleChange}
                                 className="settings-input"
                                 style={{ borderColor: "rgb(128,128,128)", borderWidth: "0.5px", borderStyle: "solid", width: "100%", height: "40px", padding: "0 20px" }}
                             />
                         </SettingsField>
                         <SettingsField label="Mô tả phụ (Subtitle)">
-                            <textarea 
-                                name="wishesSubtitle" 
-                                value={settings.wishesSubtitle} 
-                                onChange={handleChange} 
+                            <textarea
+                                name="wishesSubtitle"
+                                value={settings.wishesSubtitle}
+                                onChange={handleChange}
                                 className="settings-input"
                                 style={{ borderColor: "rgb(128,128,128)", borderWidth: "0.5px", borderStyle: "solid", width: "100%", height: "80px", padding: "10px 20px", fontFamily: "inherit" }}
                             />
@@ -1876,14 +1934,24 @@ const ReminderSettings = ({ reminders, onUpdate, eventDate }) => {
             return;
         }
 
+        // Kiểm tra xem đã có nhắc nhở trùng ngày chưa để tránh spam DB/Cron
+        const isExist = reminders.some(r => r.daysBefore === days);
+        if (isExist) {
+            showErrorToast(`Đã tồn tại lịch nhắc nhở trước ${days} ngày.`);
+            return;
+        }
+
         const newReminder = {
-            id: new Date().getTime().toString(), 
+            id: new Date().getTime().toString(),
             daysBefore: days,
             template: 'default',
             isEnabled: true
         };
 
-        onUpdate([...reminders, newReminder]);
+        // Sort lại theo thứ tự số ngày giảm dần (nhắc xa -> nhắc gần) để UI đẹp hơn
+        const updatedReminders = [...reminders, newReminder].sort((a, b) => b.daysBefore - a.daysBefore);
+
+        onUpdate(updatedReminders);
         setNewDays('');
     };
 
@@ -1896,73 +1964,88 @@ const ReminderSettings = ({ reminders, onUpdate, eventDate }) => {
     };
 
     const getSendDateDisplay = (daysBefore) => {
-        if (!eventDate) return "Vui lòng cài đặt Ngày sự kiện trước.";
+        if (!eventDate) return "Vui lòng chọn Ngày sự kiện ở trên.";
         const date = new Date(eventDate);
         date.setDate(date.getDate() - daysBefore);
-        return date.toLocaleDateString('vi-VN');
+
+        // Cảnh báo nếu ngày gửi là ngày trong quá khứ
+        const isPast = date < new Date();
+        const formattedDate = date.toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        if (isPast) {
+            return <span style={{ color: '#EF4444' }}>{formattedDate} (Đã qua)</span>;
+        }
+        return <span style={{ color: '#27548a' }}>{formattedDate}</span>;
     };
 
     return (
-        <div style={{ border: '1px solid #ccc', padding: '15px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '15px', backgroundColor: '#f9f9f9' }}>
-            <h4 style={{ margin: 0, color: '#27548a' }}>Thiết lập Email Nhắc nhở</h4>
+        <div style={{ border: '1px solid #e0e0e0', padding: '20px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '20px', backgroundColor: '#fdfdfd' }}>
+
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <input 
-                    type="number" 
+                <input
+                    type="number"
                     value={newDays}
                     onChange={(e) => setNewDays(e.target.value)}
-                    placeholder="Số ngày trước sự kiện"
+                    placeholder="Nhập số ngày trước sự kiện (VD: 3, 7)"
                     min="1"
                     className="settings-input"
-                    style={{ flex: 1, height: '40px' }}
+                    style={{ flex: 1, height: '40px', padding: '0 15px', border: '1px solid #ccc' }}
                 />
-                <button 
-                    onClick={handleAddReminder} 
+                <button
+                    type="button" // Ngăn form submit
+                    onClick={handleAddReminder}
                     className="guest-action-btn"
-                    style={{ flex: '0 0 120px', backgroundColor: '#27548a', color: 'white', borderColor: '#27548a', height: '40px' }}
+                    style={{ flex: '0 0 120px', backgroundColor: '#27548a', color: 'white', borderColor: '#27548a', height: '40px', display: 'flex', justifyContent: 'center', gap: '5px' }}
                 >
-                    <AddIcon /> Thêm
+                    <AddIcon /> Thêm lịch
                 </button>
             </div>
-            
-            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {reminders.map(reminder => (
-                    <li key={reminder.id}>
+                    <li key={reminder.id} style={{ display: 'flex', alignItems: 'center', padding: '15px', backgroundColor: '#fff', border: '1px solid #eee', borderRadius: '6px', boxShadow: '0 2px 4px rgba(0,0,0,0.02)' }}>
                         <div style={{ flex: 1 }}>
-                            <strong style={{ color: reminder.isEnabled ? '#10B981' : '#EF4444' }}>
+                            <strong style={{ color: reminder.isEnabled ? '#10B981' : '#9CA3AF', fontSize: '15px' }}>
                                 Nhắc trước {reminder.daysBefore} ngày
                             </strong>
-                            <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '4px' }}>
-                                Dự kiến gửi vào: <b>{getSendDateDisplay(reminder.daysBefore)}</b>
+                            <div style={{ fontSize: '13px', color: '#6B7280', marginTop: '6px' }}>
+                                Dự kiến gửi: <b>{getSendDateDisplay(reminder.daysBefore)}</b>
                             </div>
                         </div>
-                        <div style={{ flex: 1 }}>
-                            <strong style={{ color: reminder.isEnabled ? '#10B981' : '#EF4444' }}>
-                                {reminder.daysBefore} ngày trước
-                            </strong>
-                            <span style={{ marginLeft: '10px', fontSize: '14px', color: '#6B7280' }}>
-                                ({reminder.isEnabled ? 'Đã bật' : 'Đã tắt'})
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                            <span style={{ fontSize: '13px', fontWeight: 600, color: reminder.isEnabled ? '#10B981' : '#9CA3AF' }}>
+                                {reminder.isEnabled ? 'Đang hoạt động' : 'Tạm dừng'}
                             </span>
-                        </div>
-                        <div style={{ display: 'flex', gap: '5px' }}>
-                            <button 
-                                type="button" 
-                                onClick={() => handleToggleEnable(reminder.id)}
-                                className="table-action-btn"
-                                style={{ color: reminder.isEnabled ? '#10B981' : '#F59E0B' }}
-                            >
-                                {reminder.isEnabled ? 'Tắt' : 'Bật'}
-                            </button>
-                            <button 
-                                type="button" 
-                                onClick={() => handleRemoveReminder(reminder.id)}
-                                className="table-action-btn"
-                            >
-                                <DeleteIcon width="16" height="16" />
-                            </button>
+
+                            <div style={{ display: 'flex', gap: '8px', borderLeft: '1px solid #eee', paddingLeft: '15px' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => handleToggleEnable(reminder.id)}
+                                    className="table-action-btn"
+                                    title={reminder.isEnabled ? "Tắt nhắc nhở" : "Bật nhắc nhở"}
+                                    style={{ color: reminder.isEnabled ? '#F59E0B' : '#10B981', padding: '5px 10px', width: 'auto' }}
+                                >
+                                    {reminder.isEnabled ? 'Tắt' : 'Bật'}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveReminder(reminder.id)}
+                                    className="table-action-btn"
+                                    title="Xóa nhắc nhở"
+                                    style={{ color: '#EF4444' }}
+                                >
+                                    <DeleteIcon width="18" height="18" />
+                                </button>
+                            </div>
                         </div>
                     </li>
                 ))}
-                {reminders.length === 0 && <p style={{textAlign: 'center', color: '#6B7280', fontSize: '14px'}}>Chưa có lịch nhắc nhở nào.</p>}
+                {reminders.length === 0 && (
+                    <div style={{ textAlign: 'center', color: '#6B7280', fontSize: '14px', padding: '20px', backgroundColor: '#f9f9f9', borderRadius: '6px', border: '1px dashed #ccc' }}>
+                        Chưa có lịch nhắc nhở nào được thiết lập. Khách mời sẽ không nhận được email tự động.
+                    </div>
+                )}
             </ul>
         </div>
     );
@@ -1990,12 +2073,12 @@ const InvitationPreviewCanvas = ({ page, baseWidth, baseHeight }) => {
         };
 
         const renderAll = async () => {
-            const { backgroundImage, backgroundColor, items } = page; 
+            const { backgroundImage, backgroundColor, items } = page;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.fillStyle = backgroundColor || '#FFFFFF'; 
+
+            ctx.fillStyle = backgroundColor || '#FFFFFF';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
+
             if (backgroundImage) {
                 const bgImg = new Image();
                 bgImg.crossOrigin = "anonymous";
@@ -2051,7 +2134,7 @@ const InvitationPreviewCanvas = ({ page, baseWidth, baseHeight }) => {
                             const radiusY = item.height / 2;
 
                             if (ctx.ellipse) {
-                                 ctx.ellipse(
+                                ctx.ellipse(
                                     0, // x center (đã translate)
                                     0, // y center (đã translate)
                                     radiusX, // radiusX
@@ -2062,7 +2145,7 @@ const InvitationPreviewCanvas = ({ page, baseWidth, baseHeight }) => {
                                 );
                             } else {
                                 // Fallback cho browser không hỗ trợ ellipse (sử dụng hình tròn nhỏ hơn)
-                                 ctx.arc(
+                                ctx.arc(
                                     0, // x center (đã translate)
                                     0, // y center (đã translate)
                                     Math.min(radiusX, radiusY), // bán kính
@@ -2085,7 +2168,7 @@ const InvitationPreviewCanvas = ({ page, baseWidth, baseHeight }) => {
                         // 3. Tính toán kích thước "object-fit: cover"
                         const frameRatio = item.width / item.height;
                         const imgRatio = itemImg.naturalWidth / itemImg.naturalHeight;
-                        
+
                         let drawWidth, drawHeight;
                         if (imgRatio > frameRatio) {
                             // Ảnh rộng hơn khung
@@ -2100,7 +2183,7 @@ const InvitationPreviewCanvas = ({ page, baseWidth, baseHeight }) => {
                         // 4. Lấy vị trí pan/scan (không cần nhân scale)
                         const posX = (item.imagePosition?.x || 0);
                         const posY = (item.imagePosition?.y || 0);
-                        
+
                         // 5. Tính toán vị trí vẽ (drawX, drawY)
                         // Căn giữa ảnh (đã "cover") sau đó áp dụng vị trí pan/scan
                         const drawX = (-item.width / 2) - (drawWidth - item.width) / 2 + posX;
@@ -2109,12 +2192,12 @@ const InvitationPreviewCanvas = ({ page, baseWidth, baseHeight }) => {
                         // 6. Vẽ ảnh đã được tính toán
                         ctx.drawImage(
                             itemImg,
-                            drawX, 
+                            drawX,
                             drawY,
                             drawWidth,
                             drawHeight
                         );
-                        
+
                         // --- KẾT THÚC SỬA LỖI ---
 
                     } catch (e) {
@@ -2124,8 +2207,8 @@ const InvitationPreviewCanvas = ({ page, baseWidth, baseHeight }) => {
                 ctx.restore();
             }
         };
-        handleResize(); 
-        renderAll();    
+        handleResize();
+        renderAll();
         window.addEventListener('resize', handleResize);
         return () => {
             window.removeEventListener('resize', handleResize);
@@ -2134,7 +2217,7 @@ const InvitationPreviewCanvas = ({ page, baseWidth, baseHeight }) => {
 
     return (
         <div ref={containerRef} style={{ width: '100%', height: 'auto', lineHeight: 0 }}>
-            <canvas ref={canvasRef} style={{ border: '1px solid #ddd', borderRadius: '4px', display: 'block' }}/>
+            <canvas ref={canvasRef} style={{ border: '1px solid #ddd', borderRadius: '4px', display: 'block' }} />
         </div>
     );
 };
@@ -2269,7 +2352,7 @@ const TaskManagementPanel = ({ invitationId }) => {
         if (!newCategoryTitle.trim()) return;
         const newCat = { id: Date.now().toString(), title: newCategoryTitle, isExpanded: true, subTasks: [] };
         const updatedTasks = [...tasks, newCat];
-        
+
         handleUpdateAndSave(updatedTasks); // <-- Gọi Global State
         setNewCategoryTitle('');
     };
@@ -2342,7 +2425,7 @@ const TaskManagementPanel = ({ invitationId }) => {
     const completedTasks = tasks.reduce((sum, cat) => sum + (cat.subTasks?.filter(st => st.completed)?.length || 0), 0);
     const progress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100);
 
-    if (isLoading && tasks.length === 0) return <div style={{padding: '40px', textAlign: 'center'}}>Đang tải kế hoạch...</div>;
+    if (isLoading && tasks.length === 0) return <div style={{ padding: '40px', textAlign: 'center' }}>Đang tải kế hoạch...</div>;
 
     // --- (PHẦN RENDER UI BÊN DƯỚI GIỮ NGUYÊN HOÀN TOÀN NHƯ CŨ, TỪ <div className="task-management-wrapper">...) ---
     return (
@@ -2371,17 +2454,17 @@ const TaskManagementPanel = ({ invitationId }) => {
                                 <div className="milestone-dot"></div>
                             </div>
                         ))}
-                        
+
                         {/* Thanh chạy tiến độ */}
                         <div className="creative-timeline-fill" style={{ width: `${progress}%` }}>
                             {/* Tia sáng lướt qua */}
                             <div className="timeline-light-sweep"></div>
-                            
+
                             {/* Icon Trái tim nhịp đập ở đầu thanh */}
                             {progress > 0 && (
                                 <div className="timeline-thumb-icon">
                                     <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                                     </svg>
                                 </div>
                             )}
@@ -2393,15 +2476,15 @@ const TaskManagementPanel = ({ invitationId }) => {
             {/* 2. Thêm nhóm công việc mới (Category) */}
             <form onSubmit={handleAddCategory} className="task-add-form">
                 <div className="task-input-wrapper">
-                    <input 
-                        type="text" 
-                        value={newCategoryTitle} 
-                        onChange={(e) => setNewCategoryTitle(e.target.value)} 
-                        placeholder="Thêm Nhóm công việc lớn (VD: Đặt tiệc, Chụp ảnh cưới...)" 
+                    <input
+                        type="text"
+                        value={newCategoryTitle}
+                        onChange={(e) => setNewCategoryTitle(e.target.value)}
+                        placeholder="Thêm Nhóm công việc lớn (VD: Đặt tiệc, Chụp ảnh cưới...)"
                         className="task-add-input"
                     />
                     <button type="submit" className="task-add-submit-btn" disabled={!newCategoryTitle.trim()}>
-                        <AddIcon /> <span style={{marginLeft: '6px'}}>Thêm Nhóm</span>
+                        <AddIcon /> <span style={{ marginLeft: '6px' }}>Thêm Nhóm</span>
                     </button>
                 </div>
             </form>
@@ -2410,7 +2493,7 @@ const TaskManagementPanel = ({ invitationId }) => {
             <DragDropContext onDragEnd={onDragEnd}>
                 <Droppable droppableId="all-categories" type="CATEGORY">
                     {(provided) => (
-                        <div 
+                        <div
                             className="task-categories-container"
                             {...provided.droppableProps}
                             ref={provided.innerRef}
@@ -2422,11 +2505,11 @@ const TaskManagementPanel = ({ invitationId }) => {
                             ) : (
                                 tasks.map((category, index) => {
                                     const isCatEditing = editingItem?.catId === category.id && !editingItem?.taskId;
-                                    
+
                                     return (
                                         <Draggable key={category.id} draggableId={category.id} index={index}>
                                             {(providedCat, snapshotCat) => (
-                                                <div 
+                                                <div
                                                     className={`task-category-card ${snapshotCat.isDragging ? 'is-dragging' : ''}`}
                                                     ref={providedCat.innerRef}
                                                     {...providedCat.draggableProps}
@@ -2438,13 +2521,13 @@ const TaskManagementPanel = ({ invitationId }) => {
                                                                 <DragHandleIcon />
                                                             </div>
                                                             <div className={`dropdown-icon ${category.isExpanded ? 'expanded' : ''}`} onClick={() => handleToggleExpand(category.id)}>
-                                                                <BackArrowIcon /> 
+                                                                <BackArrowIcon />
                                                             </div>
                                                             {isCatEditing ? (
-                                                                <input 
+                                                                <input
                                                                     autoFocus
                                                                     value={editingItem.title}
-                                                                    onChange={(e) => setEditingItem({...editingItem, title: e.target.value})}
+                                                                    onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
                                                                     onBlur={handleSaveEdit}
                                                                     onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
                                                                     onClick={e => e.stopPropagation()}
@@ -2455,7 +2538,7 @@ const TaskManagementPanel = ({ invitationId }) => {
                                                             )}
                                                             <span className="task-category-counter">({category.subTasks?.length || 0})</span>
                                                         </div>
-                                                        
+
                                                         <div className="task-category-actions">
                                                             <button onClick={() => startEditing(category.id, null, category.title)} className="table-action-btn">
                                                                 <EditIcon width="16" height="16" />
@@ -2470,7 +2553,7 @@ const TaskManagementPanel = ({ invitationId }) => {
                                                     {category.isExpanded && (
                                                         <Droppable droppableId={category.id} type="SUBTASK">
                                                             {(providedSub, snapshotSub) => (
-                                                                <div 
+                                                                <div
                                                                     className={`task-category-body ${snapshotSub.isDraggingOver ? 'is-dragging-over' : ''}`}
                                                                     ref={providedSub.innerRef}
                                                                     {...providedSub.droppableProps}
@@ -2481,7 +2564,7 @@ const TaskManagementPanel = ({ invitationId }) => {
                                                                             return (
                                                                                 <Draggable key={task.id} draggableId={task.id} index={subIndex}>
                                                                                     {(providedTask, snapshotTask) => (
-                                                                                        <div 
+                                                                                        <div
                                                                                             className={`subtask-item ${task.completed ? 'completed' : ''} ${snapshotTask.isDragging ? 'is-dragging' : ''}`}
                                                                                             ref={providedTask.innerRef}
                                                                                             {...providedTask.draggableProps}
@@ -2492,13 +2575,13 @@ const TaskManagementPanel = ({ invitationId }) => {
                                                                                             <div className="subtask-checkbox" onClick={() => handleToggleComplete(category.id, task.id)}>
                                                                                                 {task.completed && <CheckIcon />}
                                                                                             </div>
-                                                                                            
+
                                                                                             <div className="subtask-content">
                                                                                                 {isTaskEditing ? (
-                                                                                                    <input 
+                                                                                                    <input
                                                                                                         autoFocus
                                                                                                         value={editingItem.title}
-                                                                                                        onChange={(e) => setEditingItem({...editingItem, title: e.target.value})}
+                                                                                                        onChange={(e) => setEditingItem({ ...editingItem, title: e.target.value })}
                                                                                                         onBlur={handleSaveEdit}
                                                                                                         onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit()}
                                                                                                         className="timeline-edit-input"
@@ -2520,13 +2603,13 @@ const TaskManagementPanel = ({ invitationId }) => {
                                                                         })}
                                                                         {providedSub.placeholder}
                                                                     </div>
-                                                                    
+
                                                                     {/* Thêm Sub-task Form */}
                                                                     <form onSubmit={(e) => handleAddSubTask(e, category.id)} className="subtask-add-form">
-                                                                        <input 
+                                                                        <input
                                                                             type="text"
                                                                             value={newSubTaskTitles[category.id] || ''}
-                                                                            onChange={e => setNewSubTaskTitles(prev => ({...prev, [category.id]: e.target.value}))}
+                                                                            onChange={e => setNewSubTaskTitles(prev => ({ ...prev, [category.id]: e.target.value }))}
                                                                             placeholder="Thêm công việc chi tiết..."
                                                                             className="subtask-add-input"
                                                                         />
@@ -2568,7 +2651,7 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
         { id: 'invitation-settings', title: 'Cài đặt thiệp mời' },
         { id: 'delete', title: 'Xóa thiệp mời' },
     ];
-    
+
     // const handleAddGuestsFromMaster = (guests) => {
     //     onDataChange(guests, 'add-guests-bulk');
     // };
@@ -2625,7 +2708,7 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
             case 'invitation-settings':
                 return <InvitationSettingsPanel invitation={invitation} onDataChange={onDataChange} />;
             default:
-                 return <InvitationDashboard invitation={invitation} onTabClick={handleTabClick} />;
+                return <InvitationDashboard invitation={invitation} onTabClick={handleTabClick} />;
         }
     }
 
@@ -2637,12 +2720,12 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
 
     return (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: '100%', overflowX: 'hidden' }}>
-            
+
             {/* 1. Header thẳng lề */}
             <GridContainer>
                 <PageHeader />
             </GridContainer>
-            
+
             {/* 2. Thanh Tabs vươn viền full màn hình nhưng nội dung lõi thẳng lề */}
             <div className="tabs-container-wrapper">
                 <GridContainer>
@@ -2658,9 +2741,9 @@ const InvitationDetailView = ({ invitation, onGoBack, onDelete, onDataChange, ac
             <GridContainer>
                 {renderActivePanel()}
             </GridContainer>
-            
+
             {isDeleteModalOpen && (
-                <DeleteConfirmationModal onClose={() => setDeleteModalOpen(false)} onConfirm={handleDeleteConfirm} message="Bạn có chắc chắn muốn xóa thiệp mời này?"/>
+                <DeleteConfirmationModal onClose={() => setDeleteModalOpen(false)} onConfirm={handleDeleteConfirm} message="Bạn có chắc chắn muốn xóa thiệp mời này?" />
             )}
         </div>
     );
@@ -2676,17 +2759,17 @@ const InvitationListView = ({ invitations, onManageClick }) => {
             </header>
             <div className="invitation-grid-wrapper">
                 {safeInvitations.map(invitation => (
-                     <div key={invitation._id} className="invitation-card" onClick={() => onManageClick(invitation)}>
-                         <img 
-                             className="invitation-card-image"
-                             src={invitation.template?.imgSrc || 'https://placehold.co/300x300/EEE/31343C?text=No+Image'} 
-                             alt={invitation.slug || 'Thiết kế không tên'}
-                         />
-                         <div className="invitation-card-title">{invitation.slug || 'Thiết kế thiệp mời không tên'}</div>
-                         <div className="invitation-card-button">
-                             <div className="invitation-card-button-text"><span>Quản lý thiệp</span></div>
-                         </div>
-                      </div>
+                    <div key={invitation._id} className="invitation-card" onClick={() => onManageClick(invitation)}>
+                        <img
+                            className="invitation-card-image"
+                            src={invitation.template?.imgSrc || 'https://placehold.co/300x300/EEE/31343C?text=No+Image'}
+                            alt={invitation.slug || 'Thiết kế không tên'}
+                        />
+                        <div className="invitation-card-title">{invitation.slug || 'Thiết kế thiệp mời không tên'}</div>
+                        <div className="invitation-card-button">
+                            <div className="invitation-card-button-text"><span>Quản lý thiệp</span></div>
+                        </div>
+                    </div>
                 ))}
             </div>
         </div>
@@ -2699,7 +2782,7 @@ const BudgetManagementPanel = ({ invitationId, initialBudget = [], onDataChange 
     const [budgetData, setBudgetData] = useState(initialBudget);
     const [newCategoryName, setNewCategoryName] = useState('');
     const [newItemNames, setNewItemNames] = useState({});
-    
+
     // State cho việc edit item
     const [editingItem, setEditingItem] = useState(null); // { catId, itemId }
     const [editForm, setEditForm] = useState({ name: '', estimatedCost: 0, actualCost: 0 });
@@ -2822,15 +2905,15 @@ const BudgetManagementPanel = ({ invitationId, initialBudget = [], onDataChange 
             {/* 2. Thêm nhóm mới */}
             <form onSubmit={handleAddCategory} className="task-add-form">
                 <div className="task-input-wrapper">
-                    <input 
-                        type="text" 
-                        value={newCategoryName} 
-                        onChange={(e) => setNewCategoryName(e.target.value)} 
-                        placeholder="Thêm Nhóm chi phí (VD: Trang phục, Tiệc cưới, Quay chụp...)" 
+                    <input
+                        type="text"
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        placeholder="Thêm Nhóm chi phí (VD: Trang phục, Tiệc cưới, Quay chụp...)"
                         className="task-add-input"
                     />
                     <button type="submit" className="task-add-submit-btn" disabled={!newCategoryName.trim()}>
-                        <AddIcon /> <span style={{marginLeft: '6px'}}>Thêm Nhóm</span>
+                        <AddIcon /> <span style={{ marginLeft: '6px' }}>Thêm Nhóm</span>
                     </button>
                 </div>
             </form>
@@ -2846,7 +2929,7 @@ const BudgetManagementPanel = ({ invitationId, initialBudget = [], onDataChange 
                         <div key={category.id} className="task-category-card">
                             <div className="task-category-header">
                                 <h4 className="task-category-title" style={{ flex: 1, color: '#27548a' }}>{category.title}</h4>
-                                <div style={{fontWeight: 600, color: '#4B5563', marginRight: '20px'}}>
+                                <div style={{ fontWeight: 600, color: '#4B5563', marginRight: '20px' }}>
                                     Tổng: {formatVND((category.items || []).reduce((s, i) => s + (Number(i.estimatedCost) || 0), 0))}
                                 </div>
                                 <button onClick={() => handleDeleteCategory(category.id)} className="table-action-btn timeline-delete-btn">
@@ -2854,13 +2937,13 @@ const BudgetManagementPanel = ({ invitationId, initialBudget = [], onDataChange 
                                 </button>
                             </div>
 
-                            <div className="task-category-body" style={{padding: 0}}>
+                            <div className="task-category-body" style={{ padding: 0 }}>
                                 {/* Table Header */}
                                 <div className="budget-table-header">
-                                    <div style={{flex: 2}}>Hạng mục</div>
-                                    <div style={{flex: 1.5, textAlign: 'right'}}>Chi phí dự kiến</div>
-                                    <div style={{flex: 1.5, textAlign: 'right'}}>Chi phí thực tế</div>
-                                    <div style={{flex: 1, textAlign: 'center'}}>Thao tác</div>
+                                    <div style={{ flex: 2 }}>Hạng mục</div>
+                                    <div style={{ flex: 1.5, textAlign: 'right' }}>Chi phí dự kiến</div>
+                                    <div style={{ flex: 1.5, textAlign: 'right' }}>Chi phí thực tế</div>
+                                    <div style={{ flex: 1, textAlign: 'center' }}>Thao tác</div>
                                 </div>
 
                                 {/* Table Body */}
@@ -2870,28 +2953,28 @@ const BudgetManagementPanel = ({ invitationId, initialBudget = [], onDataChange 
                                         <div key={item.id} className="budget-table-row">
                                             {isEditing ? (
                                                 <>
-                                                    <div style={{flex: 2, paddingRight: '10px'}}>
-                                                        <input className="settings-input" style={{height: '36px'}} value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
+                                                    <div style={{ flex: 2, paddingRight: '10px' }}>
+                                                        <input className="settings-input" style={{ height: '36px' }} value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
                                                     </div>
-                                                    <div style={{flex: 1.5, paddingRight: '10px'}}>
-                                                        <input type="number" className="settings-input" style={{height: '36px', textAlign: 'right'}} value={editForm.estimatedCost} onChange={e => setEditForm({...editForm, estimatedCost: e.target.value})} />
+                                                    <div style={{ flex: 1.5, paddingRight: '10px' }}>
+                                                        <input type="number" className="settings-input" style={{ height: '36px', textAlign: 'right' }} value={editForm.estimatedCost} onChange={e => setEditForm({ ...editForm, estimatedCost: e.target.value })} />
                                                     </div>
-                                                    <div style={{flex: 1.5, paddingRight: '10px'}}>
-                                                        <input type="number" className="settings-input" style={{height: '36px', textAlign: 'right'}} value={editForm.actualCost} onChange={e => setEditForm({...editForm, actualCost: e.target.value})} />
+                                                    <div style={{ flex: 1.5, paddingRight: '10px' }}>
+                                                        <input type="number" className="settings-input" style={{ height: '36px', textAlign: 'right' }} value={editForm.actualCost} onChange={e => setEditForm({ ...editForm, actualCost: e.target.value })} />
                                                     </div>
-                                                    <div style={{flex: 1, display: 'flex', justifyContent: 'center', gap: '8px'}}>
-                                                        <button onClick={saveEditItem} className="table-action-btn" style={{color: '#10B981'}}><SaveIcon /></button>
+                                                    <div style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                                                        <button onClick={saveEditItem} className="table-action-btn" style={{ color: '#10B981' }}><SaveIcon /></button>
                                                         <button onClick={() => setEditingItem(null)} className="table-action-btn"><CancelIcon /></button>
                                                     </div>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <div style={{flex: 2, fontWeight: 500}}>{item.name}</div>
-                                                    <div style={{flex: 1.5, textAlign: 'right', color: '#6B7280'}}>{formatVND(item.estimatedCost)}</div>
-                                                    <div style={{flex: 1.5, textAlign: 'right', fontWeight: 600}}>{formatVND(item.actualCost)}</div>
-                                                    <div style={{flex: 1, display: 'flex', justifyContent: 'center', gap: '8px'}}>
+                                                    <div style={{ flex: 2, fontWeight: 500 }}>{item.name}</div>
+                                                    <div style={{ flex: 1.5, textAlign: 'right', color: '#6B7280' }}>{formatVND(item.estimatedCost)}</div>
+                                                    <div style={{ flex: 1.5, textAlign: 'right', fontWeight: 600 }}>{formatVND(item.actualCost)}</div>
+                                                    <div style={{ flex: 1, display: 'flex', justifyContent: 'center', gap: '8px' }}>
                                                         <button onClick={() => startEditing(category.id, item)} className="table-action-btn"><EditIcon width="16" height="16" /></button>
-                                                        <button onClick={() => handleDeleteItem(category.id, item.id)} className="table-action-btn" style={{color: '#EF4444'}}><CancelIcon /></button>
+                                                        <button onClick={() => handleDeleteItem(category.id, item.id)} className="table-action-btn" style={{ color: '#EF4444' }}><CancelIcon /></button>
                                                     </div>
                                                 </>
                                             )}
@@ -2901,13 +2984,13 @@ const BudgetManagementPanel = ({ invitationId, initialBudget = [], onDataChange 
 
                                 {/* Add new item row */}
                                 <form onSubmit={(e) => handleAddItem(e, category.id)} className="budget-add-item-row">
-                                    <input 
-                                        type="text" 
-                                        placeholder="+ Thêm chi tiết hạng mục..." 
+                                    <input
+                                        type="text"
+                                        placeholder="+ Thêm chi tiết hạng mục..."
                                         value={newItemNames[category.id] || ''}
-                                        onChange={e => setNewItemNames(prev => ({...prev, [category.id]: e.target.value}))}
+                                        onChange={e => setNewItemNames(prev => ({ ...prev, [category.id]: e.target.value }))}
                                         className="subtask-add-input"
-                                        style={{flex: 1}}
+                                        style={{ flex: 1 }}
                                     />
                                     <button type="submit" disabled={!newItemNames[category.id]?.trim()} className="subtask-add-btn">
                                         Lưu
@@ -2924,7 +3007,7 @@ const BudgetManagementPanel = ({ invitationId, initialBudget = [], onDataChange 
 const InvitationManagement = () => {
     const { invitationId } = useParams();
     const navigate = useNavigate();
-    const location = useLocation(); 
+    const location = useLocation();
     const [myInvitations, setMyInvitations] = useState([]);
     const [selectedInvitation, setSelectedInvitation] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -2937,7 +3020,7 @@ const InvitationManagement = () => {
         } else {
             setActiveTab('dashboard');
         }
-    }, [invitationId, location.search]); 
+    }, [invitationId, location.search]);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
@@ -2957,7 +3040,7 @@ const InvitationManagement = () => {
             setLoading(false);
         }
     }, [invitationId, navigate]);
-    
+
     useEffect(() => { fetchData(); }, [fetchData]);
 
     const handleDelete = async (idToDelete) => {
@@ -2971,12 +3054,12 @@ const InvitationManagement = () => {
     const handleManageClick = (invitation) => {
         if (invitation?._id) navigate(`/invitation-management/${invitation._id}`);
     };
-    
+
     const handleDataChange = useCallback((data, type) => {
         setSelectedInvitation(currentInvitation => {
             if (!currentInvitation) return null;
             const newInvitation = _.cloneDeep(currentInvitation);
-            switch(type) {
+            switch (type) {
                 case 'update-settings':
                     return _.cloneDeep(data);
 
@@ -3013,7 +3096,7 @@ const InvitationManagement = () => {
                     newInvitation.guestGroups = [...(newInvitation.guestGroups || []), data];
                     return newInvitation;
                 case 'update-group':
-                     newInvitation.guestGroups = (newInvitation.guestGroups || []).map(g =>
+                    newInvitation.guestGroups = (newInvitation.guestGroups || []).map(g =>
                         g._id === data._id ? data : g
                     );
                     return newInvitation;
@@ -3057,7 +3140,7 @@ const InvitationManagement = () => {
                     invitation={selectedInvitation}
                     onGoBack={() => navigate('/invitation-management')}
                     onDelete={handleDelete}
-                    onDataChange={handleDataChange} 
+                    onDataChange={handleDataChange}
                     activeTab={activeTab}
                     onTabChange={setActiveTab}
                 />

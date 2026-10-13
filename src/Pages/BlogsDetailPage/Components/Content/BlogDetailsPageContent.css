@@ -337,3 +337,184 @@ body {
         text-align: center;
     }
 }
+
+/* ========================================================= */
+/* PREMIUM DESIGN: FULL-WIDTH TOPICS FLOOR ABOVE FOOTER      */
+/* ========================================================= */
+
+.blog-details-topics-floor {
+    margin-top: 4.5rem;
+    margin-bottom: 1.5rem;
+    padding: 2.5rem 2rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px; /* Bo góc 4px tinh tế đồng bộ phong cách Minimalism */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* Phần Header của Section */
+.topics-floor-header {
+    margin-bottom: 1.75rem;
+    border-left: 3px solid #2563eb; /* Thanh màu accent bên trái tạo điểm nhấn chuyên nghiệp */
+    padding-left: 14px;
+}
+
+.topics-floor-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #1e293b;
+}
+
+.topics-floor-icon {
+    color: #2563eb;
+}
+
+.topics-floor-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+}
+
+.topics-floor-subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 6px 0 0 0;
+    line-height: 1.4;
+}
+
+/* Khối gom nhóm các Tags */
+.topics-floor-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* Style cho từng nút Tag */
+.topics-floor-tag-btn {
+    display: inline-flex;
+    align-items: center;
+    background: #f8fafc;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    padding: 10px 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 4px; /* Bo góc nhẹ 4px cao cấp */
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.topics-floor-tag-btn .tag-hash {
+    color: #94a3b8;
+    margin-right: 3px;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+/* Hiệu ứng tương tác Hover mượt mà */
+.topics-floor-tag-btn:hover {
+    background: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+    transform: translateY(-1px);
+}
+
+.topics-floor-tag-btn:hover .tag-hash {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Tối ưu responsive trên màn hình Mobile */
+@media (max-width: 768px) {
+    .blog-details-topics-floor {
+        margin-top: 3rem;
+        padding: 1.75rem 1.25rem;
+    }
+    
+    .topics-floor-tag-btn {
+        padding: 8px 16px;
+        font-size: 0.813rem;
+    }
+}
+
+.sidebar-sticky {
+    /* Đảm bảo sidebar bám dính khi cuộn trang */
+    position: sticky;
+    top: 80px; /* Khoảng cách từ đỉnh màn hình (điều chỉnh lại cho vừa với chiều cao Header của bạn) */
+    
+    /* Giới hạn chiều cao: Bằng 100% màn hình trừ đi khoảng cách trên/dưới an toàn */
+    max-height: calc(100vh - 100px); 
+    
+    /* Mặc định ẩn scrollbar để giữ giao diện Minimalism sạch sẽ */
+    overflow-y: hidden; 
+    
+    /* Thêm padding-right để khi scrollbar hiện ra không làm xô lệch nội dung (nhảy text) */
+    padding-right: 6px; 
+}
+
+/* CHỈ BẬT TÍNH NĂNG CUỘN KHI NGƯỜI DÙNG ĐƯA CHUỘT VÀO VÙNG SIDEBAR */
+.sidebar-sticky:hover {
+    overflow-y: auto; 
+}
+
+/* --------------------------------------------------------- */
+/* TÙY CHỈNH THẨM MỸ THANH CUỘN (DÀNH CHO CHROME/SAFARI/EDGE)*/
+/* --------------------------------------------------------- */
+
+.sidebar-sticky::-webkit-scrollbar {
+    width: 4px; /* Kích thước siêu mảnh */
+}
+
+.sidebar-sticky::-webkit-scrollbar-track {
+    background: transparent; /* Ẩn rãnh cuộn */
+}
+
+.sidebar-sticky::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1; /* Màu xám nhạt tinh tế */
+    border-radius: 10px; /* Bo góc tròn thanh nắm */
+}
+
+.sidebar-sticky::-webkit-scrollbar-thumb:hover {
+    background-color: #94a3b8; /* Nhấn màu đậm hơn khi hover trực tiếp vào thanh cuộn */
+}
+
+/* Hỗ trợ thẩm mỹ tương tự trên trình duyệt Firefox */
+.sidebar-sticky {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+
+/* ========================================================= */
+/* THIẾT KẾ CHO BANNER QUẢNG CÁO NỘI TUYẾN                   */
+/* ========================================================= */
+
+.inline-banner-container {
+    margin: 2.5rem 0;
+    text-align: center;
+}
+
+.inline-banner-img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 4px; /* Bo góc 4px đồng bộ thiết kế */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.inline-banner-container a:hover .inline-banner-img {
+    transform: translateY(-2px);
+}
+
+.inline-banner-sponsor {
+    display: block;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 6px;
+    text-align: right;
+    font-style: italic;
+}

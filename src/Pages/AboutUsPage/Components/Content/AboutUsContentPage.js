@@ -74,9 +74,9 @@ const CustomHtmlSection = React.memo(({ content, title, titleStyle }) => {
     return (
         <section className="section-container">
             <SectionHeader title={title || "Nội dung tùy chỉnh"} titleStyle={titleStyle} />
-            <div 
-                className="tiptap-content1" 
-                dangerouslySetInnerHTML={{ __html: content }} 
+            <div
+                className="tiptap-content1"
+                dangerouslySetInnerHTML={{ __html: content }}
             />
         </section>
     );
@@ -86,7 +86,7 @@ const CustomHtmlSection = React.memo(({ content, title, titleStyle }) => {
 // ++ CÁC COMPONENT CON (GIỮ NGUYÊN) ++
 // ===================================================================
 
-const SectionHeader = React.memo(({ title, subtitle, decorative = true, titleStyle, subtitleStyle })  => {
+const SectionHeader = React.memo(({ title, subtitle, decorative = true, titleStyle, subtitleStyle }) => {
     // Helper để chuyển đổi object style từ DB thành object mà Material-UI/React có thể dùng
     const createStyleObject = (styleData, defaultStyles = {}) => {
         if (!styleData) return defaultStyles;
@@ -106,13 +106,13 @@ const SectionHeader = React.memo(({ title, subtitle, decorative = true, titleSty
         <div className="modern-section-header">
             {decorative && (
                 <div className="decorative-element parallax-float" data-speed="-0.15">
-                      <svg width="200" height="50" viewBox="0 0 400 100" className="decorative-swirl" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M50 50 C 80 20, 120 20, 150 50" stroke="var(--color-accent)" strokeWidth="2" />
-                          <path d="M350 50 C 320 20, 280 20, 250 50" stroke="var(--color-accent)" strokeWidth="2" />
-                          <circle cx="200" cy="50" r="8" fill="var(--color-accent-light)" stroke="var(--color-accent)" strokeWidth="1.5"/>
-                          <path d="M180 50 Q 190 35 200 25 Q 210 35 220 50" stroke="var(--color-accent)" strokeWidth="1.5" fill="none"/>
-                          <path d="M185 58 Q 195 70 200 80 Q 205 70 215 58" stroke="var(--color-accent)" strokeWidth="1.5" fill="none"/>
-                      </svg>
+                    <svg width="200" height="50" viewBox="0 0 400 100" className="decorative-swirl" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 50 C 80 20, 120 20, 150 50" stroke="var(--color-accent)" strokeWidth="2" />
+                        <path d="M350 50 C 320 20, 280 20, 250 50" stroke="var(--color-accent)" strokeWidth="2" />
+                        <circle cx="200" cy="50" r="8" fill="var(--color-accent-light)" stroke="var(--color-accent)" strokeWidth="1.5" />
+                        <path d="M180 50 Q 190 35 200 25 Q 210 35 220 50" stroke="var(--color-accent)" strokeWidth="1.5" fill="none" />
+                        <path d="M185 58 Q 195 70 200 80 Q 205 70 215 58" stroke="var(--color-accent)" strokeWidth="1.5" fill="none" />
+                    </svg>
                 </div>
             )}
             {/* Áp dụng style trực tiếp vào thẻ */}
@@ -179,20 +179,20 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
 
     return (
         <section className="art-lovestory-section">
-            <SectionHeader2 title={title} titleStyle={titleStyle}/>
-            
+            <SectionHeader2 title={title} titleStyle={titleStyle} />
+
             <div className="art-timeline-container">
                 {stories.map((story, index) => {
                     const theme = artThemes[index % artThemes.length];
                     const isImgLeft = index % 2 === 0;
 
                     return (
-                        <div 
-                            key={story.id || index} 
+                        <div
+                            key={story.id || index}
                             className={`art-timeline-row ${isImgLeft ? 'layout-img-left' : 'layout-img-right'} fade-in-up`}
-                            style={{ 
-                                '--c-main': theme.main, 
-                                '--c-dark': theme.dark 
+                            style={{
+                                '--c-main': theme.main,
+                                '--c-dark': theme.dark
                             }}
                         >
                             {/* KHỐI TRỤC ĐOẠN: Thanh hình thang đan xen mang màu sắc riêng */}
@@ -215,7 +215,7 @@ const LoveStoryTimeline = React.memo(({ stories, title, titleStyle }) => {
                                 <div className="art-ribbon-tail">
                                     <div className="art-anchor-dot"></div> {/* Điểm chấm liên kết */}
                                 </div>
-                                
+
                                 {/* Mặt trước cờ: Nằm ĐÈ LÊN cột, chứa text */}
                                 <div className="art-ribbon-front">
                                     <span className="art-ribbon-text">{story.date}</span>
@@ -258,7 +258,7 @@ const EventSchedule = React.memo(({ events, title, titleStyle }) => {
     }, []);
 
     if (!events || events.length === 0) return null;
-    
+
     const formatDate = (dateString, timeString) => {
         if (!dateString) return { date: 'Ngày chưa xác định', time: '' };
         const date = new Date(`${dateString}T${timeString || '00:00:00'}`);
@@ -277,10 +277,10 @@ const EventSchedule = React.memo(({ events, title, titleStyle }) => {
             <div className="event-schedule-grid">
                 {events.map((event) => {
                     const { date, time } = formatDate(event.date, event.time);
-                    
+
                     // Tạo link chỉ đường
-                    const directionsUrl = event.location?.lat 
-                        ? `https://www.google.com/maps/dir/?api=1&destination=${event.location.lat},${event.location.lng}`
+                    const directionsUrl = event.location?.lat
+                        ? `https://maps.google.com/?q=${event.location.lat},${event.location.lng}`
                         : event.mapUrl;
 
                     return (
@@ -289,7 +289,7 @@ const EventSchedule = React.memo(({ events, title, titleStyle }) => {
                             <div className="event-card-image-wrapper">
                                 <img src={event.imageUrl || 'https://placehold.co/400x500/F2E8EB/5C5258?text=Event'} alt={event.title} loading="lazy" />
                             </div>
-                            
+
                             <div className="event-card-content">
                                 <h3 className="event-card-title">{event.title}</h3>
                                 <p className="event-card-time">{time} | {date}</p>
@@ -297,16 +297,34 @@ const EventSchedule = React.memo(({ events, title, titleStyle }) => {
 
                                 {/* --- KHỐI BẢN ĐỒ NHÚNG TRỰC TIẾP --- */}
                                 {event.location?.lat && (
-                                    <div className="embedded-map-container">
-                                        <iframe 
+                                    <div className="embedded-map-container" style={{ position: 'relative' }}>
+                                        {/* THÊM OVERLAY TRONG SUỐT ĐỂ BẮT CLICK */}
+                                        <a
+                                            href={directionsUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                width: '100%',
+                                                height: '100%',
+                                                zIndex: 10,
+                                                display: 'block',
+                                                cursor: 'pointer'
+                                            }}
+                                            title="Click để mở Google Maps"
+                                        />
+
+                                        <iframe
                                             title={`Bản đồ ${event.title}`}
-                                            width="100%" 
-                                            height="100%" 
-                                            frameBorder="0" 
-                                            scrolling="no" 
-                                            // Sử dụng URL chuẩn của Google Maps Embed (không cần API Key)
+                                            width="100%"
+                                            height="100%"
+                                            frameBorder="0"
+                                            scrolling="no"
+                                            // Đã sửa lại URL iframe chuẩn
                                             src={`https://maps.google.com/maps?q=${event.location.lat},${event.location.lng}&z=15&output=embed`}
-                                            loading="lazy" // Cực kỳ quan trọng để không block main thread
+                                            loading="lazy"
                                         ></iframe>
                                     </div>
                                 )}
@@ -382,17 +400,17 @@ const EventVideo = React.memo(({ videoUrl, title, titleStyle }) => {
 
     return (
         <section className="section-container modern-video-section fade-in-up">
-             <SectionHeader title={title || "Video Kỷ Niệm"} titleStyle={titleStyle} />
-             <div className="video-wrapper">
-                 <div className="modern-video-container">
-                     <iframe
-                         src={embedUrl}
-                         title="Video Kỷ Niệm"
-                         frameBorder="0"
-                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                         allowFullScreen
-                     ></iframe>
-                 </div>
+            <SectionHeader title={title || "Video Kỷ Niệm"} titleStyle={titleStyle} />
+            <div className="video-wrapper">
+                <div className="modern-video-container">
+                    <iframe
+                        src={embedUrl}
+                        title="Video Kỷ Niệm"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                    ></iframe>
+                </div>
             </div>
         </section>
     );
@@ -427,7 +445,7 @@ const BannerCarousel = ({ images }) => {
     const goToNext = useCallback(() => {
         setCurrentIndex(prev => (prev === images.length - 1 ? 0 : prev + 1));
     }, [images]);
-    
+
     const goToPrevious = useCallback(() => {
         setCurrentIndex(prev => (prev === 0 ? images.length - 1 : prev - 1));
     }, [images]);
@@ -447,7 +465,7 @@ const BannerCarousel = ({ images }) => {
     // Cập nhật logic để lấy url từ cả 'preview' (khi đang edit/upload) và 'url' (khi lấy từ DB)
     const getImageUrl = (image) => {
         if (typeof image === 'string') return image;
-        return image.url || image.preview || ''; 
+        return image.url || image.preview || '';
     };
     // --- KẾT THÚC SỬA LỖI ---
 
@@ -524,7 +542,7 @@ const PageCanvas = React.memo(React.forwardRef((props, ref) => {
 
         const { canvasWidth, canvasHeight, items, backgroundImage, backgroundColor } = page;
         const dpr = window.devicePixelRatio || 1;
-        
+
         canvas.width = canvasWidth * dpr;
         canvas.height = canvasHeight * dpr;
         canvas.style.width = `${canvasWidth}px`;
@@ -569,15 +587,15 @@ const PageCanvas = React.memo(React.forwardRef((props, ref) => {
                     const fontFamily = item.fontFamily || 'Arial';
                     const fontStyle = item.fontStyle || 'normal';
                     const fontWeight = item.fontWeight || 'normal';
-                    
+
                     ctx.font = `${fontStyle} ${fontWeight} ${scaledFontSize}px "${fontFamily}"`;
                     ctx.fillStyle = item.color || '#000000';
                     ctx.textAlign = item.textAlign || 'center';
                     ctx.textBaseline = 'middle';
 
                     const isGuestNameField = item.isGuestName === true;
-                    
-                    const guestName = guestDetails?.name || "Quý Khách Mời"; 
+
+                    const guestName = guestDetails?.name || "Quý Khách Mời";
 
                     const textContent = isGuestNameField ? guestName : item.content;
 
@@ -610,7 +628,7 @@ const PageCanvas = React.memo(React.forwardRef((props, ref) => {
                             } else { // right
                                 lineX = xPos - textWidth;
                             }
-                            
+
                             const lineY = yPos + scaledFontSize / 2 + 2; // Position underline below the text baseline
 
                             ctx.save();
@@ -674,7 +692,7 @@ const PageCanvas = React.memo(React.forwardRef((props, ref) => {
                         // 3. Tính toán kích thước "object-fit: cover"
                         const frameRatio = scaledWidth / scaledHeight;
                         const imgRatio = itemImg.naturalWidth / itemImg.naturalHeight;
-                        
+
                         let drawWidth, drawHeight;
                         if (imgRatio > frameRatio) {
                             // Ảnh rộng hơn khung
@@ -689,7 +707,7 @@ const PageCanvas = React.memo(React.forwardRef((props, ref) => {
                         // 4. Lấy vị trí pan/scan (và nhân với scale của canvas)
                         const posX = (item.imagePosition?.x || 0) * scale;
                         const posY = (item.imagePosition?.y || 0) * scale;
-                        
+
                         // 5. Tính toán vị trí vẽ (drawX, drawY)
                         // Căn giữa ảnh (đã "cover") sau đó áp dụng vị trí pan/scan
                         const drawX = (-scaledWidth / 2) - (drawWidth - scaledWidth) / 2 + posX;
@@ -698,12 +716,12 @@ const PageCanvas = React.memo(React.forwardRef((props, ref) => {
                         // 6. Vẽ ảnh đã được tính toán
                         ctx.drawImage(
                             itemImg,
-                            drawX, 
+                            drawX,
                             drawY,
                             drawWidth,
                             drawHeight
                         );
-                        
+
 
                     } catch (e) { console.error("Lỗi tải ảnh item:", e); }
                 }
@@ -761,12 +779,12 @@ const InvitationCanvasDisplay = ({ pages, isFullscreen = false, guestDetails }) 
 
             const availableWidth = vw - padding;
             const availableHeight = vh * heightFactor - padding;
-            
+
             const effectiveOriginalWidth = mobile ? originalWidth : originalWidth * 2;
 
             const widthScale = availableWidth / effectiveOriginalWidth;
             const heightScale = availableHeight / originalHeight;
-            
+
             const scale = Math.min(widthScale, heightScale);
 
             newWidth = originalWidth * scale;
@@ -779,11 +797,11 @@ const InvitationCanvasDisplay = ({ pages, isFullscreen = false, guestDetails }) 
                 newHeight = newWidth / ratio; // Recalculate height based on the correct ratio
             } else {
                 // Fallback dimensions, maintaining aspect ratio
-                newWidth = 400; 
+                newWidth = 400;
                 newHeight = 400 / ratio;
             }
         }
-        
+
         setDimensions({ width: Math.floor(newWidth), height: Math.floor(newHeight) });
     }, [originalWidth, originalHeight, isFullscreen]);
     // --- END: FIX ---
@@ -795,7 +813,7 @@ const InvitationCanvasDisplay = ({ pages, isFullscreen = false, guestDetails }) 
         window.addEventListener('resize', debouncedUpdate);
         return () => window.removeEventListener('resize', debouncedUpdate);
     }, [updateDimensions]);
-    
+
     const onPage = useCallback((e) => setCurrentPage(e.data), []);
     const handleNext = useCallback(() => flipBook.current?.pageFlip().flipNext(), []);
     const handlePrev = useCallback(() => flipBook.current?.pageFlip().flipPrev(), []);
@@ -820,11 +838,11 @@ const InvitationCanvasDisplay = ({ pages, isFullscreen = false, guestDetails }) 
         return 'double-page-view';
     };
     const pageStateClass = getPageViewState();
-    
-    const pageIndicatorText = isMobile 
-        ? `${currentPage + 1} / ${pages.length}` 
+
+    const pageIndicatorText = isMobile
+        ? `${currentPage + 1} / ${pages.length}`
         : `${currentPage === 0 || currentPage >= pages.length - 1 ? currentPage + 1 : `${currentPage}-${currentPage + 1}`} / ${pages.length}`;
-    
+
     const getContainerStyle = () => {
         const style = {
             height: `${pageHeight}px`,
@@ -848,33 +866,33 @@ const InvitationCanvasDisplay = ({ pages, isFullscreen = false, guestDetails }) 
                         <HTMLFlipBook
                             width={pageWidth} height={pageHeight} size="fixed"
                             minWidth={pageWidth} maxWidth={pageWidth} minHeight={pageHeight} maxHeight={pageHeight}
-                            maxShadowOpacity={0.5} 
+                            maxShadowOpacity={0.5}
                             showCover={isFullscreen ? !isMobile : true}
                             mobileScrollSupport={true}
                             onFlip={onPage} ref={flipBook} className="invitation-flipbook"
-                            startPage={isFullscreen ? currentPage : 0} 
+                            startPage={isFullscreen ? currentPage : 0}
                             flippingElements={isFullscreen ? ["all"] : []}
                             disableFlip={!isFullscreen}
                         >
                             {isFullscreen ? pages.map((page, index) => (
-                                <PageCanvas 
-                                    key={page.id || index} 
-                                    page={{...page, canvasWidth: pageWidth, canvasHeight: pageHeight }} 
+                                <PageCanvas
+                                    key={page.id || index}
+                                    page={{ ...page, canvasWidth: pageWidth, canvasHeight: pageHeight }}
                                     originalWidth={originalWidth}
                                     guestDetails={guestDetails}
                                 />
                             )) : (
-                                <PageCanvas 
-                                    key={pages[0].id || 0} 
-                                    page={{...pages[0], canvasWidth: pageWidth, canvasHeight: pageHeight }} 
+                                <PageCanvas
+                                    key={pages[0].id || 0}
+                                    page={{ ...pages[0], canvasWidth: pageWidth, canvasHeight: pageHeight }}
                                     originalWidth={originalWidth}
                                     guestDetails={guestDetails}
                                 />
                             )}
                         </HTMLFlipBook>
-                        
+
                     </div>
-                    
+
                     {isFullscreen && (
                         <div className="navigation-controls" >
                             <button className={`modern-nav-btn prev ${currentPage === 0 ? 'disabled' : ''}`} onClick={handlePrev} disabled={currentPage === 0}>
@@ -916,14 +934,14 @@ const Countdown = ({ targetDate, title, titleStyle }) => {
         const timer = setTimeout(() => setTimeLeft(calculateTimeLeft()), 1000);
         return () => clearTimeout(timer);
     });
-    
+
     return (
         <section className="section-container">
             <SectionHeader title={title || "Sự kiện trọng đại sẽ diễn ra trong"} titleStyle={titleStyle} />
             {!timeLeft ? (
-                 <div className="countdown-ended fade-in-up">
-                     <span>Sự kiện đã diễn ra!</span>
-                 </div>
+                <div className="countdown-ended fade-in-up">
+                    <span>Sự kiện đã diễn ra!</span>
+                </div>
             ) : (
                 <div className="modern-countdown fade-in-up">
                     {Object.entries(timeLeft).map(([interval, value]) => (
@@ -945,13 +963,13 @@ const CoupleImageDisplay = ({ src, alt, position }) => {
     const scale = position?.scale || 1;
 
     return (
-        <div 
-            className="modern-couple-image" 
-            style={{ 
-                position: 'relative', 
-                overflow: 'hidden', 
+        <div
+            className="modern-couple-image"
+            style={{
+                position: 'relative',
+                overflow: 'hidden',
                 padding: 0,
-                display: 'block' 
+                display: 'block'
             }}
         >
             <img
@@ -971,6 +989,7 @@ const CoupleImageDisplay = ({ src, alt, position }) => {
     );
 };
 const CoupleInfo = React.memo(({ settings }) => {
+
     const createStyleObject = (styleData, defaultSize = 16) => ({
         fontFamily: styleData?.fontFamily || 'var(--font-primary)',
         fontSize: `${styleData?.fontSize || defaultSize}px`,
@@ -980,7 +999,8 @@ const CoupleInfo = React.memo(({ settings }) => {
         textDecoration: styleData?.textDecoration || 'none',
         textAlign: styleData?.textAlign || 'center',
     });
-
+    const groomLabelStyle = createStyleObject(settings.groomLabelStyle, 14);
+    const brideLabelStyle = createStyleObject(settings.brideLabelStyle, 14);
     const groomNameStyle = createStyleObject(settings.groomNameStyle, 32);
     const brideNameStyle = createStyleObject(settings.brideNameStyle, 32);
     const groomInfoStyle = createStyleObject(settings.groomInfoStyle);
@@ -988,9 +1008,9 @@ const CoupleInfo = React.memo(({ settings }) => {
 
     return (
         <section className="section-container">
-            <SectionHeader 
-                title={settings.coupleTitle || "Cô Dâu & Chú Rể"} 
-                subtitle={settings.coupleSubtitle || "... và hai trái tim cùng chung một nhịp đập ..."} 
+            <SectionHeader
+                title={settings.coupleTitle || "Cô Dâu & Chú Rể"}
+                subtitle={settings.coupleSubtitle || "... và hai trái tim cùng chung một nhịp đập ..."}
                 titleStyle={settings.coupleTitleStyle}
                 subtitleStyle={settings.coupleSubtitleStyle}
             />
@@ -999,13 +1019,16 @@ const CoupleInfo = React.memo(({ settings }) => {
                 <div className="modern-couple-card">
                     <div className="couple-image-wrapper">
                         {/* Sử dụng component hiển thị mới */}
-                        <CoupleImageDisplay 
+                        <CoupleImageDisplay
                             src={settings.groomImageUrl || 'https://placehold.co/300x300/F2E8EB/5C5258?text=CR'}
                             alt={settings.groomName}
                             position={settings.groomImagePosition} // Truyền tọa độ và scale
                         />
                     </div>
                     <div className="couple-content">
+                        {/* CHÈN LABEL NHÀ TRAI VÀO ĐÂY */}
+                        <p className="couple-label" style={groomLabelStyle}>{settings.groomLabel || 'Nhà trai'}</p>
+
                         <h3 className="couple-name" style={groomNameStyle}>{settings.groomName || 'Chú rể'}</h3>
                         <p className="couple-info" style={groomInfoStyle}>{settings.groomInfo}</p>
                     </div>
@@ -1014,10 +1037,10 @@ const CoupleInfo = React.memo(({ settings }) => {
                 <div className="modern-separator">
                     <div className="heart-wrapper">
                         {settings.coupleSeparatorImageUrl ? (
-                            <img 
-                                src={settings.coupleSeparatorImageUrl} 
-                                alt="Separator" 
-                                style={{ width: '40px', height: '40px', objectFit: 'contain' }} 
+                            <img
+                                src={settings.coupleSeparatorImageUrl}
+                                alt="Separator"
+                                style={{ width: '40px', height: '40px', objectFit: 'contain' }}
                             />
                         ) : (
                             <Heart size={40} style={{ color: 'var(--color-primary)' }} />
@@ -1029,13 +1052,16 @@ const CoupleInfo = React.memo(({ settings }) => {
                 <div className="modern-couple-card">
                     <div className="couple-image-wrapper">
                         {/* Sử dụng component hiển thị mới */}
-                        <CoupleImageDisplay 
+                        <CoupleImageDisplay
                             src={settings.brideImageUrl || 'https://placehold.co/300x300/F2E8EB/5C5258?text=CD'}
                             alt={settings.brideName}
                             position={settings.brideImagePosition} // Truyền tọa độ và scale
                         />
                     </div>
                     <div className="couple-content">
+                        {/* CHÈN LABEL NHÀ GÁI VÀO ĐÂY */}
+                        <p className="couple-label" style={brideLabelStyle}>{settings.brideLabel || 'Nhà gái'}</p>
+
                         <h3 className="couple-name" style={brideNameStyle}>{settings.brideName || 'Cô dâu'}</h3>
                         <p className="couple-info" style={brideInfoStyle}>{settings.brideInfo}</p>
                     </div>
@@ -1111,7 +1137,7 @@ const RsvpSection = ({ resourceId, guestDetails }) => {
             </div>
         );
     }
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
@@ -1203,8 +1229,8 @@ const EventBottomBar = React.memo(({ resourceId, guestId, isOpen }) => {
     };
 
     const handleNavigateToWishes = () => {
-        const url = guestId 
-            ? `/events/${resourceId}/wishes?guestId=${guestId}` 
+        const url = guestId
+            ? `/events/${resourceId}/wishes?guestId=${guestId}`
             : `/events/${resourceId}/wishes`;
         navigate(url);
     };
@@ -1215,17 +1241,178 @@ const EventBottomBar = React.memo(({ resourceId, guestId, isOpen }) => {
     return (
         <div className="modern-event-bottom-bar fade-in-bottom">
             <button onClick={handleScrollToRSVP} className="bottom-btn rsvp-btn">
-                <Calendar size={18} style={{marginRight: '6px'}} />
+                <Calendar size={18} style={{ marginRight: '6px' }} />
                 Xác nhận tham dự
             </button>
             <button onClick={handleNavigateToWishes} className="bottom-btn wishes-btn">
-                <MessageCircle size={18} style={{marginRight: '6px'}} />
+                <MessageCircle size={18} style={{ marginRight: '6px' }} />
                 Gửi lời chúc
             </button>
             <button onClick={() => navigate('/invitations')} className="bottom-btn create-btn">
-                <Heart size={18} style={{marginRight: '6px'}} />
+                <Heart size={18} style={{ marginRight: '6px' }} />
                 Tạo thiệp
             </button>
+        </div>
+    );
+});
+// ===================================================================
+// ++ BẢN ĐỒ SỰ KIỆN SẮP TỚI (ĐÃ FIX LỖI HIỂN THỊ & CLICKABLE MAP) ++
+// ===================================================================
+const NearestEventMap = React.memo(({ events, titleStyle }) => {
+    const nearestEvent = React.useMemo(() => {
+        if (!events || !Array.isArray(events) || events.length === 0) return null;
+
+        const now = new Date();
+        const upcomingEvents = events
+            .map(event => {
+                if (!event.date) return null;
+                const dateTimeStr = `${event.date}T${event.time || '00:00:00'}`;
+                const parsedDate = new Date(dateTimeStr);
+                return { ...event, parsedDate };
+            })
+            .filter(event => event !== null && event.parsedDate > now)
+            .sort((a, b) => a.parsedDate - b.parsedDate);
+
+        return upcomingEvents.length > 0 ? upcomingEvents[0] : null;
+    }, [events]);
+
+    if (!nearestEvent || !nearestEvent.location?.lat || !nearestEvent.location?.lng) {
+        return null;
+    }
+
+    const formattedDateTime = new Intl.DateTimeFormat('vi-VN', {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+    }).format(nearestEvent.parsedDate);
+
+    // Dùng link chuyển hướng Google Maps chuẩn để chỉ đường
+    const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${nearestEvent.location.lat},${nearestEvent.location.lng}`;
+
+    return (
+        <section className="section-container fade-in-up nearest-event-section">
+            <SectionHeader
+                title="Địa Điểm Tổ Chức"
+                subtitle={`${formattedDateTime} — ${nearestEvent.address}`}
+                titleStyle={titleStyle}
+            />
+            <div className="large-map-wrapper">
+                <div className="clickable-map-container">
+                    {/* Thẻ a đóng vai trò là lớp Overlay đè lên iframe để bắt sự kiện click */}
+                    <a
+                        href={directionsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="map-click-overlay"
+                        title="Click để chỉ đường trên Google Maps"
+                    >
+                        {/* Empty overlay */}
+                    </a>
+
+                    {/* Iframe bản đồ đã fix link src chuẩn */}
+                    <iframe
+                        title={`Bản đồ ${nearestEvent.title}`}
+                        width="100%"
+                        height="100%"
+                        frameBorder="0"
+                        scrolling="no"
+                        src={`https://maps.google.com/maps?q=${nearestEvent.location.lat},${nearestEvent.location.lng}&z=15&output=embed`}
+                        loading="lazy"
+                    ></iframe>
+                </div>
+            </div>
+        </section>
+    );
+});
+const FloatingMusicPlayer = React.memo(({ musicUrl }) => {
+    const [isPlaying, setIsPlaying] = useState(false);
+    const audioRef = useRef(null);
+    const iframeRef = useRef(null);
+    const isYoutube = musicUrl && (musicUrl.includes('youtube.com') || musicUrl.includes('youtu.be'));
+
+    // Hàm lấy ID youtube và tạo link có API control
+    const getYTUrl = (url) => {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        const id = (match && match[2].length === 11) ? match[2] : null;
+        // enablejsapi=1 rất quan trọng để dùng postMessage điều khiển play/pause
+        return id ? `https://www.youtube.com/embed/${id}?enablejsapi=1&autoplay=1&loop=1&playlist=${id}&controls=0&showinfo=0&autohide=1` : '';
+    };
+
+    useEffect(() => {
+        if (!musicUrl) return;
+
+        // Xử lý tự động phát khi user tương tác lần đầu (Click/Touch/Scroll)
+        const handleInteraction = () => {
+            if (!isPlaying) {
+                if (isYoutube && iframeRef.current) {
+                    iframeRef.current.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                    setIsPlaying(true);
+                } else if (audioRef.current) {
+                    audioRef.current.volume = 0.6;
+                    audioRef.current.play().then(() => setIsPlaying(true)).catch(() => { });
+                }
+            }
+            // Chỉ cần kích hoạt 1 lần
+            document.removeEventListener('click', handleInteraction);
+            document.removeEventListener('touchstart', handleInteraction);
+            document.removeEventListener('scroll', handleInteraction);
+        };
+
+        document.addEventListener('click', handleInteraction);
+        document.addEventListener('touchstart', handleInteraction);
+        document.addEventListener('scroll', handleInteraction);
+
+        return () => {
+            document.removeEventListener('click', handleInteraction);
+            document.removeEventListener('touchstart', handleInteraction);
+            document.removeEventListener('scroll', handleInteraction);
+        };
+    }, [musicUrl, isYoutube, isPlaying]);
+
+    const togglePlay = (e) => {
+        e.stopPropagation();
+        if (isYoutube && iframeRef.current) {
+            const action = isPlaying ? 'pauseVideo' : 'playVideo';
+            iframeRef.current.contentWindow.postMessage(`{"event":"command","func":"${action}","args":""}`, '*');
+            setIsPlaying(!isPlaying);
+        } else if (audioRef.current) {
+            if (isPlaying) {
+                audioRef.current.pause();
+            } else {
+                audioRef.current.play();
+            }
+            setIsPlaying(!isPlaying);
+        }
+    };
+
+    if (!musicUrl) return null;
+
+    return (
+        <div className="floating-music-player" onClick={togglePlay}>
+            {isYoutube ? (
+                <iframe
+                    ref={iframeRef}
+                    src={getYTUrl(musicUrl)}
+                    style={{ display: 'none' }}
+                    title="yt-audio"
+                    allow="autoplay"
+                />
+            ) : (
+                <audio ref={audioRef} src={musicUrl} loop preload="auto" />
+            )}
+
+            <div className={`music-disc ${isPlaying ? 'spinning' : ''}`}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                </svg>
+            </div>
+            {isPlaying && (
+                <div className="sound-waves">
+                    <span className="wave w1"></span>
+                    <span className="wave w2"></span>
+                    <span className="wave w3"></span>
+                </div>
+            )}
         </div>
     );
 });
@@ -1243,9 +1430,9 @@ const WeddingInvitation = () => {
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxStartIndex, setLightboxStartIndex] = useState(0);
     const loveGiftsButton = invitationData?.template?.loveGiftsButton;
-    const particleCanvasRef = useRef(null); 
+    const particleCanvasRef = useRef(null);
     const [customFonts, setCustomFonts] = useState([]);
-    const isPreview = searchParams.get('preview') === 'true'; 
+    const isPreview = searchParams.get('preview') === 'true';
     useSmoothParallax(isOpen);
     // ===================================================================
     // ++ START: STATE MỚI CHO OVERLAY ++
@@ -1269,6 +1456,12 @@ const WeddingInvitation = () => {
         return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&autohide=1&modestbranding=1` : '';
     }, []);
 
+    const getYoutubeEmbedUrlRef = useRef(getYoutubeEmbedUrl);
+    useEffect(() => {
+        getYoutubeEmbedUrlRef.current = getYoutubeEmbedUrl;
+    }, [getYoutubeEmbedUrl]);
+
+
     useEffect(() => {
         const fetchFonts = async () => {
             try {
@@ -1280,77 +1473,88 @@ const WeddingInvitation = () => {
         };
         fetchFonts();
     }, []);
-    
-    
+
+
     useEffect(() => {
+        if (!resourceId) {
+            setError("Không tìm thấy ID của thiệp mời.");
+            setLoading(false);
+            return;
+        }
+
+        let isMounted = true;
+        let controller = new AbortController(); // Thêm AbortController
+
         const loadData = async () => {
             setLoading(true);
             setError(null);
-    
-            // 1. Check for preview data from editor in sessionStorage
+
             const previewDataString = sessionStorage.getItem('invitationPreviewData');
-            if (previewDataString) {
+            if (previewDataString && isPreview) {
                 try {
                     const data = JSON.parse(previewDataString);
-                    setInvitationData({
-                        content: data.pages || [],
-                        settings: data.invitationSettings || {},
-                        guestDetails: { name: "Quý Khách Mời" },
-                        template: { loveGiftsButton: {} }
-                    });
-                    sessionStorage.removeItem('invitationPreviewData');
+                    if (isMounted) {
+                        setInvitationData({
+                            content: data.pages || [],
+                            settings: data.invitationSettings || {},
+                            guestDetails: { name: "Quý Khách Mời" },
+                            template: { loveGiftsButton: {} }
+                        });
+                        sessionStorage.removeItem('invitationPreviewData');
+                    }
                 } catch (e) {
-                    setError("Dữ liệu xem trước không hợp lệ.");
+                    if (isMounted) setError("Dữ liệu xem trước không hợp lệ.");
+                    sessionStorage.removeItem('invitationPreviewData');
                 } finally {
-                    setLoading(false);
+                    if (isMounted) setLoading(false);
                 }
                 return;
             }
-    
-            // 2. If no sessionStorage, proceed with API call based on ID
-            if (!resourceId) {
-                setError("Không tìm thấy ID của thiệp mời.");
-                setLoading(false);
-                return;
-            }
-    
+
+            // Xóa sessionStorage cũ nếu không dùng
+            sessionStorage.removeItem('invitationPreviewData');
+
             try {
                 let response;
-                // If it's a preview link (from template details), fetch the TEMPLATE
                 if (isPreview) {
                     response = await api.get(`/invitation-templates/${resourceId}`);
+                    if (!isMounted) return;
                     const template = response.data.data;
-                    const formattedData = {
+                    setInvitationData({
                         content: template.templateData?.pages || [],
                         settings: template.templateData?.settings || {},
                         guestDetails: { name: "Quý Khách Mời" },
                         template: { loveGiftsButton: template.loveGiftsButton || {} },
                         imgSrc: template.imgSrc
-                    };
-                    setInvitationData(formattedData);
+                    });
                     const musicUrl = template.templateData?.settings?.musicUrl;
-                    if (musicUrl) {
-                        setMusicEmbedUrl(getYoutubeEmbedUrl(musicUrl));
-                    }
-                } else { // Otherwise, it's a real INVITATION
+                    if (musicUrl) setMusicEmbedUrl(getYoutubeEmbedUrlRef.current(musicUrl));
+                } else {
                     const queryString = guestId ? `?guestId=${guestId}` : '';
                     response = await api.get(`/invitations/public/${resourceId}${queryString}`);
+                    if (!isMounted) return;
                     setInvitationData(response.data.data);
                     const musicUrl = response.data.data?.settings?.musicUrl;
-                    if (musicUrl) {
-                        setMusicEmbedUrl(getYoutubeEmbedUrl(musicUrl));
-                    }
+                    if (musicUrl) setMusicEmbedUrl(getYoutubeEmbedUrlRef.current(musicUrl));
                 }
             } catch (err) {
+                if (!isMounted) return;
+                console.error('API Error:', err);
                 setError("Không tìm thấy thiệp mời.");
-                console.error("Lỗi khi tải dữ liệu thiệp mời:", err);
             } finally {
-                setLoading(false);
+                if (isMounted) setLoading(false);
             }
         };
-    
+
         loadData();
-    }, [resourceId, guestId, getYoutubeEmbedUrl, isPreview]);
+
+        return () => {
+            isMounted = false;
+            controller.abort();
+        };
+        // Bỏ getYoutubeEmbedUrl khỏi dependency — dùng ref thay thế
+    }, [resourceId, guestId, isPreview]);
+
 
 
     // ===================================================================
@@ -1368,7 +1572,7 @@ const WeddingInvitation = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         };
-        
+
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
@@ -1477,12 +1681,12 @@ const WeddingInvitation = () => {
             </div>
         );
     }
-    
+
     const { settings, guestDetails, content: pages } = invitationData;
     const { contactGroom, contactBride, groomName, brideName } = settings;
     const pageTitle = (settings.title || "Thiệp mời online").replace('{LờiXưngHô}', guestDetails?.salutation || settings.salutationStyle).replace('{TênKháchMời}', guestDetails?.name || "Bạn");
     const pageDescription = (settings.description || "Mời bạn đến tham dự buổi tiệc chung vui cùng gia đình chúng tôi!").replace('{LờiXưngHô}', '').replace('{TênKháchMời}', '').trim();
-const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?guestId=${guestId}` : ''}`;
+    const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?guestId=${guestId}` : ''}`;
     const shareText = `Trân trọng kính mời bạn đến dự lễ cưới của ${groomName} và ${brideName}!`;
     const ogImageUrl = invitationData.imgSrc || settings.heroImages?.main;
 
@@ -1493,7 +1697,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
     };
 
     const hasBanner = settings.bannerImages && settings.bannerImages.length > 0;
-    
+
     const eventDescriptionStyle = {
         fontFamily: settings.eventDescriptionStyle?.fontFamily || 'var(--font-primary)',
         fontSize: `${settings.eventDescriptionStyle?.fontSize || 18}px`,
@@ -1503,7 +1707,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
         textDecoration: settings.eventDescriptionStyle?.textDecoration || 'none',
         textAlign: settings.eventDescriptionStyle?.textAlign || 'center',
     };
-    
+
     const createStyleObject = (styleData, defaultSize = 16) => ({
         fontFamily: styleData?.fontFamily || 'var(--font-primary)',
         fontSize: `${styleData?.fontSize || defaultSize}px`,
@@ -1518,16 +1722,16 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
     const contactBrideStyle = createStyleObject(settings.contactBrideStyle);
 
     const defaultBlockOrder = ['BANNER_CAROUSEL', 'EVENT_DESCRIPTION', 'COUPLE_INFO', 'PARTICIPANTS', 'EVENT_SCHEDULE', 'COUNTDOWN', 'LOVE_STORY', 'GALLERY', 'VIDEO', 'WISHES', 'CONTACT_INFO', 'QR_CODES', 'RSVP', 'CUSTOM_HTML'];
-    
-    const blocksToRender = Array.isArray(settings.blocksOrder) && settings.blocksOrder.length > 0 
-    ? settings.blocksOrder 
-    : defaultBlockOrder;
 
-        
+    const blocksToRender = Array.isArray(settings.blocksOrder) && settings.blocksOrder.length > 0
+        ? settings.blocksOrder
+        : defaultBlockOrder;
+
+
     // 2. Thêm component RSVP vào componentMap
     const componentMap = {
         EVENT_DESCRIPTION: <EventDescription description={settings.eventDescription} style={eventDescriptionStyle} />,
-        COUPLE_INFO: <CoupleInfo settings={settings}/>,
+        COUPLE_INFO: <CoupleInfo settings={settings} />,
         PARTICIPANTS: <ParticipantsSection participants={settings.participants} title={settings.participantsTitle} titleStyle={settings.participantsTitleStyle} />,
         EVENT_SCHEDULE: <EventSchedule events={settings.events} title={settings.eventsTitle} titleStyle={settings.eventsTitleStyle} />,
         COUNTDOWN: <Countdown targetDate={settings.eventDate} title={settings.countdownTitle} titleStyle={settings.countdownTitleStyle} />,
@@ -1539,20 +1743,20 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                 <SectionHeader title={settings.contactTitle || "Thông Tin Liên Hệ"} titleStyle={settings.contactTitleStyle} />
                 <div className="modern-contact-section">
                     {contactGroom && (
-                        <a href={`tel:${contactGroom.replace(/\D/g,'')}`} className="modern-contact-card">
+                        <a href={`tel:${contactGroom.replace(/\D/g, '')}`} className="modern-contact-card">
                             <div className="contact-icon"><Phone size={24} /></div>
                             <div className="contact-info">
-                                <h4 style={contactGroomStyle}>Nhà trai</h4>
+                                <h4 style={contactGroomStyle}>{settings.groomLabel || 'Nhà trai'}</h4>
                                 <span>{groomName || 'Chú rể'}</span>
                                 <p style={contactGroomStyle}>{contactGroom}</p>
                             </div>
                         </a>
                     )}
                     {contactBride && (
-                        <a href={`tel:${contactBride.replace(/\D/g,'')}`} className="modern-contact-card">
+                        <a href={`tel:${contactBride.replace(/\D/g, '')}`} className="modern-contact-card">
                             <div className="contact-icon"><Phone size={24} /></div>
                             <div className="contact-info">
-                                <h4 style={contactBrideStyle}>Nhà gái</h4>
+                                <h4 style={contactBrideStyle}>{settings.brideLabel || 'Nhà gái'}</h4>
                                 <span>{brideName || 'Cô dâu'}</span>
                                 <p style={contactBrideStyle}>{contactBride}</p>
                             </div>
@@ -1564,8 +1768,8 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
         QR_CODES: <GiftSection qrCodes={settings.qrCodes} title={settings.qrCodeTitle} titleStyle={settings.qrCodeTitleStyle} />,
         RSVP: (
             <section id="rsvp-section" className="section-container">
-                <SectionHeader 
-                    title={settings.rsvpTitle || "Xác Nhận Tham Dự"} 
+                <SectionHeader
+                    title={settings.rsvpTitle || "Xác Nhận Tham Dự"}
                     subtitle={settings.rsvpSubtitle || "Sự hiện diện của bạn là niềm vinh hạnh cho gia đình chúng tôi."}
                     titleStyle={settings.rsvpTitleStyle}
                     subtitleStyle={settings.rsvpSubtitleStyle}
@@ -1576,8 +1780,8 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
             </section>
         ),
         CUSTOM_HTML: (
-            <CustomHtmlSection 
-                content={settings.customHtmlContent} 
+            <CustomHtmlSection
+                content={settings.customHtmlContent}
                 title={settings.customHtmlTitle}
                 titleStyle={settings.customHtmlTitleStyle}
             />
@@ -1600,8 +1804,8 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
             <SEO title={pageTitle} description={pageDescription} imageUrl={ogImageUrl} url={`/events/${resourceId}${guestId ? `?guestId=${guestId}` : ''}`} />
             {isPreview && (
                 <div style={{
-                    position: 'fixed', top: 0, left: 0, width: '100%', 
-                    background: 'rgba(212, 175, 55, 0.9)', color: 'white', 
+                    position: 'fixed', top: 0, left: 0, width: '100%',
+                    background: 'rgba(212, 175, 55, 0.9)', color: 'white',
                     textAlign: 'center', padding: '10px', zIndex: 2000,
                     fontSize: '14px', fontWeight: 'bold'
                 }}>
@@ -1609,11 +1813,10 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                 </div>
             )}
             <canvas ref={particleCanvasRef} id="particle-canvas"></canvas>
-
-            {isOpen && musicEmbedUrl && <iframe width="0" height="0" src={musicEmbedUrl} title="Invitation Music" frameBorder="0" allow="autoplay" style={{ display: 'none' }} />}
+            {isOpen && settings.musicUrl && <FloatingMusicPlayer musicUrl={settings.musicUrl} />}
 
             {lightboxOpen && <LightboxModal images={settings.galleryImages || []} startIndex={lightboxStartIndex} onClose={() => setLightboxOpen(false)} />}
-            
+
             {/* =================================================================== */}
             {/* ++ START: RENDER OVERLAY ++ */}
             {/* =================================================================== */}
@@ -1623,7 +1826,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                         <X size={32} />
                     </button>
                     <div className="flipbook-fullscreen-content" onClick={(e) => e.stopPropagation()}>
-                         <InvitationCanvasDisplay pages={pages} isFullscreen={true} guestDetails={guestDetails} />
+                        <InvitationCanvasDisplay pages={pages} isFullscreen={true} guestDetails={guestDetails} />
                     </div>
                 </div>
             )}
@@ -1650,16 +1853,24 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                         </div>
 
                         <div className="address-area">
-                            {/* Dòng này sẽ hiển thị lời chào và tên khách mời nếu có */}
-                            {guestDetails && (
-                                <div className="recipient-tagline">
-                                    {settings.salutationStyle} {guestDetails.name}, trân trọng kính mời!
+                            {/* Nếu có tên khách mời, ưu tiên hiển thị tên khách mời thật to và rõ ràng */}
+                            {guestDetails?.name ? (
+                                <div className="recipient-name">
+                                    Kính mời: {guestDetails.name}
+                                </div>
+                            ) : (
+                                /* Nếu không có (khách lạ), vẫn hiển thị tên cặp đôi truyền thống */
+                                <div className="recipient-name">
+                                    {groomName} & {brideName}
                                 </div>
                             )}
-                            {/* Giữ nguyên tên cặp đôi */}
-                            <div className="recipient-name">
-                                {groomName} & {brideName}
-                            </div>
+
+                            {/* Lời chào phụ nếu cần */}
+                            {guestDetails && (
+                                <div className="recipient-tagline">
+                                    Trân trọng kính mời bạn đến chung vui cùng chúng tôi
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="flap top"></div>
@@ -1692,7 +1903,7 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                             </div>
                             <div className="invitation-preview-action">
                                 <button className="modern-btn-primary" onClick={() => setIsFlipbookFullscreen(true)}>
-                                    <ExternalLink size={18} style={{ marginRight: '8px' }}/>
+                                    <ExternalLink size={18} style={{ marginRight: '8px' }} />
                                     Xem Toàn Bộ Thiệp Mời
                                 </button>
                             </div>
@@ -1701,12 +1912,12 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                     {/* =================================================================== */}
                     {/* ++ END: KHU VỰC THAY ĐỔI ++ */}
                     {/* =================================================================== */}
-                    
-                    
+
+
                     {blocksToRender.map(blockKey => {
                         // Kiểm tra xem có dữ liệu cho khối đó không trước khi render
                         const hasData = (key) => {
-                            switch(key) {
+                            switch (key) {
                                 case 'EVENT_DESCRIPTION': return !!settings.eventDescription;
                                 case 'COUPLE_INFO': return settings.invitationType === 'Thiệp cưới';
                                 case 'PARTICIPANTS': return Array.isArray(settings.participants) && settings.participants.length > 0;
@@ -1716,16 +1927,16 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                                 case 'GALLERY': return Array.isArray(settings.galleryImages) && settings.galleryImages.length > 0;
                                 case 'VIDEO': return !!settings.videoUrl;
                                 case 'WISHES': return true;
-                                
+
                                 // SỬA: Bỏ điều kiện bắt buộc phải là 'Thiệp cưới', chỉ cần có data SĐT là hiển thị
                                 case 'CONTACT_INFO': return !!(settings.contactGroom || settings.contactBride);
-                                
+
                                 case 'QR_CODES': return Array.isArray(settings.qrCodes) && settings.qrCodes.length > 0;
-                                case 'RSVP': return settings.rsvpTitle && settings.rsvpTitle.length > 0; 
-                                
+                                case 'RSVP': return settings.rsvpTitle && settings.rsvpTitle.length > 0;
+
                                 // THÊM MỚI: Bổ sung case cho CUSTOM_HTML (trước đó bị thiếu nên nó luôn return false)
                                 case 'CUSTOM_HTML': return !!settings.customHtmlContent;
-                                
+
                                 default: return false;
                             }
                         };
@@ -1737,10 +1948,18 @@ const shareUrl = `${window.location.origin}/events/${resourceId}${guestId ? `?gu
                         }
                         return null;
                     })}
+
+                    {settings.events && settings.events.length > 0 && (
+                        <NearestEventMap
+                            events={settings.events}
+                            titleStyle={settings.eventsTitleStyle}
+                        />
+                    )}
+
                     {loveGiftsButton?.isEnabled && (
                         <section className="section-container">
                             <a href={loveGiftsButton.link} target="_blank" rel="noopener noreferrer" className="modern-btn-primary">
-                                 <Gift size={18} /> {loveGiftsButton.text || 'Gửi Quà Mừng Cưới'}
+                                <Gift size={18} /> {loveGiftsButton.text || 'Gửi Quà Mừng Cưới'}
                             </a>
                         </section>
                     )}

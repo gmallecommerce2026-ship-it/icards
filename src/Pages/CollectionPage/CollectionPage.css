@@ -1,0 +1,48 @@
+/* src/Pages/CollectionPage/CollectionPage.css */
+
+.collection-page-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.collection-page-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.collection-subtitle {
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    color: #888;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.collection-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #111;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+
+.collection-description {
+    font-size: 1rem;
+    color: #555;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.empty-collection-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.empty-collection-message p {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+}

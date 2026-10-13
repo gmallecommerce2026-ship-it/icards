@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../../../../services/api';
 import './TutorialPage.css';
 import { useSettings } from '../../../../Context/SettingsContext';
+import UniversalBanner from '../../../../Components/UniversalBanner/UniversalBanner';
 
 // ----- CÁC COMPONENT CON (Giữ nguyên không đổi) -----
 
@@ -37,7 +38,7 @@ const FaqItem = ({ question, answer, isOpen, onClick }) => (
         <div className="faq-question-pro" onClick={onClick}>
             <h4>{question}</h4>
             <svg className="faq-toggle-pro" width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M1 1L7 7L13 1" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M1 1L7 7L13 1" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
         </div>
         {isOpen && (
@@ -66,8 +67,8 @@ const TemplateCard = ({ id, title, imgSrc }) => {
             <div className="card-info-pro">
                 <h5>{title}</h5>
                 <div className={`heart-icon-pro ${isLiked ? 'liked' : ''}`} onClick={handleLikeClick}>
-                     <svg width="20" height="17" viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M16.3158 0.482422C13.8842 0.482422 12.0211 2.21053 11.0526 3.47368H10.9474C9.97895 2.21053 8.11579 0.482422 5.68421 0.482422C2.52632 0.482422 0 3.01895 0 6.16632C0 11.7558 11 17 11 17C11 17 22 11.7558 22 6.16632C22 3.01895 19.4737 0.482422 16.3158 0.482422Z"/>
+                    <svg width="20" height="17" viewBox="0 0 20 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16.3158 0.482422C13.8842 0.482422 12.0211 2.21053 11.0526 3.47368H10.9474C9.97895 2.21053 8.11579 0.482422 5.68421 0.482422C2.52632 0.482422 0 3.01895 0 6.16632C0 11.7558 11 17 11 17C11 17 22 11.7558 22 6.16632C22 3.01895 19.4737 0.482422 16.3158 0.482422Z" />
                     </svg>
                 </div>
             </div>
@@ -96,7 +97,7 @@ const CategoryShowcaseCard = ({ template }) => {
                 <button onClick={handleNavigate}>{`Tạo ${template.category} online`}</button>
             </div>
             <div className="category-showcase-image">
-                 <img src={template.imgSrc || 'https://placehold.co/160x160/e6e6e6/333?text=Image'} alt={template.category} />
+                <img src={template.imgSrc || 'https://placehold.co/160x160/e6e6e6/333?text=Image'} alt={template.category} />
             </div>
         </div>
     );
@@ -106,7 +107,7 @@ const CategoryShowcaseCard = ({ template }) => {
 const CarouselArrow = ({ direction, onClick, disabled }) => (
     <button className={`carousel-arrow ${direction}`} onClick={onClick} disabled={disabled}>
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d={direction === 'left' ? "M15 18L9 12L15 6" : "M9 18L15 12L9 6"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d={direction === 'left' ? "M15 18L9 12L15 6" : "M9 18L15 12L9 6"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     </button>
 );
@@ -127,7 +128,7 @@ const Content = () => {
     const bannerSecondaryUrl1 = settings?.banners?.professional_secondary_1?.imageUrl || "https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/herotutorial.png";
     const banners = settings?.banners || [];
     const professionalBanner = banners.find(b => b.displayPage === 'professional' && b.isEnabled) || banners.find(b => b.displayPage === 'all' && b.isEnabled);
-    
+
     const faqData = [
         { q: "Thiệp mời online là gì?", a: "Thiệp mời online là thiệp mời trên nền tảng số trực tuyến, thay vì được in ra giấy như các tấm thiệp mời truyền thống. Sau khi tạo thiệp mời online, bạn sẽ gửi tấm thiệp tới khách mời thông qua tin nhắn hoặc mạng xã hội như Facebook, Zalo,... Khi đó, khách mời chỉ cần có kết nối Internet là đã có thể xem được tấm thiệp mời của bạn." },
         { q: "Thiệp mời online và thiệp mời truyền thống khác nhau thế nào?", a: "Thiệp mời online và thiệp mời truyền thống có nhiều điểm khác biệt, chủ yếu ở hình thức, thiết kế, cách truyền tải thông tin đám cưới và cách gửi thiệp:\n\n1. Với thiệp mời truyền thống: Là thiệp in giấy, với những thiết kế phổ thông, khó thay đổi theo mong muốn cá nhân, chi phí in ấn cao, hình thức gửi thiệp là Tay Trao Tay cho khách mời. Với thời đại công nghệ hiện nay, đa phần mọi người bắt đầu sử dụng thiệp bán online, ví dụ như: Chụp hình thiệp truyền thống để gửi tin nhắn hoặc mạng xã hội cho khách mời, hoặc tự thiết kế rồi xuất thành hình ảnh rồi gửi online cho khách mời.\n\n2. Với thiệp mời online: Là thiệp bạn có thể tự mình thiết kế trên nền tảng thiết kế thiệp mời online, với đa dạng mẫu thiết kế, và cá nhân hoá thiệp mời theo những gì bạn thích. Không cần phải in ấn nên tiết kiệm chi phí. Có tính năng quản lý danh sách khách mời, và gửi thiệp mời cho từng khách bằng một liên kết online thông qua internet như tin nhắn, Facebook, Zalo,..." },
@@ -141,26 +142,26 @@ const Content = () => {
             try {
                 setLoading(true);
                 const [showcaseResponse, allTemplatesResponse] = await Promise.all([
-                    api.get('/invitation-templates?limit=10'), 
+                    api.get('/invitation-templates?limit=10'),
                     api.get('/invitation-templates?limit=1000')
                 ]);
-                
+
                 const allTemplates = showcaseResponse.data.data || [];
                 const uniqueCategories = [...new Set(allTemplates.map(t => t.category))];
                 const showcase = uniqueCategories.map(category => {
                     return allTemplates.find(t => t.category === category);
-                }).filter(Boolean); 
-                
+                }).filter(Boolean);
+
                 setShowcaseTemplates(showcase);
-                
+
                 const allTemplatesData = allTemplatesResponse.data.data || [];
                 const allUniqueCategoriesList = [...new Set(allTemplatesData.map(t => t.category).filter(Boolean))];
                 setAllCategories(allUniqueCategoriesList);
-                
+
                 if (allUniqueCategoriesList.length > 0) {
                     setActiveCategory(allUniqueCategoriesList[0]);
                 } else {
-                     setLoading(false);
+                    setLoading(false);
                 }
 
             } catch (error) {
@@ -173,7 +174,7 @@ const Content = () => {
 
     useEffect(() => {
         if (!activeCategory) return;
-        
+
         const fetchTemplatesByCategory = async () => {
             setLoading(true);
             try {
@@ -186,10 +187,10 @@ const Content = () => {
                 setLoading(false);
             }
         };
-        
+
         fetchTemplatesByCategory();
     }, [activeCategory]);
-    
+
     // --- [THÊM MỚI] --- Logic điều khiển Carousel
     const ITEMS_PER_PAGE = 3;
     const totalPages = Math.ceil(showcaseTemplates.length / ITEMS_PER_PAGE);
@@ -202,47 +203,70 @@ const Content = () => {
         }
     };
 
+    const renderProfessionalBanner = () => {
+        if (!professionalBanner) {
+            return (
+                <div style={{ position: 'relative', width: '100%', display: 'flex' }}>
+                    <img
+                        src="https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/default-banner.png"
+                        alt="Hero Banner"
+                        style={{ width: '100%', height: '100%', minHeight: '400px', objectFit: 'cover', display: 'block' }}
+                    />
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.3)', zIndex: 1 }}></div>
+                    <div className="hero-content" style={{
+                        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        color: 'white', textShadow: '2px 2px 10px rgba(0,0,0,0.8)', textAlign: 'center', padding: '20px', zIndex: 2
+                    }}>
+                        <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 'bold', margin: '0 0 16px 0', lineHeight: '1.2', maxWidth: '90%' }}>Chuyên nghiệp</h1>
+                        <p className="hero-subtitle" style={{ fontSize: 'clamp(1.2rem, 3vw, 1.8rem)', margin: 0, fontWeight: '500', maxWidth: '90%' }}>Hướng dẫn chi tiết và các mẹo hữu ích</p>
+                    </div>
+                </div>
+            );
+        }
+
+        if (professionalBanner.mediaType === 'html') {
+            return <div dangerouslySetInnerHTML={{ __html: professionalBanner.htmlContent }} style={{ width: '100%', height: '100%' }} />;
+        }
+
+        const bannerContent = (
+            <div style={{ position: 'relative', width: '100%', display: 'flex' }}>
+                {professionalBanner.mediaType === 'video' && professionalBanner.videoUrl ? (
+                    <video src={professionalBanner.videoUrl} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', minHeight: '400px', objectFit: 'cover', display: 'block' }} />
+                ) : (
+                    <img src={professionalBanner.imageUrl || 'https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/default-banner.png'} alt={professionalBanner.title || "Banner"} style={{ width: '100%', height: '100%', minHeight: '400px', objectFit: 'cover', display: 'block' }} />
+                )}
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.3)', zIndex: 1 }}></div>
+                <div className="hero-content" style={{
+                    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    color: 'white', textShadow: '2px 2px 10px rgba(0,0,0,0.8)', textAlign: 'center', padding: '20px', zIndex: 2
+                }}>
+                    {professionalBanner.title && <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 'bold', margin: '0 0 16px 0', lineHeight: '1.2', maxWidth: '90%' }}>{professionalBanner.title}</h1>}
+                    {professionalBanner.subtitle && <p className="hero-subtitle" style={{ fontSize: 'clamp(1.2rem, 3vw, 1.8rem)', margin: 0, fontWeight: '500', maxWidth: '90%' }}>{professionalBanner.subtitle}</p>}
+                </div>
+            </div>
+        );
+
+        if (professionalBanner.link) {
+            const isExternal = professionalBanner.link.startsWith('http');
+            if (isExternal) {
+                return <a href={professionalBanner.link} target="_blank" rel="noopener noreferrer" className="hero-link-wrapper" style={{ display: 'block', width: '100%' }}>{bannerContent}</a>;
+            }
+            return <Link to={professionalBanner.link} className="hero-link-wrapper" style={{ display: 'block', width: '100%' }}>{bannerContent}</Link>;
+        }
+
+        return bannerContent;
+    };
+
     return (
         <div className="pro-page-wrapper">
-            <section className="hero-section">
-                {professionalBanner ? (
-                    professionalBanner.htmlContent ? (
-                        <div dangerouslySetInnerHTML={{ __html: professionalBanner.htmlContent }} />
-                    ) : (
-                        <>
-                            {professionalBanner.mediaType === 'video' && professionalBanner.videoUrl ? (
-                                <video 
-                                    src={professionalBanner.videoUrl} 
-                                    autoPlay 
-                                    loop 
-                                    muted 
-                                    playsInline 
-                                    className="hero-video-background"
-                                />
-                            ) : (
-                                <div 
-                                    className="hero-image-background"
-                                    style={{ backgroundImage: `url(${professionalBanner.imageUrl || 'https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/default-banner.png'})` }}
-                                />
-                            )}
-                            <div className="hero-content">
-                                {professionalBanner.title && <h1 className="hero-title">{professionalBanner.title}</h1>}
-                                {professionalBanner.subtitle && <p className="hero-subtitle">{professionalBanner.subtitle}</p>}
-                            </div>
-                        </>
-                    )
-                ) : (
-                    <>
-                        <div 
-                            className="hero-image-background"
-                            style={{ backgroundImage: `url('https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/default-banner.png')` }}
-                        />
-                        <div className="hero-content">
-                            <h1 className="hero-title">Chuyên nghiệp</h1>
-                            <p className="hero-subtitle">Hướng dẫn chi tiết và các mẹo hữu ích</p>
-                        </div>
-                    </>
-                )}
+            <section className="page-hero-wrapper" style={{ width: '100%', overflow: 'hidden' }}>
+                <UniversalBanner
+                    banner={professionalBanner}
+                    defaultTitle="Chuyên nghiệp"
+                    defaultSubtitle="Hướng dẫn chi tiết và các mẹo hữu ích"
+                />
             </section>
             <main className="pro-page-content">
                 <section className="features-pro-section">
@@ -261,11 +285,11 @@ const Content = () => {
                         </div>
                     </div>
                 </section>
-                
+
                 {/* Vị trí quảng cáo: Giữa các tính năng và carousel thiệp mẫu */}
                 {/* <div className="ads-container">
                     <div className="placeholder-ad">Vị trí đặt quảng cáo (970x250)</div> */}
-                    {/*
+                {/*
                     Hãy thay thế đoạn mã trên bằng mã AdSense thực tế của bạn khi đã có tài khoản:
                     <ins className="adsbygoogle"
                          style={{ display: 'block' }}
@@ -277,14 +301,14 @@ const Content = () => {
                 {/* </div> */}
                 {/* --- [SỬA ĐỔI] --- Cấu trúc Carousel mới --- */}
                 <section className="category-showcase-section">
-                     <SectionHeader 
+                    <SectionHeader
                         title="Dễ dàng tạo thiệp mời từ vô vàn mẫu thiệp có sẵn"
                         subtitle="Những mẫu thiệp đẹp, chuyên nghiệp và cá nhân hoá, cho ngày trọng đại thêm nhiều ý nghĩa."
-                     />
-                     <div className="category-showcase-carousel-wrapper">
+                    />
+                    <div className="category-showcase-carousel-wrapper">
                         <CarouselArrow direction="left" onClick={() => handleCarouselScroll('left')} disabled={carouselIndex === 0} />
                         <div className="carousel-viewport">
-                             <div 
+                            <div
                                 className="category-showcase-grid-transform"
                                 style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
                             >
@@ -294,7 +318,7 @@ const Content = () => {
                             </div>
                         </div>
                         <CarouselArrow direction="right" onClick={() => handleCarouselScroll('right')} disabled={carouselIndex >= totalPages - 1} />
-                     </div>
+                    </div>
                 </section>
 
                 <section className="print-process-section-pro">
@@ -339,11 +363,11 @@ const Content = () => {
                     <SectionHeader title="Có thể bạn chưa biết" />
                     <div className="faq-container-pro">
                         {faqData.map((faq, index) => (
-                            <FaqItem 
-                                key={index} 
-                                question={faq.q} 
-                                answer={faq.a} 
-                                isOpen={openFaq === index} 
+                            <FaqItem
+                                key={index}
+                                question={faq.q}
+                                answer={faq.a}
+                                isOpen={openFaq === index}
                                 onClick={() => setOpenFaq(openFaq === index ? null : index)}
                             />
                         ))}

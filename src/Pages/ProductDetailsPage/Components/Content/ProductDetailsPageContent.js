@@ -106,9 +106,18 @@ const Styles = () => (
     
     .product-actions {
         margin-top: 30px;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        /* Chuyển grid thành flex hoặc block để chứa 1 nút liên hệ */
+        display: flex; 
         gap: 16px;
+    }
+    .contact-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        text-decoration: none;
+        font-size: 18px;
+        padding: 18px;
     }
     .btn { padding: 16px; font-size: 16px; font-weight: 700; border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s ease; text-transform: uppercase;}
     .btn-primary { background-color: var(--color-primary); color: white; border: none; }
@@ -206,7 +215,7 @@ const Content = () => {
     const { productId } = useParams();
     const [product, setProduct] = useState(null);
     const [mainImage, setMainImage] = useState('');
-    const [quantity, setQuantity] = useState(1);
+    // const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState('info');
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -308,17 +317,16 @@ const Content = () => {
                                 <span className="price-label">Giá: </span>
                                 <span className="price-value">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price)}</span>
                             </div>
-                            <div className="quantity-selector">
-                                <label htmlFor="quantity">Số lượng</label>
-                                <div className="quantity-input">
-                                    <button className="quantity-btn" onClick={() => setQuantity(q => Math.max(1, q - 1))}>-</button>
-                                    <span className="quantity-display">{quantity}</span>
-                                    <button className="quantity-btn" onClick={() => setQuantity(q => q + 1)}>+</button>
-                                </div>
-                            </div>
                             <div className="product-actions">
-                                <button className="btn btn-secondary">Thêm vào giỏ hàng</button>
-                                <button className="btn btn-primary">Đặt hàng</button>
+                                <a 
+                                    href="tel:0931283999" 
+                                    className="btn btn-primary contact-btn"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px' }}>
+                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                                    </svg>
+                                    Liên hệ ngay: 0931 283 999
+                                </a>
                             </div>
                         </div>
                     </div>

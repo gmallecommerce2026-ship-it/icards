@@ -81,10 +81,33 @@ img {
 }
 
 ul {
-  list-style-position: inside;
-  padding-left: 20px;
+  list-style-position: outside; /* Đổi từ 'inside' thành 'outside' */
+  padding-left: 40px; /* Tăng padding lên một chút để bù lại khoảng trống của outside */
+  margin-bottom: 1em; /* Thêm margin để cách phần tử bên dưới */
 }
 
+/* Áp dụng cho cả thẻ ol (danh sách có số) nếu cần */
+ol {
+  list-style-position: outside;
+  padding-left: 40px;
+  margin-bottom: 1em;
+}
+ul,
+.ck-content ul, 
+.tiptap-content ul,
+.ProseMirror ul {
+    list-style-position: outside !important;
+    padding-left: 2rem !important; 
+}
+
+/* 2. Ép thẻ <p> nằm bên trong <li> thành phần tử cùng dòng (inline) */
+.ck-content li > p, 
+.tiptap-content li > p,
+.ProseMirror li > p,
+li > p {
+    display: inline !important;
+    margin: 0 !important;
+}
 /* ----- PARTICLE BACKGROUND STYLE ----- */
 #particle-canvas {
     position: fixed;

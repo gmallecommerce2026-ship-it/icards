@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom'; 
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from "../../../../services/api";
 import { toast } from 'react-toastify';
 import { useSettings } from '../../../../Context/SettingsContext';
 import SEO from '../../../../Features/SEO';
 import "./ProductPageContent.css"
-// === COMPONENT CSS (Đã bao gồm các chỉnh sửa giao diện) ===
+import UniversalBanner from '../../../../Components/UniversalBanner/UniversalBanner';
+
+// === COMPONENT CSS (Giữ nguyên của bạn) ===
 const ComponentCSS = () => (
     <style>{`
         /* ----- CÀI ĐẶT CƠ BẢN ----- */
@@ -37,7 +39,7 @@ const ComponentCSS = () => (
     .products-hero {
         width: 100%;
         height: 550px;
-        background-color: var(--color-placeholder); /* Màu nền giữ chỗ */
+        background-color: var(--color-placeholder);
         background-size: cover;
         background-position: center;
     }
@@ -57,16 +59,16 @@ const ComponentCSS = () => (
         height: 6px;
     }
     .invitation-type-filters::-webkit-scrollbar-track {
-        background: var(--color-background-light); /* Thay thế #f1f1f1 */
+        background: var(--color-background-light);
     }
     .invitation-type-filters::-webkit-scrollbar-thumb {
-        background: var(--color-secondary); /* Thay thế #CDD7E5 */
+        background: var(--color-secondary);
     }
     .invitation-type-filters::-webkit-scrollbar-thumb:hover {
-        background: var(--color-primary); /* Thay thế #27548A */
+        background: var(--color-primary);
     }
     .category-button-pro {
-        border: 0.5px solid var(--color-text-dark); /* Thay thế #000 */
+        border: 0.5px solid var(--color-text-dark);
         background: transparent;
         height: 40px;
         padding: 0 24px;
@@ -79,9 +81,9 @@ const ComponentCSS = () => (
         flex-shrink: 0;
     }
     .category-button-pro.active, .category-button-pro:hover {
-        background-color: var(--color-primary); /* Thay thế #27548A */
-        color: var(--color-text-white); /* Thay thế #fff */
-        border-color: var(--color-primary); /* Thay thế #27548A */
+        background-color: var(--color-primary);
+        color: var(--color-text-white);
+        border-color: var(--color-primary);
     }
 
     /* ----- LƯỚI SẢN PHẨM ----- */
@@ -117,7 +119,7 @@ const ComponentCSS = () => (
     .product-card-new .image-placeholder {
         width: 100%;
         padding-top: 100%;
-        background-color: var(--color-placeholder); /* SỬ DỤNG BIẾN MỚI */
+        background-color: var(--color-placeholder);
         position: relative;
         overflow: hidden;
     }
@@ -153,23 +155,6 @@ const ComponentCSS = () => (
         height: 17px;
     }
 
-    /* ----- NÚT XEM THÊM ----- */
-    .load-more-btn {
-        height: 40px;
-        padding: 0 40px;
-        border: 0.5px solid var(--color-border);
-        font-size: 16px;
-        font-weight: 500;
-        text-transform: uppercase;
-        cursor: pointer;
-        transition: all 0.2s ease-in-out;
-    }
-    .load-more-btn:hover {
-        background-color: var(--color-primary);
-        color: var(--color-text-white); /* Thay thế white */
-        border-color: var(--color-primary);
-    }
-
     /* ----- THÔNG BÁO ----- */
     .grid-message {
         grid-column: 1 / -1;
@@ -202,35 +187,6 @@ const ComponentCSS = () => (
             gap: 40px;
         }
     }
-
-    /* Styling cho các vị trí đặt quảng cáo */
-    .ads-container {
-        width: 100%;
-        max-width: 1520px;
-        margin: 40px auto;
-        padding: 0 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 250px;
-        text-align: center;
-    }
-
-    .placeholder-ad {
-        width: 100%;
-        max-width: 970px; /* Kích thước phổ biến của banner ngang */
-        height: 250px; /* Chiều cao phổ biến của banner ngang */
-        background-color: #f0f0f0;
-        border: 2px dashed #ccc;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 16px;
-        color: #888;
-        text-align: center;
-        line-height: 1.5;
-        font-weight: 500;
-    }
     `}</style>
 );
 
@@ -258,31 +214,33 @@ const ProductPageContent = () => {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-    const [activeCategory, setActiveCategory] = useState('Phụ kiện trang trí'); // Sử dụng state cục bộ
+
+    // 1. Thêm 'Tất cả' vào danh sách categories
+    const categories = ['Tất cả', 'Shop - Service', 'Phụ kiện trang trí', 'Quà tặng', 'Tổ chức sự kiện'];
+
+    // Đặt mặc định là 'Tất cả' thay vì 'Phụ kiện trang trí'
+    const [activeCategory, setActiveCategory] = useState('Tất cả');
+
     const { settings } = useSettings();
     const banners = settings?.banners || [];
     const shopBanner = banners.find(b => b.displayPage === 'shop' && b.isEnabled) || banners.find(b => b.displayPage === 'all' && b.isEnabled);
-    
-    const categories = ['Shop - Service', 'Phụ kiện trang trí', 'Quà tặng', 'Tổ chức sự kiện'];
     const productsSeo = settings?.seo?.pages?.products;
 
-    // Khởi tạo activeCategory từ URL nếu có, nếu không thì dùng mặc định
     useEffect(() => {
         const categoryFromUrl = searchParams.get('category');
         if (categoryFromUrl && categories.includes(categoryFromUrl)) {
             setActiveCategory(categoryFromUrl);
         } else {
-            // Nếu URL không có hoặc không hợp lệ, đặt lại URL
-            setSearchParams({ category: activeCategory }, { replace: true });
+            setSearchParams({ category: 'Tất cả' }, { replace: true });
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps 
+        // eslint-disable-next-line react-hooks/exhaustive-deps 
     }, []);
 
     const handleCategoryHover = (category) => {
         if (category !== activeCategory) {
             setActiveCategory(category);
-            setPage(1); // Reset page khi đổi danh mục
-            setProducts([]); // Xóa sản phẩm cũ để hiển thị fade-out
+            setPage(1);
+            setProducts([]);
             setHasMore(true);
             setSearchParams({ category }, { replace: true });
         }
@@ -298,15 +256,23 @@ const ProductPageContent = () => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
+                // 2. Chỉnh sửa logic Params
                 const params = {
                     page: page,
-                    limit: 8,
-                    ...(activeCategory && { category: activeCategory })
+                    limit: 4, // Thay đổi từ 8 xuống 4 theo yêu cầu
                 };
+
+                // Nếu không phải tab "Tất cả", mới truyền param category lên API
+                if (activeCategory !== 'Tất cả') {
+                    params.category = activeCategory;
+                }
+
                 const response = await api.get('/products', { params });
                 const newProducts = response.data.data || [];
-                
+
                 setProducts(prev => page === 1 ? newProducts : [...prev, ...newProducts]);
+
+                // Nếu API trả về số lượng đúng bằng limit (4), tức là khả năng cao vẫn còn SP để "Xem thêm"
                 setHasMore(newProducts.length === params.limit);
 
             } catch (error) {
@@ -318,8 +284,63 @@ const ProductPageContent = () => {
         };
 
         fetchProducts();
-    }, [page, activeCategory, setSearchParams]); 
+    }, [page, activeCategory, setSearchParams]);
 
+    const renderShopBanner = () => {
+        if (!shopBanner) {
+            return (
+                <div style={{ position: 'relative', width: '100%', display: 'flex' }}>
+                    <img
+                        src="https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/default-banner.png"
+                        alt="Hero Banner"
+                        style={{ width: '100%', height: '100%', minHeight: '400px', objectFit: 'cover', display: 'block' }}
+                    />
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.3)', zIndex: 1 }}></div>
+                    <div className="hero-content" style={{
+                        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                        color: 'white', textShadow: '2px 2px 10px rgba(0,0,0,0.8)', textAlign: 'center', padding: '20px', zIndex: 2
+                    }}>
+                        <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 'bold', margin: '0 0 16px 0', lineHeight: '1.2', maxWidth: '90%' }}>Cửa hàng</h1>
+                        <p className="hero-subtitle" style={{ fontSize: 'clamp(1.2rem, 3vw, 1.8rem)', margin: 0, fontWeight: '500', maxWidth: '90%' }}>Khám phá các sản phẩm độc đáo của chúng tôi</p>
+                    </div>
+                </div>
+            );
+        }
+
+        if (shopBanner.mediaType === 'html') {
+            return <div dangerouslySetInnerHTML={{ __html: shopBanner.htmlContent }} style={{ width: '100%', height: '100%' }} />;
+        }
+
+        const bannerContent = (
+            <div style={{ position: 'relative', width: '100%', display: 'flex' }}>
+                {shopBanner.mediaType === 'video' && shopBanner.videoUrl ? (
+                    <video src={shopBanner.videoUrl} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', minHeight: '400px', objectFit: 'cover', display: 'block' }} />
+                ) : (
+                    <img src={shopBanner.imageUrl || 'https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/default-banner.png'} alt={shopBanner.title || "Banner"} style={{ width: '100%', height: '100%', minHeight: '400px', objectFit: 'cover', display: 'block' }} />
+                )}
+                <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.3)', zIndex: 1 }}></div>
+                <div className="hero-content" style={{
+                    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    color: 'white', textShadow: '2px 2px 10px rgba(0,0,0,0.8)', textAlign: 'center', padding: '20px', zIndex: 2
+                }}>
+                    {shopBanner.title && <h1 className="hero-title" style={{ fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 'bold', margin: '0 0 16px 0', lineHeight: '1.2', maxWidth: '90%' }}>{shopBanner.title}</h1>}
+                    {shopBanner.subtitle && <p className="hero-subtitle" style={{ fontSize: 'clamp(1.2rem, 3vw, 1.8rem)', margin: 0, fontWeight: '500', maxWidth: '90%' }}>{shopBanner.subtitle}</p>}
+                </div>
+            </div>
+        );
+
+        if (shopBanner.link) {
+            const isExternal = shopBanner.link.startsWith('http');
+            if (isExternal) {
+                return <a href={shopBanner.link} target="_blank" rel="noopener noreferrer" className="hero-link-wrapper" style={{ display: 'block', width: '100%' }}>{bannerContent}</a>;
+            }
+            return <Link to={shopBanner.link} className="hero-link-wrapper" style={{ display: 'block', width: '100%' }}>{bannerContent}</Link>;
+        }
+
+        return bannerContent;
+    };
     return (
         <div className="products-page-container">
             <SEO
@@ -329,45 +350,12 @@ const ProductPageContent = () => {
                 url="/shop"
             />
             <ComponentCSS />
-            <section className="hero-section">
-                {shopBanner ? (
-                    shopBanner.htmlContent ? (
-                        <div dangerouslySetInnerHTML={{ __html: shopBanner.htmlContent }} />
-                    ) : (
-                        <>
-                            {shopBanner.mediaType === 'video' && shopBanner.videoUrl ? (
-                                <video 
-                                    src={shopBanner.videoUrl} 
-                                    autoPlay 
-                                    loop 
-                                    muted 
-                                    playsInline 
-                                    className="hero-video-background"
-                                />
-                            ) : (
-                                <div 
-                                    className="hero-image-background"
-                                    style={{ backgroundImage: `url(${shopBanner.imageUrl || 'https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/default-banner.png'})` }}
-                                />
-                            )}
-                            <div className="hero-content">
-                                {shopBanner.title && <h1 className="hero-title">{shopBanner.title}</h1>}
-                                {shopBanner.subtitle && <p className="hero-subtitle">{shopBanner.subtitle}</p>}
-                            </div>
-                        </>
-                    )
-                ) : (
-                    <>
-                        <div 
-                            className="hero-image-background"
-                            style={{ backgroundImage: `url('https://pub-f720e3221ef5464a93d19bbdae2cfb86.r2.dev/default-banner.png')` }}
-                        />
-                        <div className="hero-content">
-                            <h1 className="hero-title">Cửa hàng</h1>
-                            <p className="hero-subtitle">Khám phá các sản phẩm độc đáo của chúng tôi</p>
-                        </div>
-                    </>
-                )}
+            <section className="page-hero-wrapper" style={{ width: '100%', overflow: 'hidden' }}>
+                <UniversalBanner
+                    banner={shopBanner}
+                    defaultTitle="Cửa hàng"
+                    defaultSubtitle="Khám phá các sản phẩm độc đáo của chúng tôi"
+                />
             </section>
             <div className="container">
                 <div className="invitation-type-filters">
@@ -381,19 +369,6 @@ const ProductPageContent = () => {
                         </button>
                     ))}
                 </div>
-
-                {/* <div className="ads-container">
-                    <div className="placeholder-ad">Vị trí đặt quảng cáo (970x250)</div> */}
-                    {/*
-                    Hãy thay thế đoạn mã trên bằng mã AdSense thực tế của bạn khi đã có tài khoản:
-                    <ins className="adsbygoogle"
-                         style={{ display: 'block' }}
-                         data-ad-client="ca-pub-1234567890123456"
-                         data-ad-slot="1234567890"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                    */}
-                {/* </div> */}
 
                 <div className="products-grid-wrapper">
                     <div className={`products-grid ${loading ? 'fade-out' : 'fade-in'}`}>
@@ -413,8 +388,13 @@ const ProductPageContent = () => {
                         )}
                     </div>
 
+                    {/* 3. Thay class load-more-btn thành category-button-pro để UI đồng bộ */}
                     {hasMore && !loading && (
-                        <button onClick={handleLoadMore} className="load-more-btn" disabled={loading}>
+                        <button
+                            onClick={handleLoadMore}
+                            className="category-button-pro"
+                            disabled={loading}
+                        >
                             {loading && page > 1 ? 'Đang tải...' : 'Xem thêm'}
                         </button>
                     )}
